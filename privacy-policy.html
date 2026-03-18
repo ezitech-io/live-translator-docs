@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Live Translator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      color: #1a1a2e;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
+
+    .wrapper {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    header {
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 24px;
+      margin-bottom: 40px;
+    }
+
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .logo-row .dot {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 8px;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 0;
+      color: #1a1a2e;
+    }
+
+    .meta {
+      color: #666;
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+
+    h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin: 40px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #e8e8e8;
+    }
+
+    p { margin: 0 0 14px; }
+
+    ul {
+      margin: 0 0 14px;
+      padding-left: 24px;
+    }
+
+    li { margin-bottom: 6px; }
+
+    .highlight-box {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-left: 4px solid #667eea;
+      border-radius: 6px;
+      padding: 16px 20px;
+      margin: 16px 0;
+    }
+
+    .highlight-box p { margin: 0; }
+
+    a { color: #667eea; }
+    a:hover { color: #764ba2; }
+
+    .section-no-data {
+      border-left-color: #4caf50;
+    }
+
+    footer {
+      margin-top: 60px;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
+      font-size: 0.85rem;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <header>
+      <div class="logo-row">
+        <div class="dot"></div>
+        <h1>Live Translator — Privacy Policy</h1>
+      </div>
+      <p class="meta">
+        Developer: Doan Pham &nbsp;·&nbsp;
+        Contact: <a href="mailto:phampdoan@gmail.com">phampdoan@gmail.com</a> &nbsp;·&nbsp;
+        Last updated: March 2026
+      </p>
+    </header>
+
+    <div class="highlight-box">
+      <p><strong>Summary:</strong> Live Translator does not collect, store, or share any personal data on its own servers. Audio is processed exclusively by the Soniox API using your own API key. All settings are stored locally on your device.</p>
+    </div>
+
+    <h2>1. What Is Live Translator?</h2>
+    <p>
+      Live Translator is a Chrome browser extension that provides real-time speech transcription and translation during online meetings and video calls on platforms such as Google Meet, Zoom, Microsoft Teams, and YouTube. It captures audio from your browser tab or microphone and sends it to the <a href="https://soniox.com" target="_blank" rel="noopener">Soniox</a> speech-to-text API for processing, then displays the transcription and translation in a floating overlay panel.
+    </p>
+
+    <h2>2. Data We Collect</h2>
+    <p>Live Translator collects and processes only the minimum data necessary to function:</p>
+
+    <ul>
+      <li>
+        <strong>Audio data</strong> — When you start a translation session, the extension captures audio from the current browser tab (via the browser's screen-sharing API) or, as a fallback, from your microphone. This audio stream is transmitted in real time to the Soniox API over an encrypted WebSocket connection (<code>wss://stt-rt.soniox.com</code>). Audio data is <em>not</em> stored by this extension; it is processed transiently by Soniox for transcription purposes only.
+      </li>
+      <li>
+        <strong>Soniox API key</strong> — You provide your own Soniox API key in the extension settings. This key is stored locally on your device using the browser's built-in <code>chrome.storage.local</code> API and is never transmitted to any server other than Soniox's own API endpoints.
+      </li>
+      <li>
+        <strong>Target language preference</strong> — Your chosen translation target language is stored locally in <code>chrome.storage.local</code> on your device. It is not shared or transmitted anywhere.
+      </li>
+    </ul>
+
+    <div class="highlight-box section-no-data">
+      <p><strong>We do not collect:</strong> browsing history, page content, cookies, personally identifiable information, usage analytics, crash reports, or any data beyond what is described above.</p>
+    </div>
+
+    <h2>3. Transcription and Translation Data</h2>
+    <p>
+      Transcription and translation results (the text displayed in the panel) exist only in memory during an active session. When you close or minimize the panel, this data is discarded.
+    </p>
+    <p>
+      A future version of the extension will include an opt-in feature allowing you to export your transcription history as a local file. If implemented, this data will remain entirely on your device and will not be transmitted to any external server without your explicit action.
+    </p>
+
+    <h2>4. Third-Party Services</h2>
+    <p>
+      Live Translator uses the <strong>Soniox API</strong> for real-time speech recognition and translation. Audio data sent to Soniox is governed by <a href="https://soniox.com/privacy" target="_blank" rel="noopener">Soniox's own Privacy Policy</a> and Terms of Service. You are responsible for reviewing and accepting Soniox's policies when you obtain an API key.
+    </p>
+    <p>
+      Live Translator has no affiliation with Google, Zoom, Microsoft, YouTube, or any other platform it operates alongside.
+    </p>
+
+    <h2>5. Permissions Explanation</h2>
+    <p>The extension requests the following browser permissions:</p>
+    <ul>
+      <li><strong>storage</strong> — To save your API key and language preference locally on your device.</li>
+      <li><strong>activeTab</strong> — To inject the translation panel into the currently active browser tab when you click the extension icon.</li>
+      <li><strong>scripting</strong> — To programmatically inject the panel UI into tabs on demand (when used on pages outside the auto-injected list).</li>
+      <li><strong>Microphone / display-capture</strong> — Prompted at runtime. Required to capture audio for transcription. The extension only accesses audio when you explicitly start a translation session. Video tracks are immediately discarded if display-capture is used.</li>
+    </ul>
+    <p>
+      The extension does <strong>not</strong> request broad host permissions (<code>*://*/*</code>). It auto-injects only on Google Meet, Zoom, Microsoft Teams, and YouTube. On other sites, injection happens only when you explicitly click the extension icon.
+    </p>
+
+    <h2>6. Data Security</h2>
+    <p>
+      All communication between the extension and the Soniox API uses encrypted connections (WSS/HTTPS). Your API key is stored locally and is never logged or transmitted by the extension itself. No data is stored on external servers operated by the developer.
+    </p>
+
+    <h2>7. Data Retention</h2>
+    <p>
+      No data is retained by this extension beyond your active browser session. Local settings (API key, language preference) persist across sessions but are stored only on your device. You can remove all stored data at any time by uninstalling the extension or clearing extension data in Chrome settings (<em>chrome://extensions → Details → Clear data</em>).
+    </p>
+
+    <h2>8. Children's Privacy</h2>
+    <p>
+      Live Translator is not directed at children under the age of 13 and does not knowingly collect any information from children.
+    </p>
+
+    <h2>9. Changes to This Policy</h2>
+    <p>
+      If this privacy policy changes materially, the updated policy will be published at this URL and the "Last updated" date will be revised. We encourage you to review this page periodically.
+    </p>
+
+    <h2>10. Contact</h2>
+    <p>
+      If you have any questions or concerns about this privacy policy or how your data is handled, please contact:
+    </p>
+    <p>
+      <strong>Doan Pham</strong><br />
+      <a href="mailto:phampdoan@gmail.com">phampdoan@gmail.com</a>
+    </p>
+
+    <footer>
+      <p>© 2026 Doan Pham. Live Translator is an independent browser extension and is not affiliated with Google, Zoom, Microsoft, or Soniox.</p>
+    </footer>
+  </div>
+</body>
+</html>
