@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>उपयोगकर्ता गाइड - लाइव अनुवादक</title>
+<meta content="लाइव ट्रांसलेटर ब्राउज़र एक्सटेंशन के लिए संपूर्ण उपयोगकर्ता मार्गदर्शिका। जानें कि कैसे इंस्टॉल करें, एपीआई कुंजियों को कॉन्फ़िगर करें, वास्तविक समय में मीटिंग का अनुवाद करें, कथन, उपशीर्षक और सभी सुविधाओं का उपयोग करें।" name="description"/>
+<link href="./icons/icon-128x128.png" rel="icon" sizes="128x128" type="image/png"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sidebar-w: 280px;
+      --header-h: 56px;
+      --c-bg: #ffffff;
+      --c-sidebar-bg: #f8f9fb;
+      --c-sidebar-border: #e5e7eb;
+      --c-text: #1a1a2e;
+      --c-text-secondary: #64748b;
+      --c-accent: #667eea;
+      --c-accent-light: #eef2ff;
+      --c-accent-hover: #5a6fd6;
+      --c-border: #e5e7eb;
+      --c-code-bg: #f1f5f9;
+      --c-tip-bg: #eff6ff;
+      --c-tip-border: #3b82f6;
+      --c-warn-bg: #fefce8;
+      --c-warn-border: #eab308;
+      --c-note-bg: #f0fdf4;
+      --c-note-border: #22c55e;
+      --c-step-bg: #f8fafc;
+      --c-img-bg: #f1f5f9;
+      --radius: 8px;
+    }
+
+    html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 20px); }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--c-text);
+      background: var(--c-bg);
+    }
+
+    /* ── Header ── */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--header-h);
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--c-border);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 12px;
+    }
+
+    .site-header .logo {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .site-header h1 {
+      font-size: 1rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .site-header .home-link {
+      font-size: 0.8rem;
+      color: var(--c-accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .site-header .home-link:hover { text-decoration: underline; }
+
+    .site-header .header-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .site-header .language-select {
+      border: 1px solid var(--c-border);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--c-text);
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 6px 10px;
+      line-height: 1.2;
+      max-width: 185px;
+    }
+
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      color: var(--c-text);
+    }
+
+    .hamburger svg { display: block; }
+
+    /* ── Layout ── */
+    .layout {
+      display: flex;
+      margin-top: var(--header-h);
+      min-height: calc(100vh - var(--header-h));
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      position: fixed;
+      top: var(--header-h);
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-w);
+      background: var(--c-sidebar-bg);
+      border-right: 1px solid var(--c-sidebar-border);
+      overflow-y: auto;
+      padding: 20px 0;
+      z-index: 90;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.3);
+      z-index: 89;
+    }
+
+    .sidebar nav { padding: 0 12px; }
+
+    .sidebar .nav-group { margin-bottom: 8px; }
+
+    .sidebar .nav-group-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--c-text-secondary);
+      padding: 10px 12px 4px;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      color: var(--c-text-secondary);
+      text-decoration: none;
+      border-radius: 6px;
+      line-height: 1.5;
+      transition: all 0.15s ease;
+    }
+
+    .sidebar a:hover {
+      background: var(--c-accent-light);
+      color: var(--c-accent);
+    }
+
+    .sidebar a.active {
+      background: var(--c-accent-light);
+      color: var(--c-accent);
+      font-weight: 600;
+    }
+
+    /* ── Content ── */
+    .content {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      max-width: 820px;
+      padding: 40px 48px 100px;
+    }
+
+    /* ── Typography ── */
+    .content h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin: 56px 0 8px;
+      padding-top: 20px;
+      color: var(--c-text);
+    }
+
+    .content h2:first-child { margin-top: 0; }
+
+    .content h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 36px 0 8px;
+      color: var(--c-text);
+    }
+
+    .content h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 24px 0 6px;
+      color: var(--c-text);
+    }
+
+    .content p { margin: 0 0 14px; }
+
+    .content ul, .content ol {
+      margin: 0 0 16px;
+      padding-left: 24px;
+    }
+
+    .content li { margin-bottom: 6px; }
+
+    .content a { color: var(--c-accent); }
+    .content a:hover { color: var(--c-accent-hover); }
+
+    .content code {
+      background: var(--c-code-bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.88em;
+      font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+    }
+
+    .content strong { font-weight: 600; }
+
+    .section-intro {
+      font-size: 0.95rem;
+      color: var(--c-text-secondary);
+      margin-bottom: 24px;
+    }
+
+    /* ── Steps ── */
+    .step {
+      background: var(--c-step-bg);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin: 16px 0;
+      position: relative;
+    }
+
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      background: var(--c-accent);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+
+    .step-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: inline;
+    }
+
+    .step-body { margin-top: 10px; }
+
+    /* ── Image placeholder ── */
+    .img-placeholder {
+      background: var(--c-img-bg);
+      border-radius: var(--radius);
+      text-align: center;
+      color: var(--c-text-secondary);
+      font-size: 0.82rem;
+      margin: 14px 0;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .img-placeholder svg {
+      width: 32px;
+      height: 32px;
+      opacity: 0.4;
+    }
+
+    .img-placeholder img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+    }
+
+    /* ── Callout boxes ── */
+    .callout {
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .callout p { margin: 0; }
+    .callout p + p { margin-top: 8px; }
+
+    .callout-tip {
+      background: var(--c-tip-bg);
+      border-left: 4px solid var(--c-tip-border);
+    }
+
+    .callout-warn {
+      background: var(--c-warn-bg);
+      border-left: 4px solid var(--c-warn-border);
+    }
+
+    .callout-note {
+      background: var(--c-note-bg);
+      border-left: 4px solid var(--c-note-border);
+    }
+
+    .callout-label {
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+
+    .callout-tip .callout-label { color: #2563eb; }
+    .callout-warn .callout-label { color: #ca8a04; }
+    .callout-note .callout-label { color: #16a34a; }
+
+    /* ── Table ── */
+    .content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 0.88rem;
+    }
+
+    .content th, .content td {
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--c-border);
+    }
+
+    .content th {
+      background: var(--c-sidebar-bg);
+      font-weight: 600;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--c-text-secondary);
+    }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 8px;
+      border-radius: 10px;
+      vertical-align: middle;
+    }
+
+    .badge-free { background: #dcfce7; color: #166534; }
+    .badge-pro { background: #fef3c7; color: #92400e; }
+
+    /* ── Separator ── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--c-border);
+      margin: 48px 0;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 960px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-overlay.open { display: block; }
+      .content { margin-left: 0; padding: 28px 20px 80px; }
+      .hamburger { display: block; }
+    }
+
+    @media (max-width: 600px) {
+      .content h2 { font-size: 1.25rem; }
+      .content h3 { font-size: 1.05rem; }
+      .step { padding: 16px 18px; }
+    }
+  </style>
+<!-- Google tag (gtag.js) -->
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-T7YFE7XLLF"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-T7YFE7XLLF');
+  </script>
+</head>
+<body>
+<!-- ═══ Header ═══ -->
+<header class="site-header">
+<img alt="लाइव अनुवादक" height="32" src="./icons/icon-128x128.png" width="32"/>
+<h1>लाइव अनुवादक — उपयोगकर्ता गाइड</h1>
+<div class="header-actions">
+<select aria-label="Select language guide version" class="language-select" id="languageSelect">
+<option value="instruction.html">🇺🇸 - English</option>
+<option value="instruction-zh.html">🇨🇳 - Chinese</option>
+<option value="instruction-hi.html">🇮🇳 - Hindi</option>
+<option value="instruction-es.html">🇪🇸 - Spanish</option>
+<option value="instruction-fr.html">🇫🇷 - French</option>
+<option value="instruction-ar.html">🇸🇦 - Arabic</option>
+<option value="instruction-pt.html">🇵🇹 - Portuguese</option>
+<option value="instruction-ru.html">🇷🇺 - Russian</option>
+</select>
+<a class="home-link" href="https://translate.ezitech.io">होमपेज पर वापस जाएं</a>
+</div>
+</header>
+<!-- ═══ Sidebar overlay (mobile) ═══ -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<!-- ═══ Layout ═══ -->
+<div class="layout">
+<!-- ═══ Sidebar ═══ -->
+<aside class="sidebar" id="sidebar">
+<nav>
+<div class="nav-group">
+<div class="nav-group-title">आरंभ करना</div>
+<a href="#installation">स्थापना</a>
+<a href="#supported-platforms">समर्थित प्लेटफार्म</a>
+<a href="#overview">एक्सटेंशन अवलोकन</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">एपीआई कुंजी सेटअप</div>
+<a href="#soniox-key">सोनियोक्स एपीआई कुंजी प्राप्त करें</a>
+<a href="#openai-key">ओपनएआई एपीआई कुंजी प्राप्त करें (वैकल्पिक)</a>
+<a href="#enter-keys">अपनी एपीआई कुंजी दर्ज करें</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">लाइसेंस एवं प्रो</div>
+<a href="#buy-license">लाइसेंस कुंजी खरीदें</a>
+<a href="#activate-license">अपना लाइसेंस सक्रिय करें</a>
+<a href="#free-vs-pro">मुफ़्त बनाम प्रो सुविधाएँ</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">बुनियादी उपयोग</div>
+<a href="#start-translation">एक अनुवाद सत्र प्रारंभ करें</a>
+<a href="#controls">नियंत्रण: रोकें, फिर से शुरू करें, समाप्त करें</a>
+<a href="#language-selection">भाषाएं बदलें</a>
+<a href="#microphone">अपना माइक्रोफोन चालू करें</a>
+<a href="#font-size">फ़ॉन्ट आकार बदलें</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">विशेषताएं</div>
+<a href="#speaker-names">वक्ता के नाम</a>
+<a href="#narration">कथन (पाठ से वाक्)</a>
+<a href="#narrate-my-voice">मेरी आवाज सुनाओ (दुभाषिया)</a>
+<a href="#send-chat">चैट के माध्यम से अनुवाद भेजें</a>
+<a href="#subtitle-mode">उपशीर्षक मोड</a>
+<a href="#inline-assistant">इनलाइन एआई असिस्टेंट</a>
+<a href="#context-setting">संदर्भ सेटिंग्स</a>
+<a href="#download-transcript">प्रतिलेख डाउनलोड करें</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">और अधिक</div>
+<a href="#auto-update">ऑटो अपडेट जांच</a>
+<a href="#troubleshooting">समस्या निवारण</a>
+<a href="#contact">संपर्क एवं सहायता</a>
+</div>
+</nav>
+</aside>
+<!-- ═══ Content ═══ -->
+<main class="content">
+<!-- ────────────────────────────────────────── -->
+<!-- GETTING STARTED                            -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="installation">स्थापना</h2>
+<p class="section-intro">किसी भी क्रोमियम-आधारित ब्राउज़र (क्रोम, एज, ब्रेव, आर्क, ओपेरा, आदि) पर लाइव ट्रांसलेटर एक्सटेंशन इंस्टॉल करें।</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">लाइव ट्रांसलेटर वेबसाइट खोलें</span>
+<div class="step-body">
+<p>पर जाएँ <a href="https://translate.ezitech.io" target="_blank">https://translate.ezitech.io</a> आपके ब्राउज़र में।</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">"इंस्टॉल करें" बटन पर क्लिक करें</span>
+<div class="step-body">
+<p>क्लिक करें <strong>क्रोम में जोड़ें</strong> बटन। इससे एक्सटेंशन फ़ाइल डाउनलोड हो जाएगी.</p>
+<div class="img-placeholder">
+<img alt="क्रोम में जोड़ें" src="./images/add-to-chrome.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">अपने ब्राउज़र में डेवलपर मोड सक्षम करें</span>
+<div class="step-body">
+<p>अपने ब्राउज़र का एक्सटेंशन प्रबंधन पृष्ठ खोलें:</p>
+<ul>
+<li><strong>क्रोम/ब्रेव/आर्क:</strong> प्रकार <code>chrome://extensions</code> एड्रेस बार में और एंटर दबाएं।</li>
+<li><strong>किनारा:</strong> प्रकार <code>edge://extensions</code> एड्रेस बार में और एंटर दबाएं।</li>
+</ul>
+<p>टॉगल करें <strong>डेवलपर मोड</strong> पेज के ऊपरी दाएं कोने में चालू है।</p>
+<div class="img-placeholder">
+<img alt="डेवलपर मोड सक्षम करें" src="./images/enable-dev-mode.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">4</span>
+<span class="step-title">एक्सटेंशन फ़ाइल इंस्टॉल करें</span>
+<div class="step-body">
+<p>डाउनलोड किए गए को खींचें और छोड़ें <code>.zip</code> एक्सटेंशन पेज पर फ़ाइल करें।</p>
+<div class="img-placeholder">
+<img alt="एक्सटेंशन इंस्टॉल करें" src="./images/drag-drop.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-note">
+<div class="callout-label">हो गया!</div>
+<p>अब आपको अपने ब्राउज़र टूलबार में लाइव ट्रांसलेटर आइकन देखना चाहिए। एक्सटेंशन स्थापित है और कॉन्फ़िगर होने के लिए तैयार है।</p>
+</div>
+<hr class="section-divider"/>
+<!-- Supported Platforms -->
+<h2 id="supported-platforms">समर्थित प्लेटफार्म</h2>
+<p class="section-intro">लाइव ट्रांसलेटर इन वेबसाइटों और प्लेटफार्मों पर काम करता है। बस इनमें से कोई भी साइट खोलें और अनुवाद शुरू करने के लिए एक्सटेंशन आइकन पर क्लिक करें।</p>
+<table>
+<thead>
+<tr><th>प्लेटफार्म</th><th>आप क्या कर सकते हैं</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>गूगल मीट</strong></td><td>बैठकों का अनुवाद करें, अपनी आवाज बताएं, चैट भेजें</td></tr>
+<tr><td><strong>ज़ूम (वेब)</strong></td><td>बैठकों का अनुवाद करें, अपनी आवाज बताएं, चैट भेजें</td></tr>
+<tr><td><strong>माइक्रोसॉफ्ट टीमें (वेब)</strong></td><td>बैठकों का अनुवाद करें, अपनी आवाज बताएं, चैट भेजें</td></tr>
+<tr><td><strong>यूट्यूब</strong></td><td>वीडियो का अनुवाद करें, वीडियो शीर्षक से संदर्भ स्वतः भरें</td></tr>
+<tr><td><strong>व्हाट्सएप वेब</strong></td><td>कॉल का अनुवाद करें, अपनी आवाज़ बताएं</td></tr>
+<tr><td><strong>फेसबुक</strong></td><td>वीडियो और लाइव स्ट्रीम का अनुवाद करें</td></tr>
+<tr><td><strong>टिकटॉक</strong></td><td>वीडियो का अनुवाद करें</td></tr>
+<tr><td><strong>डौयिन</strong></td><td>वीडियो का अनुवाद करें</td></tr>
+<tr><td><strong>वीमियो</strong></td><td>वीडियो का अनुवाद करें</td></tr>
+<tr><td><strong>डेलीमोशन</strong></td><td>वीडियो का अनुवाद करें</td></tr>
+<tr><td><strong>उडेमी</strong></td><td>पाठ्यक्रम वीडियो का अनुवाद करें</td></tr>
+<tr><td><strong>डोमेस्टिका</strong></td><td>पाठ्यक्रम वीडियो का अनुवाद करें</td></tr>
+</tbody>
+</table>
+<div class="callout callout-tip">
+<div class="callout-label">टिप</div>
+<p>एक्सटेंशन कैप्चर करता है <strong>टैब ऑडियो</strong> सीधे, इसलिए यह समर्थित साइटों पर ब्राउज़र टैब में चल रहे किसी भी ऑडियो के साथ काम करता है - दूसरे पक्ष के ऑडियो के लिए अलग माइक्रोफोन सेटअप की आवश्यकता नहीं है।</p>
+</div>
+<hr class="section-divider"/>
+<!-- Extension Overview -->
+<h2 id="overview">एक्सटेंशन अवलोकन</h2>
+<p class="section-intro">मुख्य इंटरफ़ेस का एक त्वरित अवलोकन और जहां सब कुछ स्थित है।</p>
+<div class="img-placeholder" style="min-height: 200px;">
+<img alt="एक्सटेंशन अवलोकन" src="./images/extension-overview.png"/>
+</div>
+<p>लाइव ट्रांसलेटर पैनल में ये मुख्य क्षेत्र हैं:</p>
+<ul>
+<li><strong>शीर्षक पट्टी</strong> - सेटिंग्स बटन, उपशीर्षक मोड टॉगल, बंद करें बटन। यदि कोई अपडेट उपलब्ध है, तो आपको यहां एक बैज दिखाई देगा।</li>
+<li><strong>भाषा चयनकर्ता</strong> — दो ड्रॉपडाउन: "मेरी भाषा" (वह भाषा जो आप बोलते हैं) और "उनकी भाषा" (वह भाषा जिससे आप अनुवाद करना चाहते हैं)।</li>
+<li><strong>प्रतिलेख क्षेत्र</strong> - जहां अनुवादित पाठ स्पीकर द्वारा व्यवस्थित होकर वास्तविक समय में दिखाई देता है।</li>
+<li><strong>कंट्रोल बार</strong> - प्रारंभ/रोकें/रोकें बटन, माइक्रोफ़ोन टॉगल, वर्णन सेटिंग, एआई सहायक, फ़ॉन्ट आकार, डाउनलोड, और अधिक विकल्प।</li>
+</ul>
+<div class="callout callout-tip">
+<div class="callout-label">टिप</div>
+<p>आप कर सकते हैं <strong>पैनल को खींचें</strong> इसे स्क्रीन पर कहीं भी ले जाने के लिए इसके टाइटल बार का उपयोग करें, और <strong>इसका आकार बदलें</strong> किनारों को खींचकर। इस तरह यह मीटिंग या वीडियो के दौरान महत्वपूर्ण सामग्री को ब्लॉक नहीं करेगा।</p>
+</div>
+<hr class="section-divider"/>
+<!-- ────────────────────────────────────────── -->
+<!-- API KEYS SETUP                             -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="soniox-key">सोनियोक्स एपीआई कुंजी प्राप्त करें</h2>
+<p class="section-intro">Soniox वास्तविक समय वाक् पहचान और अनुवाद इंजन प्रदान करता है। लाइव ट्रांसलेटर का उपयोग करने के लिए आपको एक सोनियोक्स एपीआई कुंजी की आवश्यकता है। <span class="badge badge-free">आवश्यक है</span></p>
+<div class="callout callout-warn">
+<div class="callout-label">महत्वपूर्ण</div>
+<p>एक सोनियोक्स एपीआई कुंजी है <strong>आवश्यक है</strong> कार्य विस्तार के लिए। इसके बिना, एक्सटेंशन किसी भी ऑडियो को ट्रांसक्राइब या अनुवाद नहीं कर सकता है।</p>
+</div>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">सोनियोक्स वेबसाइट पर जाएं</span>
+<div class="step-body">
+<p>खुला <a href="https://console.soniox.com/signup" target="_blank">https://console.soniox.com/signup</a> आपके ब्राउज़र में। अपने ईमेल या Google साइन-इन का उपयोग करके एक खाता बनाएं।</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">अपनी एपीआई कुंजी प्राप्त करें</span>
+<div class="step-body">
+<p>साइन इन करने के बाद, अपने सोनियोक्स डैशबोर्ड के एपीआई अनुभाग पर जाएँ। आप सीधे भी जा सकते हैं <a href="https://soniox.com/docs/stt/get-started#get-api-key" target="_blank">Soniox प्रारंभ करें मार्गदर्शिका</a> चरण-दर-चरण निर्देशों के लिए।</p>
+<p>अपनी एपीआई कुंजी कॉपी करें - आपको अगले चरणों में इसकी आवश्यकता होगी।</p>
+<div class="img-placeholder">
+<img alt="एपीआई कुंजी प्राप्त करें" src="./images/create-soniox-api.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">बिलिंग जोड़ें (एपीआई उपयोग के लिए आवश्यक)</span>
+<div class="step-body">
+<p>अपने सोनीओक्स खाते में एक भुगतान विधि जोड़ें। आप क्रेडिट कार्ड, पेपाल या अन्य भुगतान विधियों का उपयोग कर सकते हैं। सोनियोक्स एपीआई भुगतान-जैसा-आप-जाना है - आप केवल उसी के लिए भुगतान करते हैं जो आप उपयोग करते हैं।</p>
+<div class="img-placeholder">
+<img alt="भुगतान विधि जोड़ें" src="./images/payment-soniox.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">नोट</div>
+<p>एपीआई का उपयोग करने के लिए आपको अपने खाते में न्यूनतम $1 जमा करना होगा। आप चाहें तो और भी जमा कर सकते हैं.</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="openai-key">ओपनएआई एपीआई कुंजी प्राप्त करें (वैकल्पिक)</h2>
+<p class="section-intro">एक OpenAI API कुंजी है <strong>वैकल्पिक</strong> - आपको इसकी आवश्यकता केवल तभी होगी जब आप कथन के लिए ओपनएआई आवाज या इनलाइन एआई सहायक सुविधा का उपयोग करना चाहते हैं। <span class="badge badge-pro">प्रो</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">ओपनएआई प्लेटफॉर्म पर जाएं</span>
+<div class="step-body">
+<p>खुला <a href="https://platform.openai.com/api-keys" target="_blank">https://platform.openai.com/api-keys</a> आपके ब्राउज़र में।</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">एक खाता बनाएं या साइन इन करें</span>
+<div class="step-body">
+<p>यदि आपके पास OpenAI खाता नहीं है, तो क्लिक करें <strong>"साइन अप करें"</strong> और एक बनाएं। यदि आपके पास पहले से ही एक है, तो साइन इन करें।</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">एक नई एपीआई कुंजी बनाएं</span>
+<div class="step-body">
+<p>क्लिक करें <strong>"+ नई गुप्त कुंजी बनाएं"</strong>, इसे "लाइव ट्रांसलेटर" जैसा नाम दें और क्लिक करें <strong>"गुप्त कुंजी बनाएं"</strong>.</p>
+<p><strong>कुंजी को तुरंत कॉपी करें और सहेजें</strong> - ओपनएआई इसे केवल एक बार दिखाएगा।</p>
+<div class="img-placeholder">
+<img alt="ओपनएआई एपीआई कुंजी बनाएं" src="./images/openai-key.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">4</span>
+<span class="step-title">बिलिंग जोड़ें (एपीआई उपयोग के लिए आवश्यक)</span>
+<div class="step-body">
+<p>पर जाएँ <a href="https://platform.openai.com/account/billing" target="_blank">बिलिंग सेटिंग</a> और एक भुगतान विधि जोड़ें। ओपनएआई एपीआई भुगतान-जैसा-आप-जाना है - आप केवल उसी के लिए भुगतान करते हैं जो आप उपयोग करते हैं।</p>
+<div class="img-placeholder">
+<img alt="ओपनएआई एपीआई कुंजी बनाएं" src="./images/openai-billing.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-note">
+<div class="callout-label">नोट</div>
+<p>यदि आप केवल वर्णन (पाठ से वाक्) चाहते हैं, तो आप इसका उपयोग कर सकते हैं <strong>Google अनुवाद आवाजें निःशुल्क</strong> इसके बजाय। OpenAI कुंजी केवल तभी आवश्यक है जब आप OpenAI की प्रीमियम आवाज़ें या AI सहायक सुविधा चाहते हैं।</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="enter-keys">अपनी एपीआई कुंजी दर्ज करें</h2>
+<p class="section-intro">एक बार जब आपके पास अपनी एपीआई कुंजियाँ हों, तो उन्हें लाइव ट्रांसलेटर सेटिंग पृष्ठ में दर्ज करें।</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">लाइव ट्रांसलेटर सेटिंग खोलें</span>
+<div class="step-body">
+<p>आप इनमें से किसी भी तरीके से सेटिंग खोल सकते हैं:</p>
+<ul>
+<li>क्लिक करें <strong>गियर आइकन</strong> (⚙) अनुवादक पैनल के शीर्ष दाईं ओर।</li>
+<li>अपने टूलबार में लाइव ट्रांसलेटर आइकन पर राइट-क्लिक करें → <strong>"विकल्प"</strong>.</li>
+<li>अपने ब्राउज़र के एक्सटेंशन पेज पर जाएं → लाइव ट्रांसलेटर ढूंढें → <strong>"विवरण"</strong> → <strong>"विस्तार विकल्प"</strong>.</li>
+</ul>
+<div class="img-placeholder">
+<img alt="सेटिंग्स पृष्ठ" src="./images/gear.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">अपनी सोनियोक्स एपीआई कुंजी दर्ज करें</span>
+<div class="step-body">
+<p>सेटिंग्स पेज में, पर क्लिक करें <strong>"सोनियोक्स"</strong> बाएं साइडबार में। अपनी सोनियोक्स एपीआई कुंजी को इनपुट फ़ील्ड में चिपकाएँ। कुंजी स्वचालित रूप से सहेजी जाती है.</p>
+<div class="img-placeholder">
+<img alt="Soniox सेटिंग्स" src="./images/enter-soniox-key.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">अपनी OpenAI API कुंजी दर्ज करें (वैकल्पिक)</span>
+<div class="step-body">
+<p>पर क्लिक करें <strong>"ओपनएआई"</strong> बाएँ साइडबार में। अपनी OpenAI API कुंजी को इनपुट फ़ील्ड में चिपकाएँ। कुंजी स्वचालित रूप से सहेजी जाती है.</p>
+<div class="img-placeholder">
+<img alt="ओपनएआई सेटिंग्स" src="./images/enter-openai-key.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-note">
+<div class="callout-label">सुरक्षा नोट</div>
+<p>आपकी एपीआई कुंजियाँ संग्रहीत हैं <strong>स्थानीय रूप से केवल आपके डिवाइस पर</strong> क्रोम के सुरक्षित एक्सटेंशन स्टोरेज का उपयोग करना। उन्हें लाइव ट्रांसलेटर के सर्वर पर कभी नहीं भेजा जाता है - उनका उपयोग केवल सोनियोक्स और ओपनएआई के साथ सीधे संचार करने के लिए किया जाता है।</p>
+</div>
+<hr class="section-divider"/>
+<!-- ────────────────────────────────────────── -->
+<!-- LICENSE & PRO                              -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="buy-license">लाइसेंस कुंजी खरीदें</h2>
+<p class="section-intro">एक लाइसेंस कुंजी प्रो सुविधाओं जैसे कथन, एसआरटी डाउनलोड, एआई सहायक और बहुत कुछ को अनलॉक करती है।</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">खरीदारी पृष्ठ पर जाएं</span>
+<div class="step-body">
+<p>लाइव ट्रांसलेटर होमपेज पर जाएं <a href="https://translate.ezitech.io/#pricing" target="_blank">https://translate.ezitech.io/#pricing</a> और स्क्रॉल करें <strong>मूल्य निर्धारण</strong> अनुभाग, या क्लिक करें <strong>"लाइसेंस खरीदें"</strong> एक्सटेंशन के सेटिंग पेज में लिंक।</p>
+<div class="img-placeholder">
+<img alt="खरीदारी पृष्ठ" src="./images/pricing.jpeg"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">अपनी योजना चुनें</span>
+<div class="step-body">
+<p>किसी एक को चुनें:</p>
+<ul>
+<li><strong>मासिक</strong> - $5.99/माह</li>
+<li><strong>वार्षिक</strong> - $59/वर्ष (~18% बचाएं)</li>
+</ul>
+<p>आप एक प्राप्त कर सकते हैं <strong>7 दिन का निःशुल्क परीक्षण</strong> प्रो सुविधाओं को आज़माने के लिए। परीक्षण के बाद, आप प्रो सुविधाओं का उपयोग जारी रखने के लिए लाइसेंस खरीद सकते हैं।</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">भुगतान पूरा करें</span>
+<div class="step-body">
+<p>आपको पोलर भुगतान पृष्ठ पर पुनः निर्देशित किया जाएगा। अपना ईमेल और भुगतान विवरण दर्ज करें, फिर खरीदारी पूरी करें।</p>
+<div class="img-placeholder">
+<img alt="भुगतान पृष्ठ" src="./images/purchase.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">4</span>
+<span class="step-title">अपनी लाइसेंस कुंजी प्राप्त करें</span>
+<div class="step-body">
+<p>भुगतान के बाद, आपको एक प्राप्त होगा <strong>लाइसेंस कुंजी</strong> ईमेल के माध्यम से। लाइसेंस कुंजी एक लंबे कोड की तरह दिखती है (उदाहरण के लिए, <code>LT-XXXX-XXXX-XXXX-XXXX</code>). इस कुंजी को कॉपी करें.</p>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">रिफंड नीति</div>
+<p>आप भीतर धनवापसी का अनुरोध कर सकते हैं <strong>30 दिन</strong> भुगतान तिथि से संपर्क करके <a href="mailto:phampdoan@gmail.com">phampdoan@gmail.com</a>.</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="activate-license">अपना लाइसेंस सक्रिय करें</h2>
+<p class="section-intro">खरीदने के बाद, एक्सटेंशन सेटिंग्स में अपनी लाइसेंस कुंजी सक्रिय करें।</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">अपनी लाइसेंस कुंजी दर्ज करें और सक्रिय करें</span>
+<div class="step-body">
+<p>एक्सटेंशन सेटिंग्स खोलें (गियर आइकन या राइट-क्लिक → विकल्प)। पर क्लिक करें <strong>"लाइसेंस"</strong> बाएं साइडबार में। अपनी लाइसेंस कुंजी को इनपुट फ़ील्ड में चिपकाएँ और क्लिक करें <strong>"सक्रिय करें"</strong>। एक्सटेंशन आपके लाइसेंस को सर्वर से सत्यापित करेगा।</p>
+<div class="img-placeholder">
+<img alt="लाइसेंस सक्रिय करें" src="./images/enter-license-key.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">सक्रियण सत्यापित करें</span>
+<div class="step-body">
+<p>एक बार सक्रिय होने पर, आपको अपने लाइसेंस की स्थिति, लाइसेंस से जुड़ा ईमेल और समाप्ति तिथि दिखाई देगी। सभी प्रो सुविधाएँ अब अनलॉक हो गई हैं।</p>
+<div class="img-placeholder">
+<img alt="लाइसेंस सक्रिय करें" src="./images/license-activated.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-warn">
+<div class="callout-label">डिवाइस स्विच कर रहे हैं?</div>
+<p>यदि आपने पहले किसी अन्य डिवाइस पर लाइसेंस सक्रिय किया है, तो आप इसका उपयोग कर सकते हैं <strong>"बलपूर्वक सक्रिय करें"</strong> लाइसेंस को अपने वर्तमान डिवाइस पर स्थानांतरित करने का विकल्प। प्रत्येक लाइसेंस एक समय में केवल एक डिवाइस पर सक्रिय हो सकता है।</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="free-vs-pro">मुफ़्त बनाम प्रो सुविधाएँ</h2>
+<p class="section-intro">यहां बताया गया है कि आप मुफ़्त संस्करण के साथ क्या कर सकते हैं और प्रो लाइसेंस की आवश्यकता क्या है।</p>
+<table>
+<thead>
+<tr><th>फ़ीचर</th><th>निःशुल्क</th><th>प्रो</th></tr>
+</thead>
+<tbody>
+<tr><td>वास्तविक समय में अनुवाद</td><td>✓</td><td>✓</td></tr>
+<tr><td>60+ भाषाएँ</td><td>✓</td><td>✓</td></tr>
+<tr><td>स्पीकर लेबल</td><td>✓</td><td>✓</td></tr>
+<tr><td>पैनल को खींचें, आकार बदलें, छोटा करें</td><td>✓</td><td>✓</td></tr>
+<tr><td>फ़ॉन्ट आकार नियंत्रण</td><td>✓</td><td>✓</td></tr>
+<tr><td>प्रतिलेख डाउनलोड करें (TXT/JSON)</td><td>—</td><td>✓</td></tr>
+<tr><td>प्रतिलेख डाउनलोड करें (एसआरटी)</td><td>—</td><td>✓</td></tr>
+<tr><td>उनकी आवाज़ सुनाएँ (टीटीएस)</td><td>—</td><td>✓</td></tr>
+<tr><td>मेरी आवाज सुनाओ (दुभाषिया)</td><td>—</td><td>✓</td></tr>
+<tr><td>चैट के माध्यम से अनुवाद भेजें</td><td>—</td><td>✓</td></tr>
+<tr><td>उपशीर्षक मोड</td><td>—</td><td>✓</td></tr>
+<tr><td>इनलाइन एआई असिस्टेंट</td><td>—</td><td>✓</td></tr>
+<tr><td>संदर्भ सेटिंग्स</td><td>✓</td><td>✓</td></tr>
+<tr><td>वक्ता के नाम</td><td>✓</td><td>✓</td></tr>
+</tbody>
+</table>
+<hr class="section-divider"/>
+<!-- ────────────────────────────────────────── -->
+<!-- BASIC USAGE                                -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="start-translation">एक अनुवाद सत्र प्रारंभ करें</h2>
+<p class="section-intro">जानें कि किसी मीटिंग या वीडियो में अनुवाद कैसे शुरू करें।</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">एक समर्थित वेबसाइट खोलें</span>
+<div class="step-body">
+<p>किसी पर भी जाएं <a href="#supported-platforms">समर्थित मंच</a> (उदाहरण के लिए, Google मीट, ज़ूम, यूट्यूब, आदि) और किसी मीटिंग में शामिल हों या वीडियो चलाएं।</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">लाइव ट्रांसलेटर पैनल खोलें</span>
+<div class="step-body">
+<p>क्लिक करें <strong>लाइव ट्रांसलेटर आइकन</strong> आपके ब्राउज़र टूलबार में। अनुवादक पैनल पृष्ठ पर दिखाई देगा. आप भी क्लिक कर सकते हैं <strong>फ्लोटिंग आइकन</strong> जो पेज पर दिखाई देता है।</p>
+<div class="img-placeholder">
+<img alt="खुला पैनल" src="./images/floating-icon.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">अपनी भाषाएं चुनें</span>
+<div class="step-body">
+<p>पैनल के शीर्ष पर दो भाषा ड्रॉपडाउन का उपयोग करें:</p>
+<ul>
+<li><strong>"मेरी भाषा"</strong> - भाषा <em>आप</em> बोलें (उदाहरण के लिए, वियतनामी)।</li>
+<li><strong>"उनकी भाषा"</strong> - भाषा <em>अन्य</em> बोलें कि आप अनुवाद करना चाहते हैं (उदाहरण के लिए, अंग्रेजी)।</li>
+</ul>
+<div class="img-placeholder">
+<img alt="भाषा चयन" src="./images/language.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">4</span>
+<span class="step-title">स्टार्ट बटन दबाएँ</span>
+<div class="step-body">
+<p>क्लिक करें <strong>शुरू करें</strong> पैनल के नीचे कंट्रोल बार में बटन (प्ले आइकन)।</p>
+<p>आपका ब्राउज़र ऑडियो कैप्चर करने की अनुमति मांग सकता है - क्लिक करें <strong>"अनुमति दें"</strong> और वह टैब चुनें जिसे आप कैप्चर करना चाहते हैं।</p>
+<div class="img-placeholder">
+<img alt="स्टार्ट बटन" src="./images/press-start.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">5</span>
+<span class="step-title">वास्तविक समय में अनुवाद देखें</span>
+<div class="step-body">
+<p>जैसे लोग बोलते हैं, आपको दोनों दिखाई देंगे <strong>मूल पाठ</strong> और <strong>अनुवादित पाठ</strong> प्रतिलेख क्षेत्र में दिखाई देते हैं। लाइनें स्वचालित रूप से स्पीकर द्वारा समूहीकृत हो जाती हैं।</p>
+<div class="img-placeholder">
+<img alt="वास्तविक समय अनुवाद" src="./images/translate-real.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">ऑटो-स्क्रॉल</div>
+<p>प्रतिलेख नवीनतम पाठ दिखाने के लिए स्वतः स्क्रॉल होता है। यदि आप पहले का पाठ पढ़ने के लिए ऊपर स्क्रॉल करते हैं, तो स्वतः-स्क्रॉल रुक जाता है। क्लिक करें <strong>"नवीनतम तक स्क्रॉल करें"</strong> बटन जो लाइव टेक्स्ट पर वापस जाता हुआ प्रतीत होता है।</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="controls">नियंत्रण: रोकें, फिर से शुरू करें, समाप्त करें</h2>
+<p class="section-intro">अनुवाद सत्र नियंत्रणों को समझें।</p>
+<table>
+<thead>
+<tr><th>बटन</th><th>यह क्या करता है</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>शुरू करें</strong> (▶)</td><td>एक नया अनुवाद सत्र शुरू होता है। किसी भी पिछले प्रतिलेख को साफ़ करता है।</td></tr>
+<tr><td><strong>रोकें</strong> (⏸)</td><td>अस्थायी रूप से अनुवाद रोक देता है। प्रतिलेख रखा गया है. ऑडियो कैप्चर जारी है लेकिन टेक्स्ट रुका हुआ है।</td></tr>
+<tr><td><strong>फिर से शुरू करें</strong> (▶)</td><td>विराम के बाद अनुवाद जारी रखता है। नया पाठ पिछली सामग्री के बाद प्रकट होता है।</td></tr>
+<tr><td><strong>समाप्त</strong> (⏹)</td><td>सत्र को पूरी तरह से रोक देता है। जब तक आप नया सत्र शुरू नहीं करते तब तक प्रतिलेख स्क्रीन पर रखा जाता है। ऑडियो कैप्चर समाप्त करता है, माइक और कथन बंद करता है।</td></tr>
+</tbody>
+</table>
+<hr class="section-divider"/>
+<h2 id="language-selection">भाषाएं बदलें</h2>
+<p class="section-intro">आप किसी भी समय अनुवाद की भाषाएँ बदल सकते हैं।</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">भाषा ड्रॉपडाउन पर क्लिक करें</span>
+<div class="step-body">
+<p>दोनों में से किसी एक पर क्लिक करें <strong>"मेरी भाषा"</strong> या <strong>"उनकी भाषा"</strong> पैनल के शीर्ष पर ड्रॉपडाउन।</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">एक नई भाषा चुनें</span>
+<div class="step-body">
+<p>सूची समर्थन करती है <strong>60+ भाषाएँ</strong> वर्णानुक्रम में क्रमबद्ध। अपनी भाषा खोजने के लिए स्क्रॉल करें या टाइप करें। इसे चुनने के लिए क्लिक करें.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">अनुवाद स्वचालित रूप से पुनः आरंभ होता है</span>
+<div class="step-body">
+<p>यदि कोई सत्र सक्रिय है, तो भाषा बदलने से नई भाषा जोड़ी के साथ अनुवाद स्वचालित रूप से पुनः आरंभ हो जाएगा। आपका भाषा चयन अगली बार के लिए सहेजा गया है।</p>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="microphone">अपना माइक्रोफोन चालू करें</h2>
+<p class="section-intro">अपना माइक्रोफ़ोन सक्षम करें ताकि मीटिंग/वीडियो ऑडियो के साथ-साथ आपका अपना भाषण भी अनुवादित हो सके।</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">माइक्रोफ़ोन बटन पर क्लिक करें</span>
+<div class="step-body">
+<p>कंट्रोल बार में, क्लिक करें <strong>माइक्रोफोन आइकन</strong>। माइक चालू होने पर आइकन सक्रिय (हाइलाइट) हो जाता है।</p>
+<div class="img-placeholder">
+<img alt="माइक्रोफोन बटन" src="./images/micro.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">माइक्रोफ़ोन पहुंच की अनुमति दें</span>
+<div class="step-body">
+<p>यदि यह पहली बार है, तो आपका ब्राउज़र माइक्रोफ़ोन की अनुमति मांगेगा। क्लिक करें <strong>"अनुमति दें"</strong>.</p>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">टिप</div>
+<p>माइक्रोफोन है <strong>डिफ़ॉल्ट रूप से बंद</strong> जब आप पैनल खोलते हैं। इसे केवल तभी चालू करें जब आप चाहते हैं कि आपका भाषण प्रतिलेखित और अनुवादित किया जाए। जब आप दबाते हैं <strong>समाप्त</strong>, माइक्रोफ़ोन स्वचालित रूप से बंद हो जाता है।</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="font-size">फ़ॉन्ट आकार बदलें</h2>
+<p class="section-intro">आरामदायक पढ़ने के लिए प्रतिलेख पाठ का आकार समायोजित करें।</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">फ़ॉन्ट आकार बटन पर क्लिक करें</span>
+<div class="step-body">
+<p>कंट्रोल बार में, क्लिक करें <strong>फ़ॉन्ट आकार बटन</strong> (एए आइकन)। एक मेनू तीन आकारों के साथ प्रकट होता है:</p>
+<ul>
+<li><strong>छोटा</strong> —संक्षिप्त दृश्य, अधिक पाठ में फिट बैठता है</li>
+<li><strong>मध्यम</strong> - डिफ़ॉल्ट संतुलित आकार</li>
+<li><strong>बड़ा</strong> - दूर से पढ़ना आसान</li>
+</ul>
+<p>अपने पसंदीदा आकार पर क्लिक करें। परिवर्तन तुरंत लागू होता है और अगली बार के लिए सहेजा जाता है।</p>
+<div class="img-placeholder">
+<img alt="फ़ॉन्ट आकार चयनकर्ता" src="./images/font.png"/>
+</div>
+</div>
+</div>
+<hr class="section-divider"/>
+<!-- ────────────────────────────────────────── -->
+<!-- FEATURES                                   -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="speaker-names">वक्ता के नाम</h2>
+<p class="section-intro">वक्ताओं को वास्तविक नाम निर्दिष्ट करें ताकि आप आसानी से पहचान सकें कि प्रतिलेख में किसने क्या कहा है। <span class="badge badge-free">निःशुल्क</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">"अधिक" मेनू खोलें</span>
+<div class="step-body">
+<p>कंट्रोल बार में, क्लिक करें <strong>"अधिक"</strong> बटन (⋯ आइकन)। फिर क्लिक करें <strong>"स्पीकर सेटिंग्स"</strong> बटन।</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">"स्पीकर सेटिंग्स" संवाद खोलें</span>
+<div class="step-body">
+<p>स्पीकर सेटिंग्स संवाद खुल जाएगा।</p>
+<div class="img-placeholder">
+<img alt="स्पीकर सेटिंग्स डायलॉग" src="./images/speaker.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">नाम निर्दिष्ट करें</span>
+<div class="step-body">
+<p>आपको पता लगाए गए स्पीकर (स्पीकर 1, स्पीकर 2, आदि) की एक सूची दिखाई देगी। प्रत्येक के आगे एक वास्तविक नाम टाइप करें (उदाहरण के लिए, "जॉन", "सारा")। क्लिक करें <strong>"पंक्ति जोड़ें"</strong> अगर आपको और चाहिए।</p>
+<p>क्लिक करें <strong>"सहेजें"</strong>। सभी प्रतिलेख पंक्तियाँ - अतीत और भविष्य - अब आपके द्वारा निर्दिष्ट नामों का उपयोग करेंगी।</p>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="narration">कथन (पाठ से वाक्)</h2>
+<p class="section-intro">अनुवादों को ऊंची आवाज में पढ़कर सुनाएं ताकि आप पढ़ने के बजाय सुन सकें। यह "उनकी आवाज़ सुनाएँ" सुविधा है। <span class="badge badge-pro">प्रो</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">नैरेशन सेटिंग्स खोलें</span>
+<div class="step-body">
+<p>कंट्रोल बार में, क्लिक करें <strong> कथन बटन</strong> (स्पीकर आइकन)। कथन सेटिंग संवाद खुलता है.</p>
+<div class="img-placeholder">
+<img alt="कथन सेटिंग्स" src="./images/narration-setting.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">एक टीटीएस प्रदाता और आवाज चुनें</span>
+<div class="step-body">
+<p>अपना वॉयस प्रदाता चुनें:</p>
+<ul>
+<li><strong>Google अनुवाद</strong> (निःशुल्क) - बिना किसी एपीआई कुंजी के काम करता है। 60+ भाषाओं में अच्छी गुणवत्ता वाली आवाज़ें।</li>
+<li><strong>ओपनएआई</strong> (प्रीमियम) - उच्च गुणवत्ता, अधिक प्राकृतिक आवाजें। OpenAI API कुंजी की आवश्यकता है.</li>
+</ul>
+<p>ए चुनें <strong>आवाज</strong> ड्रॉपडाउन से क्लिक करें <strong>"परीक्षण"</strong> यह पूर्वावलोकन करने के लिए कि यह कैसा लगता है।</p>
+<p>समायोजित करें <strong>आवाज की गति</strong> और <strong>वॉल्यूम</strong> यदि आवश्यक हो।</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">कथन प्रारंभ करें</span>
+<div class="step-body">
+<p>क्लिक करें <strong>"उनकी आवाज़ सुनाएँ"</strong> संवाद में बटन। अब, जब भी कोई अनुवाद आएगा, वह आपको ऊंचे स्वर में पढ़कर सुनाया जाएगा।</p>
+<p>रोकने के लिए, कथन बटन पर फिर से क्लिक करें और क्लिक करें <strong>"रुको"</strong>.</p>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="narrate-my-voice">मेरी आवाज सुनाओ (दुभाषिया मोड)</h2>
+<p class="section-intro">अपनी भाषा में बात करें और अपनी अनुवादित आवाज को अन्य मीटिंग प्रतिभागियों को सुनाएं - जैसे एक निजी दुभाषिया रखना। <span class="badge badge-pro">प्रो</span></p>
+<div class="callout callout-warn">
+<div class="callout-label">आवश्यकताएँ</div>
+<p>यह सुविधा चालू रहती है <strong>गूगल मीट</strong>, <strong>ज़ूम (वेब)</strong>, <strong>माइक्रोसॉफ्ट टीमें (वेब)</strong>, और <strong>व्हाट्सएप वेब</strong>। आपको आपकी जरूरत है <strong>माइक्रोफ़ोन सक्षम</strong> और एक अनुवाद सत्र <strong>चल रहा है</strong>.</p>
+</div>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">नैरेशन सेटिंग्स खोलें</span>
+<div class="step-body">
+<p>क्लिक करें <strong> कथन बटन</strong> नैरेशन सेटिंग्स डायलॉग खोलने के लिए कंट्रोल बार में।</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">"मेरी आवाज़ सुनाएँ" कॉन्फ़िगर करें</span>
+<div class="step-body">
+<p>संवाद में, खोजें <strong>"मेरी आवाज सुनाओ"</strong> अनुभाग। अपनी पसंदीदा आवाज़ और प्रदाता (Google या OpenAI) चुनें। आप एक सेट कर सकते हैं <strong>अलग आवाज</strong> "मेरी आवाज़" और "उनकी आवाज़" कथन के लिए।</p>
+<p>क्लिक करें <strong>"परीक्षण"</strong> अपनी चयनित आवाज का पूर्वावलोकन करने के लिए।</p>
+<div class="img-placeholder">
+<img alt="मेरी आवाज सुनाओ" src="./images/my-voice-setting.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">"मेरी आवाज़ सुनाओ" शुरू करें</span>
+<div class="step-body">
+<p>क्लिक करें <strong>"मेरी आवाज़ सुनाना शुरू करें"</strong>। जब आप बोलते हैं, तो आपके शब्द होते हैं:</p>
+<ol>
+<li>आपकी भाषा में प्रतिलेखित</li>
+<li>दूसरी भाषा में अनुवादित</li>
+<li>बैठक में ज़ोर से बोला जाए ताकि दूसरा व्यक्ति आपकी अनुवादित आवाज़ सुन सके</li>
+</ol>
+<p>प्रतिध्वनि को रोकने के लिए अनुवादित ऑडियो चलने के दौरान आपका माइक्रोफ़ोन स्वचालित रूप से म्यूट हो जाता है।</p>
+<div class="img-placeholder">
+<img alt="मेरी आवाज सुनाना शुरू करें" src="./images/narrate-my-voice.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">4</span>
+<span class="step-title">कथन बंद करो</span>
+<div class="step-body">
+<p> कथन बटन पर क्लिक करें और फिर <strong>"रुको"</strong>, या दबाएँ <strong>समाप्त</strong> पूरे सत्र को रोकने के लिए (जिससे कथन भी रुक जाता है)।</p>
+</div>
+</div>
+<div class="callout callout-note">
+<div class="callout-label">नोट</div>
+<p>आप केवल दौड़ सकते हैं <strong>एक समय में एक कथन विधा</strong> - या तो "मेरी आवाज़ सुनाओ" या "उनकी आवाज़ सुनाओ", दोनों एक साथ नहीं। कौन सा मोड सक्रिय है यह दिखाने के लिए टूलबार आइकन बदल जाता है।</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="send-chat">चैट के माध्यम से अनुवाद भेजें</h2>
+<p class="section-intro">मीटिंग की चैट में अपने अनुवादित भाषण को टेक्स्ट संदेश के रूप में स्वचालित रूप से भेजें। <span class="badge badge-pro">प्रो</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">"चैट के माध्यम से भेजें" सक्षम करें</span>
+<div class="step-body">
+<p>कंट्रोल बार में, देखें <strong>चैट भेजें बटन</strong> (माइक्रोफ़ोन आइकन के बगल में)। टॉगल ऑन करने के लिए इसे क्लिक करें - बटन बदल जाता है <strong>हरा</strong> सक्रिय होने पर।</p>
+<div class="img-placeholder">
+<img alt="चैट भेजें" src="./images/send-via-chat.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">बोलें और यह स्वचालित रूप से भेज देता है</span>
+<div class="step-body">
+<p>आपका माइक्रोफ़ोन चालू होने और अनुवाद सत्र चलने पर, जब आप बोलते हैं, तो आपका अनुवादित पाठ स्वचालित रूप से मीटिंग के चैट इनपुट में डाला जाता है और भेजा जाता है।</p>
+<p>यह काम करता है <strong>गूगल मीट</strong>, <strong>ज़ूम (वेब)</strong>, और <strong>माइक्रोसॉफ्ट टीमें (वेब)</strong>.</p>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">टिप</div>
+<p>यह तब उपयोगी है जब आपके प्लेटफ़ॉर्म के लिए "नैरेट माई वॉइस" उपलब्ध नहीं है, या यदि आप वॉयस नैरेशन और टेक्स्ट चैट अनुवाद दोनों एक साथ चाहते हैं।</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="subtitle-mode">उपशीर्षक मोड</h2>
+<p class="section-intro">एक न्यूनतम, मूवी-शैली उपशीर्षक बार पर स्विच करें जो स्क्रीन के नीचे केवल नवीनतम अनुवाद दिखाता है। <span class="badge badge-pro">प्रो</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">उपशीर्षक मोड सक्षम करें</span>
+<div class="step-body">
+<p>अनुवादक पैनल के शीर्षक बार में, क्लिक करें <strong>उपशीर्षक चिह्न</strong> (बंद कैप्शन आइकन)।</p>
+<p>पूरे पैनल को स्क्रीन के नीचे एक पतली उपशीर्षक बार से बदल दिया जाएगा।</p>
+<div class="img-placeholder">
+<img alt="उपशीर्षक मोड" src="./images/subtitle.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">उपशीर्षक बार को अनुकूलित करें</span>
+<div class="step-body">
+<p>क्लिक करें <strong>ट्यून आइकन</strong> (सेटिंग्स गियर) समायोजित करने के लिए उपशीर्षक पट्टी पर:</p>
+<ul>
+<li><strong>अस्पष्टता</strong> —बार को अधिक या कम पारदर्शी बनाने के लिए स्लाइड करें।</li>
+<li><strong>फ़ॉन्ट आकार</strong> - छोटे, मध्यम या बड़े टेक्स्ट में से चुनें।</li>
+</ul>
+<p>आप भी कर सकते हैं <strong>खींचें</strong> उपशीर्षक पट्टी को स्थानांतरित करने के लिए, और <strong>आकार बदलें</strong> किनारों को खींचकर।</p>
+<div class="img-placeholder">
+<img alt="उपशीर्षक सेटिंग" src="./images/customize-subtitle-bar.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">उपशीर्षक मोड से बाहर निकलें</span>
+<div class="step-body">
+<p>क्लिक करें <strong>बटन बंद करें</strong> (✕) पूर्ण अनुवादक पैनल पर लौटने के लिए उपशीर्षक पट्टी पर।</p>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="inline-assistant">इनलाइन एआई असिस्टेंट</h2>
+<p class="section-intro">ट्रांसक्रिप्ट से सीधे बातचीत के संदर्भ के आधार पर एआई-संचालित स्पष्टीकरण और उत्पन्न उत्तर प्राप्त करें। <span class="badge badge-pro">प्रो</span></p>
+<div class="callout callout-warn">
+<div class="callout-label">आवश्यकता</div>
+<p>इनलाइन एआई असिस्टेंट के लिए एक की आवश्यकता होती है <strong>ओपनएआई एपीआई कुंजी</strong> सेटिंग्स में कॉन्फ़िगर किया जाना है।</p>
+</div>
+<h3>एक पंक्ति समझाइये</h3>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">एक ट्रांसक्रिप्ट लाइन पर होवर करें</span>
+<div class="step-body">
+<p>जब आप प्रतिलेख में किसी पंक्ति पर होवर करते हैं, तो <strong>एआई आइकन</strong> (🤖) प्रकट होता है।</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">एआई आइकन पर क्लिक करें और "स्पष्ट करें" चुनें</span>
+<div class="step-body">
+<p>एआई सहायक एक अलग विंडो में खुलता है। यह आपको विस्तृत विवरण देने के लिए पूर्ण प्रतिलेख संदर्भ और चयनित पंक्ति का उपयोग करेगा।</p>
+<div class="img-placeholder">
+<img alt="स्पष्ट करें" src="./images/ai-explain.png"/>
+</div>
+</div>
+</div>
+<h3>एक उत्तर उत्पन्न करें</h3>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">एआई आइकन पर क्लिक करें और "उत्तर उत्पन्न करें" चुनें</span>
+<div class="step-body">
+<p>एआई सहायक बातचीत में कही गई बातों के आधार पर एक सुझाया गया उत्तर तैयार करेगा। यह अधिक सटीक उत्तर प्रदान करने के लिए वेब खोज का भी उपयोग कर सकता है।</p>
+<div class="img-placeholder">
+<img alt="उत्तर उत्पन्न करें" src="./images/ai-help-answer.png"/>
+</div>
+</div>
+</div>
+<h3>सहायक पैनल खोलें</h3>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">कंट्रोल बार में असिस्टेंट बटन पर क्लिक करें</span>
+<div class="step-body">
+<p>आप एआई असिस्टेंट पैनल को सीधे यहां से भी खोल सकते हैं <strong>सहायक बटन</strong> (🤖 आइकन) कंट्रोल बार में। यह एक ड्रैग करने योग्य चैट विंडो खोलता है जहां आप कोई भी प्रश्न टाइप कर सकते हैं। सहायक के पास संदर्भ के रूप में पूर्ण प्रतिलेख तक पहुंच होती है।</p>
+<div class="img-placeholder">
+<img alt="सहायक पैनल" src="./images/ai.png"/>
+</div>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="context-setting">संदर्भ सेटिंग्स</h2>
+<p class="section-intro">अनुवाद सटीकता में सुधार के लिए बातचीत के विषय के बारे में संदर्भ प्रदान करें। <span class="badge badge-free">निःशुल्क</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">संदर्भ सेटिंग्स खोलें</span>
+<div class="step-body">
+<p>क्लिक करें <strong>"अधिक"</strong> कंट्रोल बार में बटन (⋯), फिर क्लिक करें <strong>"संदर्भ"</strong>.</p>
+<div class="img-placeholder">
+<img alt="संदर्भ सेटिंग" src="./images/context.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">संदर्भ फ़ील्ड भरें</span>
+<div class="step-body">
+<p>आप प्रदान कर सकते हैं:</p>
+<ul>
+<li><strong>डोमेन/विषय</strong> - बातचीत किस बारे में है (उदाहरण के लिए, "मेडिकल कॉन्फ्रेंस", "सॉफ्टवेयर इंजीनियरिंग स्टैंडअप")।</li>
+<li><strong>मुख्य शब्द</strong> - तकनीकी शब्द, व्यक्तिवाचक संज्ञा, या शब्दजाल जिन्हें पहचानना मुश्किल हो सकता है (उदाहरण के लिए, "कुबेरनेट्स, एपीआई गेटवे, माइक्रोसर्विसेज")।</li>
+<li><strong>स्पीकर की जानकारी</strong> - प्रतिभागियों के नाम और भूमिकाएं (उदाहरण के लिए, "डॉ. स्मिथ - हृदय रोग विशेषज्ञ, प्रस्तुतिकरण")।</li>
+</ul>
+<p>क्लिक करें <strong>"लागू करें"</strong> इस संदर्भ को वर्तमान सत्र के लिए अनुवाद इंजन को भेजने के लिए।</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">प्रीसेट सहेजें (वैकल्पिक)</span>
+<div class="step-body">
+<p>यदि आपकी समान विषयों पर बार-बार बैठकें होती हैं, तो क्लिक करें <strong>"प्रीसेट सहेजें"</strong> वर्तमान संदर्भ को सहेजने के लिए। अगली बार, सब कुछ दोबारा टाइप करने के बजाय बस प्रीसेट लोड करें।</p>
+<p>आप भी कर सकते हैं <strong>आयात/निर्यात</strong> उन्हें साझा करने या बैकअप लेने के लिए JSON फ़ाइलों के रूप में प्रीसेट।</p>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">यूट्यूब ऑटो-फिल</div>
+<p>लाइव ट्रांसलेटर का उपयोग करते समय <strong>यूट्यूब</strong>, संदर्भ फ़ील्ड हो सकते हैं <strong>स्वचालित रूप से भरा हुआ</strong> वीडियो के शीर्षक और विवरण के साथ। इससे अनुवाद इंजन को वीडियो के विषय को बेहतर ढंग से समझने में मदद मिलती है।</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="download-transcript">प्रतिलेख डाउनलोड करें</h2>
+<p class="section-intro">अपने अनुवादित प्रतिलेखों को बाद में संदर्भ या अन्य टूल में उपयोग के लिए फ़ाइलों के रूप में सहेजें। <span class="badge badge-pro">प्रो</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">डाउनलोड बटन पर क्लिक करें</span>
+<div class="step-body">
+<p>अनुवाद सत्र के बाद (या एक के दौरान), क्लिक करें <strong>डाउनलोड बटन</strong> (↓ आइकन) कंट्रोल बार में। डाउनलोड ट्रांसक्रिप्ट संवाद खुलता है।</p>
+<div class="img-placeholder">
+<img alt="प्रतिलेख डाउनलोड करें" src="./images/download-transcript.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">एक प्रारूप चुनें</span>
+<div class="step-body">
+<p>अपना पसंदीदा प्रारूप चुनें:</p>
+<table>
+<thead>
+<tr><th>प्रारूप</th><th>के लिए सर्वोत्तम</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>टेक्स्ट</strong></td><td>टाइमस्टैम्प और स्पीकर नामों के साथ सरल टेक्स्ट फ़ाइल। पढ़ने में आसान.</td></tr>
+<tr><td><strong>जेएसओएन</strong></td><td>संरचित डेटा प्रारूप। अन्य टूल या स्क्रिप्ट के साथ प्रसंस्करण के लिए अच्छा है।</td></tr>
+<tr><td><strong>एसआरटी (मूल)</strong></td><td>मूल भाषा पाठ के साथ उपशीर्षक फ़ाइल। वीडियो संपादन सॉफ़्टवेयर में उपयोग करें.</td></tr>
+<tr><td><strong>एसआरटी (अनुवादित)</strong></td><td>अनुवादित पाठ के साथ उपशीर्षक फ़ाइल। वीडियो संपादन सॉफ़्टवेयर में उपयोग करें.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">फ़ाइल डाउनलोड करें</span>
+<div class="step-body">
+<p>अपने चुने हुए प्रारूप के लिए डाउनलोड बटन पर क्लिक करें। फ़ाइल आपके ब्राउज़र में जेनरेट होती है और आपके डिफ़ॉल्ट डाउनलोड फ़ोल्डर में सहेजी जाती है।</p>
+</div>
+</div>
+<div class="callout callout-note">
+<div class="callout-label">गोपनीयता</div>
+<p>ट्रांसक्रिप्ट फ़ाइलें उत्पन्न होती हैं <strong>पूरी तरह से आपके ब्राउज़र में</strong>। डाउनलोड प्रक्रिया के दौरान किसी भी सर्वर पर कोई ट्रांसक्रिप्ट डेटा नहीं भेजा जाता है।</p>
+</div>
+<hr class="section-divider"/>
+<!-- ────────────────────────────────────────── -->
+<!-- MORE                                       -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="auto-update">ऑटो अपडेट जांच</h2>
+<p class="section-intro">हर बार जब आप इसे खोलते हैं तो एक्सटेंशन स्वचालित रूप से अपडेट की जांच करता है।</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">अपडेट बैज देखें</span>
+<div class="step-body">
+<p>जब कोई नया संस्करण उपलब्ध होगा, तो आपको एक दिखाई देगा <strong>"अपडेट उपलब्ध है"</strong> अनुवादक पैनल के शीर्षक बार में बैज।</p>
+<div class="img-placeholder">
+<img alt="अपडेट उपलब्ध है" src="./images/update-badge.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">अपडेट करने के लिए क्लिक करें</span>
+<div class="step-body">
+<p>इंस्टॉल पेज पर ले जाने के लिए बैज पर क्लिक करें जहां आप नवीनतम संस्करण डाउनलोड कर सकते हैं। उसी का पालन करें <a href="#installation">स्थापना चरण</a> अद्यतन करने के लिए।</p>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="troubleshooting">समस्या निवारण</h2>
+<p class="section-intro">सामान्य समस्याएं और उन्हें कैसे ठीक करें।</p>
+<h3>"कोई सोनियोक्स एपीआई कुंजी नहीं" संदेश</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">समाधान</span>
+<div class="step-body">
+<p>आपने अभी तक अपनी सोनियोक्स एपीआई कुंजी दर्ज नहीं की है। पर जाएँ <a href="#enter-keys">अपनी एपीआई कुंजी दर्ज करें</a> इसे स्थापित करने के लिए।</p>
+</div>
+</div>
+<h3>कोई ऑडियो कैप्चर नहीं किया जा रहा है</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">समाधान</span>
+<div class="step-body">
+<ul>
+<li>सुनिश्चित करें कि आपने क्लिक किया है <strong>"अनुमति दें"</strong> जब ब्राउज़र ने ऑडियो कैप्चर की अनुमति मांगी।</li>
+<li>सुनिश्चित करें कि आपने इसका चयन किया है <strong>सही टैब</strong> संकेत मिलने पर साझा करें।</li>
+<li>पृष्ठ को ताज़ा करने और अनुवादक को फिर से खोलने का प्रयास करें।</li>
+<li>जांचें कि मीटिंग/वीडियो में वास्तव में ऑडियो चल रहा है।</li>
+</ul>
+</div>
+</div>
+<h3>अनुवाद ग़लत लगता है</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">समाधान</span>
+<div class="step-body">
+<ul>
+<li>सुनिश्चित करें <strong>"उनकी भाषा"</strong> ड्रॉपडाउन बोली जाने वाली सही भाषा पर सेट है।</li>
+<li>उपयोग करें <a href="#context-setting">संदर्भ सेटिंग्स</a> विषय संबंधी जानकारी और मुख्य शब्द उपलब्ध कराने के लिए।</li>
+<li>सुनिश्चित करें कि ऑडियो गुणवत्ता स्पष्ट है - पृष्ठभूमि शोर सटीकता को प्रभावित कर सकता है।</li>
+</ul>
+</div>
+</div>
+<h3>"मेरी आवाज़ सुनाओ" - अन्य लोग अनुवाद नहीं सुन सकते</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">समाधान</span>
+<div class="step-body">
+<ul>
+<li>पुष्टि करें कि आप ए पर हैं <strong>समर्थित मंच</strong> (गूगल मीट, ज़ूम वेब, टीम्स वेब, व्हाट्सएप वेब)।</li>
+<li>सुनिश्चित करें कि एक अनुवाद सत्र है <strong>चल रहा है</strong> और आपका <strong>माइक्रोफ़ोन चालू है</strong>.</li>
+<li>जांचें कि आपके पास एक है <strong>प्रो लाइसेंस</strong> सक्रिय।</li>
+<li>मीटिंग पेज को रीफ्रेश करके फिर से शुरू करने का प्रयास करें।</li>
+</ul>
+</div>
+</div>
+<h3>ओपनएआई सुविधाएं काम नहीं कर रही हैं</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">समाधान</span>
+<div class="step-body">
+<ul>
+<li>अपना सत्यापन करें <strong>ओपनएआई एपीआई कुंजी</strong>  सही ढंग से दर्ज किया गया है <a href="#enter-keys">सेटिंग्स</a>.</li>
+<li>सुनिश्चित करें कि आपके पास OpenAI खाता है <strong>बिलिंग सेट अप</strong> पर्याप्त क्रेडिट के साथ।</li>
+<li>यदि आपको OpenAI सुविधाओं की आवश्यकता नहीं है, तो उपयोग करें <strong>गूगल अनुवाद आवाजें</strong> इसके बजाय कथन के लिए (निःशुल्क, कोई एपीआई कुंजी की आवश्यकता नहीं है)।</li>
+</ul>
+</div>
+</div>
+<h3>वेबसाइट पर एक्सटेंशन दिखाई नहीं दे रहा है</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">समाधान</span>
+<div class="step-body">
+<ul>
+<li>लाइव ट्रांसलेटर केवल पर काम करता है <a href="#supported-platforms">समर्थित प्लेटफार्म</a>। यह असमर्थित वेबसाइटों पर दिखाई नहीं देगा.</li>
+<li>यदि साइट समर्थित है लेकिन एक्सटेंशन दिखाई नहीं देता है, तो प्रयास करें <strong>पेज को रिफ्रेश कर रहा हूं</strong>.</li>
+<li>सुनिश्चित करें कि एक्सटेंशन है <strong>सक्षम</strong> आपके ब्राउज़र के एक्सटेंशन प्रबंधन पृष्ठ में।</li>
+</ul>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="contact">संपर्क एवं सहायता</h2>
+<p class="section-intro">मदद चाहिए? कोई प्रश्न या सुझाव है?</p>
+<p>डेवलपर से संपर्क करें:</p>
+<ul>
+<li><strong>ईमेल:</strong> <a href="mailto:ezsolu.io@gmail.com">ezsolu.io@gmail.com</a></li>
+<li><strong>वेबसाइट:</strong> <a href="https://translate.ezitech.io" target="_blank">https://translate.ezitech.io</a></li>
+<li><strong>व्हाट्सएप:</strong> <a href="https://wa.me/84355561599" target="_blank">+84 355 561 599</a></li>
+<li><strong>टेलीग्राम:</strong> <a href="https://t.me/ezi_tech" target="_blank">ईज़ीटेक</a></li>
+</ul>
+<div class="callout callout-tip">
+<div class="callout-label">प्रतिक्रिया का स्वागत है</div>
+<p>यदि आपके पास नई सुविधाओं या सुधारों के लिए विचार हैं, तो हमें आपसे सुनना अच्छा लगेगा। अपने सुझावों के साथ हमें एक ईमेल भेजें!</p>
+</div>
+<footer style="margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--c-border); font-size: 0.82rem; color: var(--c-text-secondary);">
+<p>© 2026 दून फाम। लाइव ट्रांसलेटर एक स्वतंत्र ब्राउज़र एक्सटेंशन है और यह Google, Zoom, Microsoft,oniox, या OpenAI से संबद्ध नहीं है।</p>
+</footer>
+</main>
+</div>
+<!-- ═══ Scripts ═══ -->
+<script>
+(function () {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const menuBtn = document.getElementById('menuBtn');
+  const languageSelect = document.getElementById('languageSelect');
+  const links = sidebar.querySelectorAll('a[href^="#"]');
+
+  if (menuBtn) {
+    menuBtn.addEventListener('click', function () {
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('open');
+    });
+  }
+
+  overlay.addEventListener('click', function () {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+  });
+
+  if (languageSelect) {
+    const currentFile = window.location.pathname.split('/').pop() || 'instruction.html';
+    languageSelect.value = currentFile in {
+      'instruction.html': true,
+      'instruction-zh.html': true,
+      'instruction-hi.html': true,
+      'instruction-es.html': true,
+      'instruction-fr.html': true,
+      'instruction-ar.html': true,
+      'instruction-pt.html': true,
+      'instruction-ru.html': true
+    } ? currentFile : 'instruction.html';
+
+    languageSelect.addEventListener('change', function (event) {
+      const target = event.target.value;
+      if (target) {
+        window.location.href = target;
+      }
+    });
+  }
+
+  links.forEach(function (link) {
+    link.addEventListener('click', function () {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('open');
+    });
+  });
+
+  function setActive() {
+    var scrollY = window.scrollY || document.documentElement.scrollTop;
+    var current = null;
+    links.forEach(function (link) {
+      var id = link.getAttribute('href').slice(1);
+      var el = document.getElementById(id);
+      if (el && el.offsetTop - 100 <= scrollY) {
+        current = link;
+      }
+    });
+    links.forEach(function (l) { l.classList.remove('active'); });
+    if (current) current.classList.add('active');
+  }
+
+  window.addEventListener('scroll', setActive, { passive: true });
+  setActive();
+})();
+</script>
+</body>
+</html>

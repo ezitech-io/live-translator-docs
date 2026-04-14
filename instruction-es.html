@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Guía del usuario: Traductor en vivo</title>
+<meta content="Guía de usuario completa para la extensión de navegador Live Translator. Aprenda a instalar, configurar claves API, traducir reuniones en tiempo real, usar narración, subtítulos y todas las funciones." name="description"/>
+<link href="./icons/icon-128x128.png" rel="icon" sizes="128x128" type="image/png"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sidebar-w: 280px;
+      --header-h: 56px;
+      --c-bg: #ffffff;
+      --c-sidebar-bg: #f8f9fb;
+      --c-sidebar-border: #e5e7eb;
+      --c-text: #1a1a2e;
+      --c-text-secondary: #64748b;
+      --c-accent: #667eea;
+      --c-accent-light: #eef2ff;
+      --c-accent-hover: #5a6fd6;
+      --c-border: #e5e7eb;
+      --c-code-bg: #f1f5f9;
+      --c-tip-bg: #eff6ff;
+      --c-tip-border: #3b82f6;
+      --c-warn-bg: #fefce8;
+      --c-warn-border: #eab308;
+      --c-note-bg: #f0fdf4;
+      --c-note-border: #22c55e;
+      --c-step-bg: #f8fafc;
+      --c-img-bg: #f1f5f9;
+      --radius: 8px;
+    }
+
+    html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 20px); }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--c-text);
+      background: var(--c-bg);
+    }
+
+    /* ── Header ── */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--header-h);
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--c-border);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 12px;
+    }
+
+    .site-header .logo {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .site-header h1 {
+      font-size: 1rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .site-header .home-link {
+      font-size: 0.8rem;
+      color: var(--c-accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .site-header .home-link:hover { text-decoration: underline; }
+
+    .site-header .header-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .site-header .language-select {
+      border: 1px solid var(--c-border);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--c-text);
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 6px 10px;
+      line-height: 1.2;
+      max-width: 185px;
+    }
+
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      color: var(--c-text);
+    }
+
+    .hamburger svg { display: block; }
+
+    /* ── Layout ── */
+    .layout {
+      display: flex;
+      margin-top: var(--header-h);
+      min-height: calc(100vh - var(--header-h));
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      position: fixed;
+      top: var(--header-h);
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-w);
+      background: var(--c-sidebar-bg);
+      border-right: 1px solid var(--c-sidebar-border);
+      overflow-y: auto;
+      padding: 20px 0;
+      z-index: 90;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.3);
+      z-index: 89;
+    }
+
+    .sidebar nav { padding: 0 12px; }
+
+    .sidebar .nav-group { margin-bottom: 8px; }
+
+    .sidebar .nav-group-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--c-text-secondary);
+      padding: 10px 12px 4px;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      color: var(--c-text-secondary);
+      text-decoration: none;
+      border-radius: 6px;
+      line-height: 1.5;
+      transition: all 0.15s ease;
+    }
+
+    .sidebar a:hover {
+      background: var(--c-accent-light);
+      color: var(--c-accent);
+    }
+
+    .sidebar a.active {
+      background: var(--c-accent-light);
+      color: var(--c-accent);
+      font-weight: 600;
+    }
+
+    /* ── Content ── */
+    .content {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      max-width: 820px;
+      padding: 40px 48px 100px;
+    }
+
+    /* ── Typography ── */
+    .content h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin: 56px 0 8px;
+      padding-top: 20px;
+      color: var(--c-text);
+    }
+
+    .content h2:first-child { margin-top: 0; }
+
+    .content h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 36px 0 8px;
+      color: var(--c-text);
+    }
+
+    .content h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 24px 0 6px;
+      color: var(--c-text);
+    }
+
+    .content p { margin: 0 0 14px; }
+
+    .content ul, .content ol {
+      margin: 0 0 16px;
+      padding-left: 24px;
+    }
+
+    .content li { margin-bottom: 6px; }
+
+    .content a { color: var(--c-accent); }
+    .content a:hover { color: var(--c-accent-hover); }
+
+    .content code {
+      background: var(--c-code-bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.88em;
+      font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+    }
+
+    .content strong { font-weight: 600; }
+
+    .section-intro {
+      font-size: 0.95rem;
+      color: var(--c-text-secondary);
+      margin-bottom: 24px;
+    }
+
+    /* ── Steps ── */
+    .step {
+      background: var(--c-step-bg);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin: 16px 0;
+      position: relative;
+    }
+
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      background: var(--c-accent);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+
+    .step-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: inline;
+    }
+
+    .step-body { margin-top: 10px; }
+
+    /* ── Image placeholder ── */
+    .img-placeholder {
+      background: var(--c-img-bg);
+      border-radius: var(--radius);
+      text-align: center;
+      color: var(--c-text-secondary);
+      font-size: 0.82rem;
+      margin: 14px 0;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .img-placeholder svg {
+      width: 32px;
+      height: 32px;
+      opacity: 0.4;
+    }
+
+    .img-placeholder img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+    }
+
+    /* ── Callout boxes ── */
+    .callout {
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .callout p { margin: 0; }
+    .callout p + p { margin-top: 8px; }
+
+    .callout-tip {
+      background: var(--c-tip-bg);
+      border-left: 4px solid var(--c-tip-border);
+    }
+
+    .callout-warn {
+      background: var(--c-warn-bg);
+      border-left: 4px solid var(--c-warn-border);
+    }
+
+    .callout-note {
+      background: var(--c-note-bg);
+      border-left: 4px solid var(--c-note-border);
+    }
+
+    .callout-label {
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+
+    .callout-tip .callout-label { color: #2563eb; }
+    .callout-warn .callout-label { color: #ca8a04; }
+    .callout-note .callout-label { color: #16a34a; }
+
+    /* ── Table ── */
+    .content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 0.88rem;
+    }
+
+    .content th, .content td {
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--c-border);
+    }
+
+    .content th {
+      background: var(--c-sidebar-bg);
+      font-weight: 600;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--c-text-secondary);
+    }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 8px;
+      border-radius: 10px;
+      vertical-align: middle;
+    }
+
+    .badge-free { background: #dcfce7; color: #166534; }
+    .badge-pro { background: #fef3c7; color: #92400e; }
+
+    /* ── Separator ── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--c-border);
+      margin: 48px 0;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 960px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-overlay.open { display: block; }
+      .content { margin-left: 0; padding: 28px 20px 80px; }
+      .hamburger { display: block; }
+    }
+
+    @media (max-width: 600px) {
+      .content h2 { font-size: 1.25rem; }
+      .content h3 { font-size: 1.05rem; }
+      .step { padding: 16px 18px; }
+    }
+  </style>
+<!-- Google tag (gtag.js) -->
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-T7YFE7XLLF"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-T7YFE7XLLF');
+  </script>
+</head>
+<body>
+<!-- ═══ Header ═══ -->
+<header class="site-header">
+<img alt="Traductor en vivo" height="32" src="./icons/icon-128x128.png" width="32"/>
+<h1>Traductor en vivo — Guía del usuario</h1>
+<div class="header-actions">
+<select aria-label="Select language guide version" class="language-select" id="languageSelect">
+<option value="instruction.html">🇺🇸 - English</option>
+<option value="instruction-zh.html">🇨🇳 - Chinese</option>
+<option value="instruction-hi.html">🇮🇳 - Hindi</option>
+<option value="instruction-es.html">🇪🇸 - Spanish</option>
+<option value="instruction-fr.html">🇫🇷 - French</option>
+<option value="instruction-ar.html">🇸🇦 - Arabic</option>
+<option value="instruction-pt.html">🇵🇹 - Portuguese</option>
+<option value="instruction-ru.html">🇷🇺 - Russian</option>
+</select>
+<a class="home-link" href="https://translate.ezitech.io">Volver a la página de inicio</a>
+</div>
+</header>
+<!-- ═══ Sidebar overlay (mobile) ═══ -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<!-- ═══ Layout ═══ -->
+<div class="layout">
+<!-- ═══ Sidebar ═══ -->
+<aside class="sidebar" id="sidebar">
+<nav>
+<div class="nav-group">
+<div class="nav-group-title">Comenzando</div>
+<a href="#installation">Instalación</a>
+<a href="#supported-platforms">Plataformas compatibles</a>
+<a href="#overview">Descripción general de la extensión</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">Configuración de claves API</div>
+<a href="#soniox-key">Obtenga una clave API de Soniox</a>
+<a href="#openai-key">Obtenga una clave API de OpenAI (opcional)</a>
+<a href="#enter-keys">Ingrese sus claves API</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">Licencia y Pro</div>
+<a href="#buy-license">Comprar una clave de licencia</a>
+<a href="#activate-license">Active su licencia</a>
+<a href="#free-vs-pro">Funciones gratuitas versus funciones profesionales</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">Uso básico</div>
+<a href="#start-translation">Iniciar una sesión de traducción</a>
+<a href="#controls">Controles: Pausa, Reanudar, Finalizar</a>
+<a href="#language-selection">Cambiar idiomas</a>
+<a href="#microphone">Enciende tu micrófono</a>
+<a href="#font-size">Cambiar tamaño de fuente</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">Características</div>
+<a href="#speaker-names">Nombres de los oradores</a>
+<a href="#narration">Narración (Texto a voz)</a>
+<a href="#narrate-my-voice">Narrar Mi Voz (Intérprete)</a>
+<a href="#send-chat">Enviar traducción vía chat</a>
+<a href="#subtitle-mode">Modo de subtítulos</a>
+<a href="#inline-assistant">Asistente de IA en línea</a>
+<a href="#context-setting">Configuración de contexto</a>
+<a href="#download-transcript">Descargar Transcripción</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">Más</div>
+<a href="#auto-update">Verificación de actualización automática</a>
+<a href="#troubleshooting">Solución de problemas</a>
+<a href="#contact">Contacto y soporte</a>
+</div>
+</nav>
+</aside>
+<!-- ═══ Content ═══ -->
+<main class="content">
+<!-- ────────────────────────────────────────── -->
+<!-- GETTING STARTED                            -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="installation">Instalación</h2>
+<p class="section-intro">Instala la extensión Live Translator en cualquier navegador basado en Chromium (Chrome, Edge, Brave, Arc, Opera, etc.).</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">Abre el sitio web de Live Translator</span>
+<div class="step-body">
+<p>Ir a <a href="https://translate.ezitech.io" target="_blank">https://translate.ezitech.io</a> en tu navegador.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">Haga clic en el botón "Instalar"</span>
+<div class="step-body">
+<p>Haga clic en <strong>Agregar a Chrome</strong> botón. Esto descargará el archivo de extensión.</p>
+<div class="img-placeholder">
+<img alt="Agregar a Chrome" src="./images/add-to-chrome.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">Habilite el Modo Desarrollador en su navegador</span>
+<div class="step-body">
+<p>Abre la página de administración de extensiones de tu navegador:</p>
+<ul>
+<li><strong>Cromo/Valiente/Arco:</strong> Tipo <code>chrome://extensions</code> en la barra de direcciones y presione Enter.</li>
+<li><strong>Borde:</strong> Tipo <code>edge://extensions</code> en la barra de direcciones y presione Enter.</li>
+</ul>
+<p>Alternar <strong>Modo desarrollador</strong> ON en la esquina superior derecha de la página.</p>
+<div class="img-placeholder">
+<img alt="Habilitar modo de desarrollador" src="./images/enable-dev-mode.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">4</span>
+<span class="step-title">Instalar el archivo de extensión</span>
+<div class="step-body">
+<p>Arrastra y suelta el archivo descargado. <code>.zip</code> archivo en la página de extensiones.</p>
+<div class="img-placeholder">
+<img alt="Instalar extensión" src="./images/drag-drop.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-note">
+<div class="callout-label">¡Listo!</div>
+<p>Ahora deberías ver el ícono de Live Translator en la barra de herramientas de tu navegador. La extensión está instalada y lista para ser configurada.</p>
+</div>
+<hr class="section-divider"/>
+<!-- Supported Platforms -->
+<h2 id="supported-platforms">Plataformas compatibles</h2>
+<p class="section-intro">Live Translator funciona en estos sitios web y plataformas. Simplemente abra cualquiera de estos sitios y haga clic en el ícono de la extensión para comenzar a traducir.</p>
+<table>
+<thead>
+<tr><th>Plataforma</th><th>Qué puedes hacer</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Google Meet</strong></td><td>Traduce reuniones, narra tu voz, envía chat</td></tr>
+<tr><td><strong>Zoom (Web)</strong></td><td>Traduce reuniones, narra tu voz, envía chat</td></tr>
+<tr><td><strong>Equipos de Microsoft (Web)</strong></td><td>Traduce reuniones, narra tu voz, envía chat</td></tr>
+<tr><td><strong>YouTube</strong></td><td>Traducir videos, contexto de autocompletar desde el título del video</td></tr>
+<tr><td><strong>WhatsAppWeb</strong></td><td>Traduce llamadas, narra tu voz</td></tr>
+<tr><td><strong>Facebook</strong></td><td>Traduce videos y transmisiones en vivo</td></tr>
+<tr><td><strong>Tik Tok</strong></td><td>Traducir vídeos</td></tr>
+<tr><td><strong>Douyin</strong></td><td>Traducir vídeos</td></tr>
+<tr><td><strong>Vimeo</strong></td><td>Traducir vídeos</td></tr>
+<tr><td><strong>Dailymotion</strong></td><td>Traducir vídeos</td></tr>
+<tr><td><strong>Udemy</strong></td><td>Traducir vídeos del curso</td></tr>
+<tr><td><strong>Domestica</strong></td><td>Traducir vídeos del curso</td></tr>
+</tbody>
+</table>
+<div class="callout callout-tip">
+<div class="callout-label">Consejo</div>
+<p>La extensión captura <strong>pestaña audio</strong> directamente, por lo que funciona con cualquier audio que se reproduzca en la pestaña del navegador en sitios compatibles; no se necesita una configuración de micrófono separada para el audio de la otra parte.</p>
+</div>
+<hr class="section-divider"/>
+<!-- Extension Overview -->
+<h2 id="overview">Descripción general de la extensión</h2>
+<p class="section-intro">Una descripción general rápida de la interfaz principal y dónde se encuentra todo.</p>
+<div class="img-placeholder" style="min-height: 200px;">
+<img alt="Descripción general de la extensión" src="./images/extension-overview.png"/>
+</div>
+<p>El panel Live Translator tiene estas áreas principales:</p>
+<ul>
+<li><strong>Barra de título</strong> — Botón de configuración, alternar modo de subtítulos, botón Cerrar. Si hay una actualización disponible, verá una insignia aquí.</li>
+<li><strong>Selector de idioma</strong> — Dos menús desplegables: "Mi idioma" (el idioma que hablas) y "Su idioma" (el idioma desde el que deseas traducir).</li>
+<li><strong>Área de transcripción</strong> — Donde el texto traducido aparece en tiempo real, organizado por hablante.</li>
+<li><strong>Barra de control</strong> — Botón Iniciar/Detener/Pausar, alternar micrófono, configuración de narración, asistente de IA, tamaño de fuente, descarga y más opciones.</li>
+</ul>
+<div class="callout callout-tip">
+<div class="callout-label">Consejo</div>
+<p>Tú puedes <strong>arrastra el panel</strong> por su barra de título para moverlo a cualquier lugar de la pantalla, y <strong>cambiar su tamaño</strong> arrastrando los bordes. De esta forma no bloqueará contenido importante durante reuniones o vídeos.</p>
+</div>
+<hr class="section-divider"/>
+<!-- ────────────────────────────────────────── -->
+<!-- API KEYS SETUP                             -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="soniox-key">Obtenga una clave API de Soniox</h2>
+<p class="section-intro">Soniox proporciona el motor de traducción y reconocimiento de voz en tiempo real. Necesita una clave API de Soniox para utilizar Live Translator. <span class="badge badge-free">Requerido</span></p>
+<div class="callout callout-warn">
+<div class="callout-label">Importante</div>
+<p>Una clave API de Soniox es <strong>requerido</strong> para que la extensión funcione. Sin él, la extensión no puede transcribir ni traducir ningún audio.</p>
+</div>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">Ir al sitio web de Soniox</span>
+<div class="step-body">
+<p>Abrir <a href="https://console.soniox.com/signup" target="_blank">https://console.soniox.com/signup</a> en tu navegador. Cree una cuenta utilizando su correo electrónico o inicio de sesión de Google.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">Obtén tu clave API</span>
+<div class="step-body">
+<p>Después de iniciar sesión, navega a la sección API de tu panel de control de Soniox. También puedes ir directamente a <a href="https://soniox.com/docs/stt/get-started#get-api-key" target="_blank">Guía de introducción a Soniox</a> para obtener instrucciones paso a paso.</p>
+<p>Copia tu clave API; la necesitarás en los siguientes pasos.</p>
+<div class="img-placeholder">
+<img alt="Obtener clave API" src="./images/create-soniox-api.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">Agregar facturación (requerido para el uso de API)</span>
+<div class="step-body">
+<p>Agrega un método de pago a tu cuenta Soniox. Puede utilizar una tarjeta de crédito, PayPal u otros métodos de pago. La API de Soniox es de pago por uso: solo paga por lo que usa.</p>
+<div class="img-placeholder">
+<img alt="Agregar método de pago" src="./images/payment-soniox.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">Nota</div>
+<p>Necesitas depositar un mínimo de $1 en tu cuenta para usar la API. Puedes depositar más si lo deseas.</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="openai-key">Obtenga una clave API de OpenAI (opcional)</h2>
+<p class="section-intro">Una clave API de OpenAI es <strong>opcional</strong> : solo lo necesitas si quieres usar voces OpenAI para la narración o la función Inline AI Assistant. <span class="badge badge-pro">Pro</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">Ir a la plataforma OpenAI</span>
+<div class="step-body">
+<p>Abrir <a href="https://platform.openai.com/api-keys" target="_blank">https://platform.openai.com/api-keys</a> en tu navegador.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">Crea una cuenta o inicia sesión</span>
+<div class="step-body">
+<p>Si no tienes una cuenta OpenAI, haz clic en <strong>"Registrarse"</strong> y crea uno. Si ya tienes uno, inicia sesión.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">Crear una nueva clave API</span>
+<div class="step-body">
+<p>Haga clic <strong>"+ Crear nueva clave secreta"</strong>, asígnale un nombre como "Traductor en vivo" y haz clic en <strong>"Crear clave secreta"</strong>.</p>
+<p><strong>Copia y guarda la clave inmediatamente.</strong> — OpenAI solo lo mostrará una vez.</p>
+<div class="img-placeholder">
+<img alt="Crear clave API de OpenAI" src="./images/openai-key.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">4</span>
+<span class="step-title">Agregar facturación (requerido para el uso de API)</span>
+<div class="step-body">
+<p>Ir a <a href="https://platform.openai.com/account/billing" target="_blank">Configuración de facturación</a> y agrega un método de pago. La API de OpenAI es de pago por uso: solo paga por lo que usa.</p>
+<div class="img-placeholder">
+<img alt="Crear clave API de OpenAI" src="./images/openai-billing.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-note">
+<div class="callout-label">Nota</div>
+<p>Si solo quieres narración (texto a voz), puedes usar <strong>Google Translate voces gratis</strong> en su lugar. La clave OpenAI solo es necesaria si desea las voces premium de OpenAI o la función Asistente AI.</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="enter-keys">Ingrese sus claves API</h2>
+<p class="section-intro">Una vez que tengas tus claves API, ingrésalas en la página de configuración de Live Translator.</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">Abrir la configuración de Live Translator</span>
+<div class="step-body">
+<p>Puedes abrir la configuración de cualquiera de estas maneras:</p>
+<ul>
+<li>Haga clic en <strong>icono de engranaje</strong> (⚙) en la parte superior derecha del panel del traductor.</li>
+<li>Haz clic derecho en el ícono de Live Translator en tu barra de herramientas → <strong>"Opciones"</strong>.</li>
+<li>Vaya a la página de extensiones de su navegador → busque Live Translator → <strong>"Detalles"</strong> → <strong>"Opciones de extensión"</strong>.</li>
+</ul>
+<div class="img-placeholder">
+<img alt="Página de configuración" src="./images/gear.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">Ingrese su clave API de Soniox</span>
+<div class="step-body">
+<p>En la página de configuración, haga clic en <strong>"Soniox"</strong> en la barra lateral izquierda. Pegue su clave API de Soniox en el campo de entrada. La clave se guarda automáticamente.</p>
+<div class="img-placeholder">
+<img alt="Configuración de Soniox" src="./images/enter-soniox-key.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">Ingresa tu clave API de OpenAI (opcional)</span>
+<div class="step-body">
+<p>Haga clic en <strong>"AI abierta"</strong> en la barra lateral izquierda. Pegue su clave API de OpenAI en el campo de entrada. La clave se guarda automáticamente.</p>
+<div class="img-placeholder">
+<img alt="Configuración de OpenAI" src="./images/enter-openai-key.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-note">
+<div class="callout-label">Nota de seguridad</div>
+<p>Tus claves API se almacenan <strong>localmente solo en tu dispositivo</strong> usando la extensión de almacenamiento segura de Chrome. Nunca se envían a los servidores de Live Translator; solo se utilizan para comunicarse directamente con Soniox y OpenAI.</p>
+</div>
+<hr class="section-divider"/>
+<!-- ────────────────────────────────────────── -->
+<!-- LICENSE & PRO                              -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="buy-license">Comprar una clave de licencia</h2>
+<p class="section-intro">Una clave de licencia desbloquea funciones Pro como narración, descarga SRT, asistente de IA y más.</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">Ir a la página de compra</span>
+<div class="step-body">
+<p>Visite la página de inicio de Live Translator en <a href="https://translate.ezitech.io/#pricing" target="_blank">https://translate.ezitech.io/#pricing</a> y desplázate hasta la <strong>Precios</strong> sección, o haga clic en el <strong>"Comprar una licencia"</strong> enlace en la página de configuración de la extensión.</p>
+<div class="img-placeholder">
+<img alt="Página de compra" src="./images/pricing.jpeg"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">Elige tu plan</span>
+<div class="step-body">
+<p>Seleccione:</p>
+<ul>
+<li><strong>Mensual</strong> — $5,99/mes</li>
+<li><strong>Anual</strong> — $59/año (ahorre ~18%)</li>
+</ul>
+<p>Puedes conseguir un <strong>Prueba gratuita de 7 días</strong> para probar las funciones Pro. Después de la prueba, puede comprar una licencia para continuar usando las funciones Pro.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">Completar el pago</span>
+<div class="step-body">
+<p>Serás redirigido a la página de pago de Polar. Ingrese su correo electrónico y detalles de pago, luego complete la compra.</p>
+<div class="img-placeholder">
+<img alt="Página de pago" src="./images/purchase.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">4</span>
+<span class="step-title">Reciba su clave de licencia</span>
+<div class="step-body">
+<p>Después del pago, recibirás un <strong>clave de licencia</strong> vía correo electrónico. La clave de licencia parece un código largo (p. ej., <code>LT-XXXX-XXXX-XXXX-XXXX</code>). Copie esta clave.</p>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">Política de reembolso</div>
+<p>Puedes solicitar un reembolso dentro de <strong>30 días</strong> desde la fecha de pago contactando <a href="mailto:phampdoan@gmail.com">phampdoan@gmail.com</a>.</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="activate-license">Active su licencia</h2>
+<p class="section-intro">Después de comprar, active su clave de licencia en la configuración de la extensión.</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">Ingresa y activa tu clave de licencia</span>
+<div class="step-body">
+<p>Abra la configuración de la extensión (icono de engranaje o haga clic derecho → Opciones). Haga clic en <strong>"Licencia"</strong> en la barra lateral izquierda. Pegue su clave de licencia en el campo de entrada y haga clic <strong>"Activar"</strong>. La extensión verificará su licencia con el servidor.</p>
+<div class="img-placeholder">
+<img alt="Activar Licencia" src="./images/enter-license-key.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">Verificar activación</span>
+<div class="step-body">
+<p>Una vez activada, verá el estado de su licencia, el correo electrónico asociado con la licencia y la fecha de vencimiento. Todas las funciones Pro ahora están desbloqueadas.</p>
+<div class="img-placeholder">
+<img alt="Activar Licencia" src="./images/license-activated.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-warn">
+<div class="callout-label">¿Cambiar de dispositivo?</div>
+<p>Si previamente activaste la licencia en otro dispositivo, puedes usar la <strong>"Forzar activación"</strong> opción para mover la licencia a su dispositivo actual. Cada licencia solo puede estar activa en un dispositivo a la vez.</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="free-vs-pro">Funciones gratuitas versus funciones profesionales</h2>
+<p class="section-intro">Esto es lo que puedes hacer con la versión gratuita y lo que requiere una licencia Pro.</p>
+<table>
+<thead>
+<tr><th>Característica</th><th>Gratis</th><th>Pro</th></tr>
+</thead>
+<tbody>
+<tr><td>Traducción en tiempo real</td><td>✓</td><td>✓</td></tr>
+<tr><td>60+ idiomas</td><td>✓</td><td>✓</td></tr>
+<tr><td>Etiquetas de los altavoces</td><td>✓</td><td>✓</td></tr>
+<tr><td>Arrastrar, cambiar el tamaño y minimizar el panel</td><td>✓</td><td>✓</td></tr>
+<tr><td>Control de tamaño de fuente</td><td>✓</td><td>✓</td></tr>
+<tr><td>Descargar transcripción (TXT/JSON)</td><td>—</td><td>✓</td></tr>
+<tr><td>Descargar transcripción (SRT)</td><td>—</td><td>✓</td></tr>
+<tr><td>Narrar su voz (TTS)</td><td>—</td><td>✓</td></tr>
+<tr><td>Narrar Mi Voz (Intérprete)</td><td>—</td><td>✓</td></tr>
+<tr><td>Enviar traducción vía chat</td><td>—</td><td>✓</td></tr>
+<tr><td>Modo de subtítulos</td><td>—</td><td>✓</td></tr>
+<tr><td>Asistente de IA en línea</td><td>—</td><td>✓</td></tr>
+<tr><td>Configuración de contexto</td><td>✓</td><td>✓</td></tr>
+<tr><td>Nombres de los oradores</td><td>✓</td><td>✓</td></tr>
+</tbody>
+</table>
+<hr class="section-divider"/>
+<!-- ────────────────────────────────────────── -->
+<!-- BASIC USAGE                                -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="start-translation">Iniciar una sesión de traducción</h2>
+<p class="section-intro">Aprenda cómo comenzar a traducir en una reunión o video.</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">Abrir un sitio web compatible</span>
+<div class="step-body">
+<p>Ir a cualquier <a href="#supported-platforms">plataforma compatible</a> (por ejemplo, Google Meet, Zoom, YouTube, etc.) y únete a una reunión o reproduce un vídeo.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">Abre el panel de Live Translator</span>
+<div class="step-body">
+<p>Haga clic en <strong>Icono de Traductor en vivo</strong> en la barra de herramientas de tu navegador. El panel del traductor aparecerá en la página. También puede hacer clic en <strong>icono flotante</strong> que aparece en la página.</p>
+<div class="img-placeholder">
+<img alt="Panel abierto" src="./images/floating-icon.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">Selecciona tus idiomas</span>
+<div class="step-body">
+<p>Utiliza los dos menús desplegables de idiomas en la parte superior del panel:</p>
+<ul>
+<li><strong>"Mi idioma"</strong> — El idioma <em>tú</em> habla (p. ej., vietnamita).</li>
+<li><strong>"Su idioma"</strong> — El idioma <em>otros</em> habla que quieres traducir (por ejemplo, inglés).</li>
+</ul>
+<div class="img-placeholder">
+<img alt="Selección de idioma" src="./images/language.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">4</span>
+<span class="step-title">Presiona el botón Inicio</span>
+<div class="step-body">
+<p>Haga clic en <strong>Inicio</strong> botón (icono de reproducción) en la barra de control en la parte inferior del panel.</p>
+<p>Su navegador puede solicitar permiso para capturar audio: haga clic en <strong>"Permitir"</strong> y selecciona la pestaña que deseas capturar.</p>
+<div class="img-placeholder">
+<img alt="Botón Inicio" src="./images/press-start.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">5</span>
+<span class="step-title">Ver traducciones en tiempo real</span>
+<div class="step-body">
+<p>Mientras la gente habla, verás tanto el <strong>texto original</strong> y el <strong>texto traducido</strong> aparecen en el área de transcripción. Las líneas se agrupan automáticamente por altavoz.</p>
+<div class="img-placeholder">
+<img alt="Traducción en tiempo real" src="./images/translate-real.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">Desplazamiento automático</div>
+<p>La transcripción se desplaza automáticamente para mostrar el texto más reciente. Si se desplaza hacia arriba para leer el texto anterior, el desplazamiento automático se detiene. Haga clic en <strong>"Desplazarse hasta lo último"</strong> botón que parece regresar al texto en vivo.</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="controls">Controles: Pausa, Reanudar, Finalizar</h2>
+<p class="section-intro">Comprende los controles de la sesión de traducción.</p>
+<table>
+<thead>
+<tr><th>Botón</th><th>Qué hace</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Inicio</strong> (▶)</td><td>Comienza una nueva sesión de traducción. Borra cualquier transcripción anterior.</td></tr>
+<tr><td><strong>Pausa</strong> (⏸)</td><td>Detiene temporalmente la traducción. Se conserva la transcripción. La captura de audio continúa pero el texto está en pausa.</td></tr>
+<tr><td><strong>Reanudar</strong> (▶)</td><td>Continúa la traducción después de una pausa. El nuevo texto aparece después del contenido anterior.</td></tr>
+<tr><td><strong>Fin</strong> (⏹)</td><td>Detiene la sesión por completo. La transcripción se mantiene en pantalla hasta que inicie una nueva sesión. Finaliza la captura de audio, apaga el micrófono y la narración.</td></tr>
+</tbody>
+</table>
+<hr class="section-divider"/>
+<h2 id="language-selection">Cambiar idiomas</h2>
+<p class="section-intro">Puedes cambiar los idiomas de traducción en cualquier momento.</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">Haz clic en el menú desplegable de idiomas</span>
+<div class="step-body">
+<p>Haz clic en cualquiera de los <strong>"Mi idioma"</strong> o <strong>"Su idioma"</strong> menú desplegable en la parte superior del panel.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">Selecciona un nuevo idioma</span>
+<div class="step-body">
+<p>La lista admite <strong>60+ idiomas</strong> ordenados alfabéticamente. Desplázate o escribe para buscar tu idioma. Haga clic para seleccionarlo.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">La traducción se reinicia automáticamente</span>
+<div class="step-body">
+<p>Si hay una sesión activa, cambiar el idioma reiniciará automáticamente la traducción con el nuevo par de idiomas. Su selección de idioma se guarda para la próxima vez.</p>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="microphone">Enciende tu micrófono</h2>
+<p class="section-intro">Habilite su micrófono para que su propio discurso también se traduzca junto con el audio de la reunión/video.</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">Haz clic en el botón del micrófono</span>
+<div class="step-body">
+<p>En la barra de control, haz clic en el <strong>icono de micrófono</strong>. El icono se activa (resaltado) cuando el micrófono está encendido.</p>
+<div class="img-placeholder">
+<img alt="Botón de micrófono" src="./images/micro.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">Permitir acceso al micrófono</span>
+<div class="step-body">
+<p>Si es la primera vez, tu navegador te pedirá permiso para el micrófono. Haga clic <strong>"Permitir"</strong>.</p>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">Consejo</div>
+<p>El micrófono está <strong>desactivado de forma predeterminada</strong> al abrir el panel. Actívelo sólo si desea que se transcriba y traduzca su propio discurso. Cuando presionas <strong>Fin</strong>, el micrófono se apaga automáticamente.</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="font-size">Cambiar tamaño de fuente</h2>
+<p class="section-intro">Ajusta el tamaño del texto de la transcripción para una lectura cómoda.</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">Haga clic en el botón de tamaño de fuente</span>
+<div class="step-body">
+<p>En la barra de control, haz clic en el <strong>botón de tamaño de fuente</strong> (ícono Aa). Aparece un menú con tres tamaños:</p>
+<ul>
+<li><strong>Pequeño</strong> — Vista compacta, se adapta a más texto</li>
+<li><strong>Medio</strong> — Tamaño equilibrado predeterminado</li>
+<li><strong>Grande</strong> — Más fácil de leer a distancia</li>
+</ul>
+<p>Haz clic en tu tamaño preferido. El cambio se aplica inmediatamente y se guarda para la próxima vez.</p>
+<div class="img-placeholder">
+<img alt="Selector de tamaño de fuente" src="./images/font.png"/>
+</div>
+</div>
+</div>
+<hr class="section-divider"/>
+<!-- ────────────────────────────────────────── -->
+<!-- FEATURES                                   -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="speaker-names">Nombres de los oradores</h2>
+<p class="section-intro">Asigna nombres reales a los hablantes para que puedas identificar fácilmente quién dijo qué en la transcripción. <span class="badge badge-free">Gratis</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">Abre el menú "Más"</span>
+<div class="step-body">
+<p>En la barra de control, haz clic en el <strong>"Más"
+Botón </strong> (icono ⋯). Luego haga clic <strong>"Configuración de los altavoces"</strong> botón.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">Abra el cuadro de diálogo "Configuración de los altavoces"</span>
+<div class="step-body">
+<p>Se abrirá el cuadro de diálogo Configuración de altavoces.</p>
+<div class="img-placeholder">
+<img alt="Diálogo de configuración del altavoz" src="./images/speaker.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">Asignar nombres</span>
+<div class="step-body">
+<p>Verás una lista de los oradores detectados (Altavoz 1, Orador 2, etc.). Escriba un nombre real al lado de cada uno (por ejemplo, "John", "Sarah"). Haga clic <strong>"Agregar fila"</strong> si necesitas más.</p>
+<p>Haga clic <strong>"Guardar"</strong>. Todas las líneas de transcripción (pasadas y futuras) ahora usarán los nombres que usted asignó.</p>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="narration">Narración (Texto a voz)</h2>
+<p class="section-intro">Haz que te lean las traducciones en voz alta para que puedas escuchar en lugar de leer. Esta es la función "Narrar su voz". <span class="badge badge-pro">Pro</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">Abrir configuración de narración</span>
+<div class="step-body">
+<p>En la barra de control, haz clic en el <strong>botón de narración</strong> (icono de altavoz). Se abre el cuadro de diálogo Configuración de narración.</p>
+<div class="img-placeholder">
+<img alt="Configuración de narración" src="./images/narration-setting.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">Elija un proveedor de TTS y voz</span>
+<div class="step-body">
+<p>Selecciona tu proveedor de voz:</p>
+<ul>
+<li><strong>Traductor de Google</strong> (Gratis) — Funciona sin ninguna clave API. Voces de buena calidad en más de 60 idiomas.</li>
+<li><strong>OpenAI</strong> (Premium) — Voces más naturales y de mayor calidad. Requiere una clave API de OpenAI.</li>
+</ul>
+<p>Selecciona un <strong>voz</strong> en el menú desplegable y haga clic en <strong>"Prueba"</strong> para obtener una vista previa de cómo suena.</p>
+<p>Ajustar <strong>velocidad de voz</strong> y <strong>volumen</strong> si es necesario.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">Iniciar narración</span>
+<div class="step-body">
+<p>Haga clic <strong>"Narra su voz"</strong> botón en el cuadro de diálogo. Ahora, cada vez que aparezca una traducción, se la leerá en voz alta.</p>
+<p>Para detener, haz clic nuevamente en el botón de narración y haz clic en <strong>"Detener"</strong>.</p>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="narrate-my-voice">Narrar mi voz (modo intérprete)</h2>
+<p class="section-intro">Hable en su idioma y reproduzca su voz traducida a otros participantes de la reunión, como si tuviera un intérprete personal. <span class="badge badge-pro">Pro</span></p>
+<div class="callout callout-warn">
+<div class="callout-label">Requisitos</div>
+<p>Esta función funciona en <strong>Google Meet</strong>, <strong>Zoom (Web)</strong>, <strong>Equipos de Microsoft (Web)</strong>, y <strong>WhatsAppWeb</strong>. Necesitas tu <strong>micrófono habilitado</strong> y una sesión de traducción <strong>corriendo</strong>.</p>
+</div>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">Abrir configuración de narración</span>
+<div class="step-body">
+<p>Haga clic en <strong>botón de narración</strong> en la barra de control para abrir el cuadro de diálogo Configuración de narración.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">Configurar "Narrar Mi Voz"</span>
+<div class="step-body">
+<p>En el cuadro de diálogo, busque el <strong>"Narrar Mi Voz"</strong> sección. Elija su voz y proveedor preferidos (Google u OpenAI). Puedes establecer un <strong>voz diferente</strong> para la narración de "Mi voz" y "Su voz".</p>
+<p>Haga clic <strong>"Prueba"</strong> para obtener una vista previa de la voz seleccionada.</p>
+<div class="img-placeholder">
+<img alt="Narrar Mi Voz" src="./images/my-voice-setting.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">Inicia "Narrar mi voz"</span>
+<div class="step-body">
+<p>Haga clic <strong>"Empezar a Narrar Mi Voz"</strong>. Cuando hablas, tus palabras son:</p>
+<ol>
+<li>Transcrito en tu idioma</li>
+<li>Traducido al otro idioma</li>
+<li>Hablado en voz alta en la reunión para que la otra persona escuche tu voz traducida.</li>
+</ol>
+<p>Tu micrófono se silencia automáticamente mientras se reproduce el audio traducido para evitar el eco.</p>
+<div class="img-placeholder">
+<img alt="Empezar a Narrar Mi Voz" src="./images/narrate-my-voice.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">4</span>
+<span class="step-title">Detener narración</span>
+<div class="step-body">
+<p>Haz clic en el botón de narración y luego <strong>"Detener"</strong>, o presiona <strong>Fin</strong> para detener toda la sesión (que también detiene la narración).</p>
+</div>
+</div>
+<div class="callout callout-note">
+<div class="callout-label">Nota</div>
+<p>Solo puedes ejecutar <strong>un modo de narración a la vez</strong> — ya sea "Narrar mi voz" o "Narrar su voz", no ambas simultáneamente. El icono de la barra de herramientas cambia para mostrar qué modo está activo.</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="send-chat">Enviar traducción vía chat</h2>
+<p class="section-intro">Envía automáticamente tu discurso traducido como mensajes de texto en el chat de la reunión. <span class="badge badge-pro">Pro</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">Habilitar "Enviar vía Chat"</span>
+<div class="step-body">
+<p>En la barra de control, busca el <strong>botón de envío de chat</strong> (al lado del ícono del micrófono). Haga clic en él para activarlo: el botón se activa. <strong>verde</strong> cuando está activo.</p>
+<div class="img-placeholder">
+<img alt="Enviar Chat" src="./images/send-via-chat.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">Habla y envía automáticamente</span>
+<div class="step-body">
+<p>Con el micrófono encendido y una sesión de traducción en ejecución, cuando hablas, tu texto traducido se inserta automáticamente en la entrada del chat de la reunión y se envía.</p>
+<p>Esto funciona en <strong>Google Meet</strong>, <strong>Zoom (Web)</strong>, y <strong>Equipos de Microsoft (Web)</strong>.</p>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">Consejo</div>
+<p>Esto es útil cuando "Narrar mi voz" no está disponible para tu plataforma, o si deseas narración de voz Y traducción de chat de texto simultáneamente.</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="subtitle-mode">Modo de subtítulos</h2>
+<p class="section-intro">Cambie a una barra de subtítulos mínima, estilo película, que muestra solo la última traducción en la parte inferior de la pantalla. <span class="badge badge-pro">Pro</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">Habilitar modo de subtítulos</span>
+<div class="step-body">
+<p>En la barra de título del panel del traductor, haz clic en el <strong>icono de subtítulo</strong> (icono de subtítulos).</p>
+<p>El panel completo será reemplazado por una delgada barra de subtítulos en la parte inferior de la pantalla.</p>
+<div class="img-placeholder">
+<img alt="Modo de subtítulos" src="./images/subtitle.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">Personaliza la barra de subtítulos</span>
+<div class="step-body">
+<p>Haga clic en <strong>icono de melodía</strong> (engranaje de configuración) en la barra de subtítulos para ajustar:</p>
+<ul>
+<li><strong>Opacidad</strong> — Desliza para hacer la barra más o menos transparente.</li>
+<li><strong>Tamaño de fuente</strong> —Elige entre texto pequeño, mediano o grande.</li>
+</ul>
+<p>También puedes <strong>arrastrar</strong> la barra de subtítulos para moverla, y <strong>cambiar tamaño</strong> arrastrando los bordes.</p>
+<div class="img-placeholder">
+<img alt="Configuración de subtítulos" src="./images/customize-subtitle-bar.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">Salir del modo de subtítulos</span>
+<div class="step-body">
+<p>Haga clic en <strong>botón cerrar</strong> (✕) en la barra de subtítulos para regresar al panel completo del traductor.</p>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="inline-assistant">Asistente de IA en línea</h2>
+<p class="section-intro">Obtenga explicaciones basadas en IA y respuestas generadas según el contexto de la conversación, directamente desde la transcripción. <span class="badge badge-pro">Pro</span></p>
+<div class="callout callout-warn">
+<div class="callout-label">Requisito</div>
+<p>El Asistente de IA en línea requiere un <strong>Clave API de OpenAI</strong> para configurar en ajustes.</p>
+</div>
+<h3>Explica una línea</h3>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">Pase el cursor sobre una línea de transcripción</span>
+<div class="step-body">
+<p>Cuando pasas el cursor sobre cualquier línea de la transcripción, aparece un <strong>Icono de IA
+Aparece </strong> (🤖).</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">Haz clic en el ícono AI y elige "Explicar"</span>
+<div class="step-body">
+<p>El asistente de IA se abre en una ventana separada. Utilizará el contexto de la transcripción completa y la línea seleccionada para brindarle una explicación detallada.</p>
+<div class="img-placeholder">
+<img alt="Explicar" src="./images/ai-explain.png"/>
+</div>
+</div>
+</div>
+<h3>Generar una respuesta</h3>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">Haz clic en el ícono AI y elige "Generar respuesta"</span>
+<div class="step-body">
+<p>El asistente de IA generará una respuesta sugerida basada en lo que se dijo en la conversación. Incluso puede utilizar la búsqueda web para proporcionar respuestas más precisas.</p>
+<div class="img-placeholder">
+<img alt="Generar respuesta" src="./images/ai-help-answer.png"/>
+</div>
+</div>
+</div>
+<h3>Abre el panel Asistente</h3>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">Haz clic en el botón Asistente en la barra de control.</span>
+<div class="step-body">
+<p>También puedes abrir el panel del asistente de IA directamente desde la <strong>botón asistente</strong> (icono 🤖) en la barra de control. Esto abre una ventana de chat que se puede arrastrar donde puedes escribir cualquier pregunta. El asistente tiene acceso a la transcripción completa como contexto.</p>
+<div class="img-placeholder">
+<img alt="Asistente del Panel" src="./images/ai.png"/>
+</div>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="context-setting">Configuración de contexto</h2>
+<p class="section-intro">Proporciona contexto sobre el tema de conversación para mejorar la precisión de la traducción. <span class="badge badge-free">Gratis</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">Abrir configuración de contexto</span>
+<div class="step-body">
+<p>Haga clic en <strong>"Más"
+Botón </strong> botón (⋯) en la barra de control, luego haga clic en <strong>"Contexto"</strong>.</p>
+<div class="img-placeholder">
+<img alt="Configuración de contexto" src="./images/context.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">Rellena los campos de contexto</span>
+<div class="step-body">
+<p>Puedes proporcionar:</p>
+<ul>
+<li><strong>Dominio / Tema</strong> —De qué trata la conversación (p. ej., "Conferencia médica", "Stand-up de ingeniería de software").</li>
+<li><strong>Términos clave</strong> —Términos técnicos, nombres propios o jerga que pueden ser difíciles de reconocer (por ejemplo, "Kubernetes, puerta de enlace API, microservicios").</li>
+<li><strong>Información del orador</strong> —Nombres y funciones de los participantes (p. ej., "Dr. Smith, cardiólogo, presentador").</li>
+</ul>
+<p>Haga clic <strong>"Aplicar"</strong> para enviar este contexto al motor de traducción para la sesión actual.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">Guardar ajustes preestablecidos (opcional)</span>
+<div class="step-body">
+<p>Si tienes reuniones recurrentes con temas similares, haz clic en <strong>"Guardar preajuste"</strong> para guardar el contexto actual. La próxima vez, simplemente cargue el ajuste preestablecido en lugar de escribir todo nuevamente.</p>
+<p>También puedes <strong>Importar/Exportar</strong> ajustes preestablecidos como archivos JSON para compartirlos o hacer una copia de seguridad de ellos.</p>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">Autocompletar de YouTube</div>
+<p>Cuando se utiliza Live Translator en <strong>YouTube</strong>, los campos de contexto pueden ser <strong>llenado automáticamente</strong> con el título y la descripción del video. Esto ayuda al motor de traducción a comprender mejor el tema del video.</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="download-transcript">Descargar Transcripción</h2>
+<p class="section-intro">Guarde sus transcripciones traducidas como archivos para consultarlas más adelante o utilizarlas en otras herramientas. <span class="badge badge-pro">Pro</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">Haga clic en el botón Descargar</span>
+<div class="step-body">
+<p>Después de una sesión de traducción (o durante una), haz clic en el <strong>botón de descarga</strong> (icono ↓) en la barra de control. Se abre el cuadro de diálogo Descargar transcripción.</p>
+<div class="img-placeholder">
+<img alt="Descargar Transcripción" src="./images/download-transcript.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">Elige un formato</span>
+<div class="step-body">
+<p>Selecciona tu formato preferido:</p>
+<table>
+<thead>
+<tr><th>Formato</th><th>Lo mejor para</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>TXT</strong></td><td>Archivo de texto simple con marcas de tiempo y nombres de oradores. Fácil de leer.</td></tr>
+<tr><td><strong>JSON</strong></td><td>Formato de datos estructurados. Bueno para procesar con otras herramientas o scripts.</td></tr>
+<tr><td><strong>SRT (Original)</strong></td><td>Archivo de subtítulos con el texto en idioma original. Uso en software de edición de vídeo.</td></tr>
+<tr><td><strong>SRT (Traducido)</strong></td><td>Archivo de subtítulos con el texto traducido. Uso en software de edición de vídeo.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">Descargar el archivo</span>
+<div class="step-body">
+<p>Haz clic en el botón de descarga del formato elegido. El archivo se genera en su navegador y se guarda en su carpeta de descarga predeterminada.</p>
+</div>
+</div>
+<div class="callout callout-note">
+<div class="callout-label">Privacidad</div>
+<p>Se generan archivos de transcripción <strong>completamente en tu navegador</strong>. No se envían datos de transcripción a ningún servidor durante el proceso de descarga.</p>
+</div>
+<hr class="section-divider"/>
+<!-- ────────────────────────────────────────── -->
+<!-- MORE                                       -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="auto-update">Verificación de actualización automática</h2>
+<p class="section-intro">La extensión busca actualizaciones automáticamente cada vez que la abres.</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">Busque la insignia de actualización</span>
+<div class="step-body">
+<p>Cuando haya una nueva versión disponible, verás un <strong>"Actualización disponible"</strong> insignia en la barra de título del panel del traductor.</p>
+<div class="img-placeholder">
+<img alt="Actualización disponible" src="./images/update-badge.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">Haga clic para actualizar</span>
+<div class="step-body">
+<p>Haz clic en la insignia para ir a la página de instalación donde podrás descargar la última versión. sigue lo mismo <a href="#installation">pasos de instalación</a> para actualizar.</p>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="troubleshooting">Solución de problemas</h2>
+<p class="section-intro">Problemas comunes y cómo solucionarlos.</p>
+<h3>Mensaje "Sin clave API de Soniox"</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">Solución</span>
+<div class="step-body">
+<p>Aún no has ingresado tu clave API de Soniox. Ir a <a href="#enter-keys">Ingrese sus claves API</a> para configurarlo.</p>
+</div>
+</div>
+<h3>No se está capturando audio</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">Solución</span>
+<div class="step-body">
+<ul>
+<li>Asegúrate de haber hecho clic <strong>"Permitir"</strong> cuando el navegador solicitó permiso de captura de audio.</li>
+<li>Asegúrate de haber seleccionado el <strong>pestaña correcta</strong> para compartir cuando se le solicite.</li>
+<li>Intenta actualizar la página y abrir el traductor nuevamente.</li>
+<li>Verifique que la reunión/video realmente tenga reproducción de audio.</li>
+</ul>
+</div>
+</div>
+<h3>La traducción parece inexacta</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">Solución</span>
+<div class="step-body">
+<ul>
+<li>Asegúrate de que <strong>"Su idioma"</strong> el menú desplegable está configurado en el idioma correcto que se habla.</li>
+<li>Usar <a href="#context-setting">Configuración de contexto</a> para proporcionar información sobre el tema y términos clave.</li>
+<li>Asegúrate de que la calidad del audio sea clara: el ruido de fondo puede afectar la precisión.</li>
+</ul>
+</div>
+</div>
+<h3>"Narrate My Voice" — otros no pueden escuchar la traducción</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">Solución</span>
+<div class="step-body">
+<ul>
+<li>Confirma que estás en un <strong>plataforma compatible</strong> (Google Meet, Zoom Web, Teams Web, WhatsApp Web).</li>
+<li>Asegúrate de que haya una sesión de traducción <strong>corriendo</strong> y tu <strong>el micrófono está encendido</strong>.</li>
+<li>Comprueba que tienes un <strong>Licencia profesional</strong> activado.</li>
+<li>Intenta actualizar la página de la reunión y comenzar de nuevo.</li>
+</ul>
+</div>
+</div>
+<h3>Las funciones de OpenAI no funcionan</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">Solución</span>
+<div class="step-body">
+<ul>
+<li>Verifica tu <strong>Clave API de OpenAI</strong> se ingresó correctamente en <a href="#enter-keys">configuración</a>.</li>
+<li>Asegúrate de que tu cuenta OpenAI tenga <strong>configuración de facturación</strong> con créditos suficientes.</li>
+<li>Si no necesitas las funciones de OpenAI, usa <strong>Voces del Traductor de Google</strong> para la narración (gratis, no se necesita clave API).</li>
+</ul>
+</div>
+</div>
+<h3>La extensión no aparece en un sitio web</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">Solución</span>
+<div class="step-body">
+<ul>
+<li>Live Translator solo funciona en <a href="#supported-platforms">plataformas compatibles</a>. No aparecerá en sitios web no compatibles.</li>
+<li>Si el sitio es compatible pero la extensión no se muestra, intenta <strong>actualizando la página</strong>.</li>
+<li>Asegúrate de que la extensión sea <strong>habilitado</strong> en la página de administración de extensiones de tu navegador.</li>
+</ul>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="contact">Contacto y soporte</h2>
+<p class="section-intro">¿Necesitas ayuda? ¿Tiene alguna pregunta o sugerencia?</p>
+<p>Contactar al desarrollador:</p>
+<ul>
+<li><strong>Correo electrónico:</strong> <a href="mailto:ezsolu.io@gmail.com">ezsolu.io@gmail.com</a></li>
+<li><strong>Sitio web:</strong> <a href="https://translate.ezitech.io" target="_blank">https://translate.ezitech.io</a></li>
+<li><strong>WhatsApp:</strong> <a href="https://wa.me/84355561599" target="_blank">+84 355 561 599</a></li>
+<li><strong>Telegrama:</strong> <a href="https://t.me/ezi_tech" target="_blank">EziTech</a></li>
+</ul>
+<div class="callout callout-tip">
+<div class="callout-label">Bienvenidos comentarios</div>
+<p>Si tienes ideas para nuevas funciones o mejoras, nos encantaría saber de ti. ¡Envíanos un correo electrónico con tus sugerencias!</p>
+</div>
+<footer style="margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--c-border); font-size: 0.82rem; color: var(--c-text-secondary);">
+<p>© 2026 Doan Pham. Live Translator es una extensión de navegador independiente y no está afiliada a Google, Zoom, Microsoft, Soniox ni OpenAI.</p>
+</footer>
+</main>
+</div>
+<!-- ═══ Scripts ═══ -->
+<script>
+(function () {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const menuBtn = document.getElementById('menuBtn');
+  const languageSelect = document.getElementById('languageSelect');
+  const links = sidebar.querySelectorAll('a[href^="#"]');
+
+  if (menuBtn) {
+    menuBtn.addEventListener('click', function () {
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('open');
+    });
+  }
+
+  overlay.addEventListener('click', function () {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+  });
+
+  if (languageSelect) {
+    const currentFile = window.location.pathname.split('/').pop() || 'instruction.html';
+    languageSelect.value = currentFile in {
+      'instruction.html': true,
+      'instruction-zh.html': true,
+      'instruction-hi.html': true,
+      'instruction-es.html': true,
+      'instruction-fr.html': true,
+      'instruction-ar.html': true,
+      'instruction-pt.html': true,
+      'instruction-ru.html': true
+    } ? currentFile : 'instruction.html';
+
+    languageSelect.addEventListener('change', function (event) {
+      const target = event.target.value;
+      if (target) {
+        window.location.href = target;
+      }
+    });
+  }
+
+  links.forEach(function (link) {
+    link.addEventListener('click', function () {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('open');
+    });
+  });
+
+  function setActive() {
+    var scrollY = window.scrollY || document.documentElement.scrollTop;
+    var current = null;
+    links.forEach(function (link) {
+      var id = link.getAttribute('href').slice(1);
+      var el = document.getElementById(id);
+      if (el && el.offsetTop - 100 <= scrollY) {
+        current = link;
+      }
+    });
+    links.forEach(function (l) { l.classList.remove('active'); });
+    if (current) current.classList.add('active');
+  }
+
+  window.addEventListener('scroll', setActive, { passive: true });
+  setActive();
+})();
+</script>
+</body>
+</html>

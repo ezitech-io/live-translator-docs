@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>用户指南 — 实时翻译</title>
+<meta content="实时翻译浏览器扩展程序的完整用户指南。了解如何安装、配置 API 密钥、实时翻译会议、使用旁白、字幕和所有功能。" name="description"/>
+<link href="./icons/icon-128x128.png" rel="icon" sizes="128x128" type="image/png"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sidebar-w: 280px;
+      --header-h: 56px;
+      --c-bg: #ffffff;
+      --c-sidebar-bg: #f8f9fb;
+      --c-sidebar-border: #e5e7eb;
+      --c-text: #1a1a2e;
+      --c-text-secondary: #64748b;
+      --c-accent: #667eea;
+      --c-accent-light: #eef2ff;
+      --c-accent-hover: #5a6fd6;
+      --c-border: #e5e7eb;
+      --c-code-bg: #f1f5f9;
+      --c-tip-bg: #eff6ff;
+      --c-tip-border: #3b82f6;
+      --c-warn-bg: #fefce8;
+      --c-warn-border: #eab308;
+      --c-note-bg: #f0fdf4;
+      --c-note-border: #22c55e;
+      --c-step-bg: #f8fafc;
+      --c-img-bg: #f1f5f9;
+      --radius: 8px;
+    }
+
+    html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 20px); }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--c-text);
+      background: var(--c-bg);
+    }
+
+    /* ── Header ── */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--header-h);
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--c-border);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 12px;
+    }
+
+    .site-header .logo {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .site-header h1 {
+      font-size: 1rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .site-header .home-link {
+      font-size: 0.8rem;
+      color: var(--c-accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .site-header .home-link:hover { text-decoration: underline; }
+
+    .site-header .header-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .site-header .language-select {
+      border: 1px solid var(--c-border);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--c-text);
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 6px 10px;
+      line-height: 1.2;
+      max-width: 185px;
+    }
+
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      color: var(--c-text);
+    }
+
+    .hamburger svg { display: block; }
+
+    /* ── Layout ── */
+    .layout {
+      display: flex;
+      margin-top: var(--header-h);
+      min-height: calc(100vh - var(--header-h));
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      position: fixed;
+      top: var(--header-h);
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-w);
+      background: var(--c-sidebar-bg);
+      border-right: 1px solid var(--c-sidebar-border);
+      overflow-y: auto;
+      padding: 20px 0;
+      z-index: 90;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.3);
+      z-index: 89;
+    }
+
+    .sidebar nav { padding: 0 12px; }
+
+    .sidebar .nav-group { margin-bottom: 8px; }
+
+    .sidebar .nav-group-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--c-text-secondary);
+      padding: 10px 12px 4px;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      color: var(--c-text-secondary);
+      text-decoration: none;
+      border-radius: 6px;
+      line-height: 1.5;
+      transition: all 0.15s ease;
+    }
+
+    .sidebar a:hover {
+      background: var(--c-accent-light);
+      color: var(--c-accent);
+    }
+
+    .sidebar a.active {
+      background: var(--c-accent-light);
+      color: var(--c-accent);
+      font-weight: 600;
+    }
+
+    /* ── Content ── */
+    .content {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      max-width: 820px;
+      padding: 40px 48px 100px;
+    }
+
+    /* ── Typography ── */
+    .content h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin: 56px 0 8px;
+      padding-top: 20px;
+      color: var(--c-text);
+    }
+
+    .content h2:first-child { margin-top: 0; }
+
+    .content h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 36px 0 8px;
+      color: var(--c-text);
+    }
+
+    .content h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 24px 0 6px;
+      color: var(--c-text);
+    }
+
+    .content p { margin: 0 0 14px; }
+
+    .content ul, .content ol {
+      margin: 0 0 16px;
+      padding-left: 24px;
+    }
+
+    .content li { margin-bottom: 6px; }
+
+    .content a { color: var(--c-accent); }
+    .content a:hover { color: var(--c-accent-hover); }
+
+    .content code {
+      background: var(--c-code-bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.88em;
+      font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+    }
+
+    .content strong { font-weight: 600; }
+
+    .section-intro {
+      font-size: 0.95rem;
+      color: var(--c-text-secondary);
+      margin-bottom: 24px;
+    }
+
+    /* ── Steps ── */
+    .step {
+      background: var(--c-step-bg);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin: 16px 0;
+      position: relative;
+    }
+
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      background: var(--c-accent);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+
+    .step-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: inline;
+    }
+
+    .step-body { margin-top: 10px; }
+
+    /* ── Image placeholder ── */
+    .img-placeholder {
+      background: var(--c-img-bg);
+      border-radius: var(--radius);
+      text-align: center;
+      color: var(--c-text-secondary);
+      font-size: 0.82rem;
+      margin: 14px 0;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .img-placeholder svg {
+      width: 32px;
+      height: 32px;
+      opacity: 0.4;
+    }
+
+    .img-placeholder img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+    }
+
+    /* ── Callout boxes ── */
+    .callout {
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .callout p { margin: 0; }
+    .callout p + p { margin-top: 8px; }
+
+    .callout-tip {
+      background: var(--c-tip-bg);
+      border-left: 4px solid var(--c-tip-border);
+    }
+
+    .callout-warn {
+      background: var(--c-warn-bg);
+      border-left: 4px solid var(--c-warn-border);
+    }
+
+    .callout-note {
+      background: var(--c-note-bg);
+      border-left: 4px solid var(--c-note-border);
+    }
+
+    .callout-label {
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+
+    .callout-tip .callout-label { color: #2563eb; }
+    .callout-warn .callout-label { color: #ca8a04; }
+    .callout-note .callout-label { color: #16a34a; }
+
+    /* ── Table ── */
+    .content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 0.88rem;
+    }
+
+    .content th, .content td {
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--c-border);
+    }
+
+    .content th {
+      background: var(--c-sidebar-bg);
+      font-weight: 600;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--c-text-secondary);
+    }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 8px;
+      border-radius: 10px;
+      vertical-align: middle;
+    }
+
+    .badge-free { background: #dcfce7; color: #166534; }
+    .badge-pro { background: #fef3c7; color: #92400e; }
+
+    /* ── Separator ── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--c-border);
+      margin: 48px 0;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 960px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-overlay.open { display: block; }
+      .content { margin-left: 0; padding: 28px 20px 80px; }
+      .hamburger { display: block; }
+    }
+
+    @media (max-width: 600px) {
+      .content h2 { font-size: 1.25rem; }
+      .content h3 { font-size: 1.05rem; }
+      .step { padding: 16px 18px; }
+    }
+  </style>
+<!-- Google tag (gtag.js) -->
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-T7YFE7XLLF"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-T7YFE7XLLF');
+  </script>
+</head>
+<body>
+<!-- ═══ Header ═══ -->
+<header class="site-header">
+<img alt="实时翻译" height="32" src="./icons/icon-128x128.png" width="32"/>
+<h1>实时翻译 — 用户指南</h1>
+<div class="header-actions">
+<select aria-label="Select language guide version" class="language-select" id="languageSelect">
+<option value="instruction.html">🇺🇸 - English</option>
+<option value="instruction-zh.html">🇨🇳 - Chinese</option>
+<option value="instruction-hi.html">🇮🇳 - Hindi</option>
+<option value="instruction-es.html">🇪🇸 - Spanish</option>
+<option value="instruction-fr.html">🇫🇷 - French</option>
+<option value="instruction-ar.html">🇸🇦 - Arabic</option>
+<option value="instruction-pt.html">🇵🇹 - Portuguese</option>
+<option value="instruction-ru.html">🇷🇺 - Russian</option>
+</select>
+<a class="home-link" href="https://translate.ezitech.io">返回首页</a>
+</div>
+</header>
+<!-- ═══ Sidebar overlay (mobile) ═══ -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<!-- ═══ Layout ═══ -->
+<div class="layout">
+<!-- ═══ Sidebar ═══ -->
+<aside class="sidebar" id="sidebar">
+<nav>
+<div class="nav-group">
+<div class="nav-group-title">开始使用</div>
+<a href="#installation">安装</a>
+<a href="#supported-platforms">支持的平台</a>
+<a href="#overview">扩展概述</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">API 密钥设置</div>
+<a href="#soniox-key">获取 Soniox API 密钥</a>
+<a href="#openai-key">获取 OpenAI API 密钥（可选）</a>
+<a href="#enter-keys">输入您的 API 密钥</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">许可证和专业版</div>
+<a href="#buy-license">购买许可证密钥</a>
+<a href="#activate-license">激活您的许可证</a>
+<a href="#free-vs-pro">免费与专业功能</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">基本用法</div>
+<a href="#start-translation">开始翻译会话</a>
+<a href="#controls">控件：暂停、恢复、结束</a>
+<a href="#language-selection">更改语言</a>
+<a href="#microphone">打开你的麦克风</a>
+<a href="#font-size">更改字体大小</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">特点</div>
+<a href="#speaker-names">发言者姓名</a>
+<a href="#narration">旁白（文本转语音）</a>
+<a href="#narrate-my-voice">讲述我的声音（口译员）</a>
+<a href="#send-chat">通过聊天发送翻译</a>
+<a href="#subtitle-mode">字幕模式</a>
+<a href="#inline-assistant">内嵌人工智能助手</a>
+<a href="#context-setting">上下文设置</a>
+<a href="#download-transcript">下载文字记录</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">更多</div>
+<a href="#auto-update">自动更新检查</a>
+<a href="#troubleshooting">故障排除</a>
+<a href="#contact">联系与支持</a>
+</div>
+</nav>
+</aside>
+<!-- ═══ Content ═══ -->
+<main class="content">
+<!-- ────────────────────────────────────────── -->
+<!-- GETTING STARTED                            -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="installation">安装</h2>
+<p class="section-intro">在任何基于 Chromium 的浏览器（Chrome、Edge、Brave、Arc、Opera 等）上安装实时翻译扩展。</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">打开实时翻译网站</span>
+<div class="step-body">
+<p>前往 <a href="https://translate.ezitech.io" target="_blank">https://translate.ezitech.io</a> 在您的浏览器中。</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">单击“安装”按钮</span>
+<div class="step-body">
+<p>单击 <strong>添加到 Chrome</strong> 按钮。这将下载扩展文件。</p>
+<div class="img-placeholder">
+<img alt="添加到 Chrome" src="./images/add-to-chrome.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">在浏览器中启用开发者模式</span>
+<div class="step-body">
+<p>打开浏览器的扩展程序管理页面：</p>
+<ul>
+<li><strong>镀铬/勇敢/电弧：</strong> 类型
+在地址栏中输入  <code>chrome://extensions</code> ，然后按 Enter。</li>
+<li><strong>边缘：</strong> 类型
+在地址栏中输入  <code>edge://extensions</code> ，然后按 Enter。</li>
+</ul>
+<p>切换 <strong>开发者模式
+页面右上角的</strong> ON。</p>
+<div class="img-placeholder">
+<img alt="启用开发者模式" src="./images/enable-dev-mode.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">4</span>
+<span class="step-title">安装扩展文件</span>
+<div class="step-body">
+<p>拖放下载的 <code>.zip</code> 文件到扩展页面。</p>
+<div class="img-placeholder">
+<img alt="安装扩展" src="./images/drag-drop.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-note">
+<div class="callout-label">完成！</div>
+<p>您现在应该在浏览器工具栏中看到实时翻译器图标。扩展已安装并准备好进行配置。</p>
+</div>
+<hr class="section-divider"/>
+<!-- Supported Platforms -->
+<h2 id="supported-platforms">支持的平台</h2>
+<p class="section-intro">实时翻译适用于这些网站和平台。只需打开这些网站中的任何一个并单击扩展图标即可开始翻译。</p>
+<table>
+<thead>
+<tr><th>平台</th><th>你能做什么</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Google Meet</strong></td><td>翻译会议、叙述你的声音、发送聊天</td></tr>
+<tr><td><strong>Zoom (Web)</strong></td><td>翻译会议、叙述你的声音、发送聊天</td></tr>
+<tr><td><strong>Microsoft Teams（web）</strong></td><td>翻译会议、叙述你的声音、发送聊天</td></tr>
+<tr><td><strong>YouTube</strong></td><td>翻译视频，自动填充视频标题的上下文</td></tr>
+<tr><td><strong>WhatsApp (web)</strong></td><td>翻译通话，讲述你的声音</td></tr>
+<tr><td><strong>Facebook</strong></td><td>翻译视频和直播</td></tr>
+<tr><td><strong>TikTok</strong></td><td>翻译视频</td></tr>
+<tr><td><strong>Douyin</strong></td><td>翻译视频</td></tr>
+<tr><td><strong>Vimeo</strong></td><td>翻译视频</td></tr>
+<tr><td><strong>Dailymotion</strong></td><td>翻译视频</td></tr>
+<tr><td><strong>Udemy</strong></td><td>翻译课程视频</td></tr>
+<tr><td><strong>Domestika</strong></td><td>翻译课程视频</td></tr>
+</tbody>
+</table>
+<div class="callout callout-tip">
+<div class="callout-label">提示</div>
+<p>扩展捕获 <strong>标签音频</strong> 直接，因此它适用于受支持网站上浏览器选项卡中播放的任何音频 - 无需为另一方的音频单独设置麦克风。</p>
+</div>
+<hr class="section-divider"/>
+<!-- Extension Overview -->
+<h2 id="overview">扩展概述</h2>
+<p class="section-intro">主界面和所有内容所在位置的快速概述。</p>
+<div class="img-placeholder" style="min-height: 200px;">
+<img alt="扩展概述" src="./images/extension-overview.png"/>
+</div>
+<p>实时翻译面板有以下主要区域：</p>
+<ul>
+<li><strong>标题栏</strong> — 设置按钮、字幕模式切换、关闭按钮。如果有可用更新，您将在此处看到一个徽章。</li>
+<li><strong>语言选择器</strong> — 两个下拉菜单：“我的语言”（您所说的语言）和“他们的语言”（您要翻译的语言）。</li>
+<li><strong>转录区</strong> ——翻译文本实时出现，由演讲者组织。</li>
+<li><strong>控制栏</strong> — 开始/停止/暂停按钮、麦克风切换、旁白设置、AI 助手、字体大小、下载和更多选项。</li>
+</ul>
+<div class="callout callout-tip">
+<div class="callout-label">提示</div>
+<p>你可以 <strong>拖动面板</strong>  通过其标题栏将其移动到屏幕上的任何位置，以及 <strong>调整大小</strong> 通过拖动边缘。这样，它就不会在会议或视频期间屏蔽重要内容。</p>
+</div>
+<hr class="section-divider"/>
+<!-- ────────────────────────────────────────── -->
+<!-- API KEYS SETUP                             -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="soniox-key">获取 Soniox API 密钥</h2>
+<p class="section-intro">Soniox 提供实时语音识别和翻译引擎。您需要 Soniox API 密钥才能使用实时翻译器。 <span class="badge badge-free">必填</span></p>
+<div class="callout callout-warn">
+<div class="callout-label">重要</div>
+<p>Soniox API 密钥是 <strong>必填</strong> 使扩展能够正常工作。如果没有它，扩展程序就无法转录或翻译任何音频。</p>
+</div>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">前往 Soniox 网站</span>
+<div class="step-body">
+<p>打开 <a href="https://console.soniox.com/signup" target="_blank">https://console.soniox.com/signup</a> 在您的浏览器中。使用您的电子邮件或 Google 登录创建帐户。</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">获取您的 API 密钥</span>
+<div class="step-body">
+<p>登录后，导航至 Soniox 仪表板的 API 部分。您也可以直接前往 <a href="https://soniox.com/docs/stt/get-started#get-api-key" target="_blank">Soniox 入门指南</a> 了解分步说明。</p>
+<p>复制您的 API 密钥 - 您将在后续步骤中需要它。</p>
+<div class="img-placeholder">
+<img alt="获取API密钥" src="./images/create-soniox-api.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">添加计费（API 使用所需）</span>
+<div class="step-body">
+<p>向您的 Soniox 帐户添加付款方式。您可以使用信用卡、PayPal 或其他付款方式。 Soniox API 是即用即付的 — 您只需为使用的内容付费。</p>
+<div class="img-placeholder">
+<img alt="添加付款方式" src="./images/payment-soniox.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">注意</div>
+<p>您需要向您的帐户存入至少 1 美元才能使用 API。如果您愿意，您可以存入更多资金。</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="openai-key">获取 OpenAI API 密钥（可选）</h2>
+<p class="section-intro">OpenAI API 密钥是 <strong>可选</strong> ——仅当您想使用 OpenAI 语音进行旁白或内联 AI 助手功能时才需要它。 <span class="badge badge-pro">临</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">前往OpenAI平台</span>
+<div class="step-body">
+<p>打开 <a href="https://platform.openai.com/api-keys" target="_blank">https://platform.openai.com/api-keys</a> 在您的浏览器中。</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">创建帐户或登录</span>
+<div class="step-body">
+<p>如果您没有 OpenAI 帐户，请单击 <strong>“注册”</strong> 并创建一个。如果您已有，请登录。</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">创建新的 API 密钥</span>
+<div class="step-body">
+<p>点击 <strong>“+创建新的密钥”</strong>，将其命名为“Live Translator”，然后单击 <strong>“创建密钥”</strong>.</p>
+<p><strong>立即复制并保存密钥</strong> — OpenAI 只会显示一次。</p>
+<div class="img-placeholder">
+<img alt="创建 OpenAI API 密钥" src="./images/openai-key.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">4</span>
+<span class="step-title">添加计费（API 使用所需）</span>
+<div class="step-body">
+<p>前往 <a href="https://platform.openai.com/account/billing" target="_blank">计费设置</a> 并添加付款方式。 OpenAI API 是按需付费的——您只需为使用的内容付费。</p>
+<div class="img-placeholder">
+<img alt="创建 OpenAI API 密钥" src="./images/openai-billing.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-note">
+<div class="callout-label">注意</div>
+<p>如果您只想旁白（文字转语音），您可以使用 <strong>免费谷歌翻译语音</strong> 代替。仅当您需要 OpenAI 的高级语音或 AI Assistant 功能时才需要 OpenAI 密钥。</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="enter-keys">输入您的 API 密钥</h2>
+<p class="section-intro">获得 API 密钥后，将其输入到实时翻译器设置页面中。</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">打开实时翻译设置</span>
+<div class="step-body">
+<p>您可以通过以下任一方式打开设置：</p>
+<ul>
+<li>单击 <strong>齿轮图标</strong> (⚙) 位于翻译器面板的右上角。</li>
+<li>右键单击工具栏中的实时翻译图标 → <strong>“选项”</strong>.</li>
+<li>转到浏览器的扩展页面→找到实时翻译→ <strong>“详细信息”</strong> → <strong>“扩展选项”</strong>.</li>
+</ul>
+<div class="img-placeholder">
+<img alt="设置页面" src="./images/gear.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">输入您的 Soniox API 密钥</span>
+<div class="step-body">
+<p>在设置页面中，单击 <strong>“索尼克斯”</strong> 在左侧边栏中。将您的 Soniox API 密钥粘贴到输入字段中。密钥会自动保存。</p>
+<div class="img-placeholder">
+<img alt="Soniox 设置" src="./images/enter-soniox-key.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">输入您的 OpenAI API 密钥（可选）</span>
+<div class="step-body">
+<p>点击 <strong>“OpenAI”</strong> 在左侧边栏中。将您的 OpenAI API 密钥粘贴到输入字段中。密钥会自动保存。</p>
+<div class="img-placeholder">
+<img alt="OpenAI 设置" src="./images/enter-openai-key.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-note">
+<div class="callout-label">安全说明</div>
+<p>您的 API 密钥已存储 <strong>仅在您的设备本地</strong> 使用 Chrome 的安全扩展存储。它们永远不会发送到 Live Translator 的服务器 - 它们仅用于直接与 Soniox 和 OpenAI 通信。</p>
+</div>
+<hr class="section-divider"/>
+<!-- ────────────────────────────────────────── -->
+<!-- LICENSE & PRO                              -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="buy-license">购买许可证密钥</h2>
+<p class="section-intro">许可证密钥可解锁 Pro 功能，如旁白、SRT 下载、AI 助手等。</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">进入购买页面</span>
+<div class="step-body">
+<p>访问实时翻译主页： <a href="https://translate.ezitech.io/#pricing" target="_blank">https://translate.ezitech.io/#pricing</a> 并滚动到 <strong>定价</strong> 部分，或单击 <strong>“购买许可证”
+扩展程序设置页面中的 </strong>  链接。</p>
+<div class="img-placeholder">
+<img alt="购买页面" src="./images/pricing.jpeg"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">选择您的计划</span>
+<div class="step-body">
+<p>选择：</p>
+<ul>
+<li><strong>每月</strong> — 5.99 美元/月</li>
+<li><strong>每年</strong> — 59 美元/年（节省约 18%）</li>
+</ul>
+<p>你可以获得 <strong>7天免费试用</strong> 尝试专业版功能。试用后，您可以购买许可证以继续使用专业版功能。</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">完成付款</span>
+<div class="step-body">
+<p>您将被重定向至 Polar 付款页面。输入您的电子邮件和付款详细信息，然后完成购买。</p>
+<div class="img-placeholder">
+<img alt="付款页面" src="./images/purchase.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">4</span>
+<span class="step-title">接收您的许可证密钥</span>
+<div class="step-body">
+<p>付款后，您将收到 <strong>许可证密钥</strong> 通过电子邮件。许可证密钥看起来像一个长代码（例如， <code>LT-XXXX-XXXX-XXXX-XXXX</code>）。复制此密钥。</p>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">退款政策</div>
+<p>您可以在以下时间内申请退款 <strong>30 天</strong> 从付款之日起联系 <a href="mailto:phampdoan@gmail.com">phampdoan@gmail.com</a>.</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="activate-license">激活您的许可证</h2>
+<p class="section-intro">购买后，在扩展设置中激活您的许可证密钥。</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">输入并激活您的许可证密钥</span>
+<div class="step-body">
+<p>打开扩展设置（齿轮图标或右键单击→选项）。点击 <strong>“许可证”</strong> 在左侧边栏中。将您的许可证密钥粘贴到输入字段中，然后单击 <strong>“激活”</strong>。该扩展程序将通过服务器验证您的许可证。</p>
+<div class="img-placeholder">
+<img alt="激活许可证" src="./images/enter-license-key.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">验证激活</span>
+<div class="step-body">
+<p>激活后，您将看到您的许可证状态、与许可证关联的电子邮件以及到期日期。所有 Pro 功能现已解锁。</p>
+<div class="img-placeholder">
+<img alt="激活许可证" src="./images/license-activated.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-warn">
+<div class="callout-label">切换设备？</div>
+<p>如果您之前在其他设备上激活了许可证，则可以使用 <strong>“强制激活”</strong> 选项可将许可证移至您当前的设备。每个许可证一次只能在一台设备上处于活动状态。</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="free-vs-pro">免费与专业功能</h2>
+<p class="section-intro">以下是免费版本可以执行的操作以及需要专业版许可证的操作。</p>
+<table>
+<thead>
+<tr><th>特征</th><th>免费</th><th>临</th></tr>
+</thead>
+<tbody>
+<tr><td>实时翻译</td><td>✓</td><td>✓</td></tr>
+<tr><td>60 多种语言</td><td>✓</td><td>✓</td></tr>
+<tr><td>演讲者标签</td><td>✓</td><td>✓</td></tr>
+<tr><td>拖动、调整大小、最小化面板</td><td>✓</td><td>✓</td></tr>
+<tr><td>字体大小控制</td><td>✓</td><td>✓</td></tr>
+<tr><td>下载文字记录 (TXT/JSON)</td><td>—</td><td>✓</td></tr>
+<tr><td>下载文字记录（SRT）</td><td>—</td><td>✓</td></tr>
+<tr><td>讲述他们的声音（TTS）</td><td>—</td><td>✓</td></tr>
+<tr><td>讲述我的声音（口译员）</td><td>—</td><td>✓</td></tr>
+<tr><td>通过聊天发送翻译</td><td>—</td><td>✓</td></tr>
+<tr><td>字幕模式</td><td>—</td><td>✓</td></tr>
+<tr><td>内嵌人工智能助手</td><td>—</td><td>✓</td></tr>
+<tr><td>上下文设置</td><td>✓</td><td>✓</td></tr>
+<tr><td>发言者姓名</td><td>✓</td><td>✓</td></tr>
+</tbody>
+</table>
+<hr class="section-divider"/>
+<!-- ────────────────────────────────────────── -->
+<!-- BASIC USAGE                                -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="start-translation">开始翻译会话</h2>
+<p class="section-intro">了解如何在会议或视频中开始翻译。</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">打开支持的网站</span>
+<div class="step-body">
+<p>前往任意 <a href="#supported-platforms">支持的平台</a> （例如 Google Meet、Zoom、YouTube 等）并加入会议或播放视频。</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">打开实时翻译面板</span>
+<div class="step-body">
+<p>单击 <strong>实时翻译图标</strong> 在浏览器工具栏中。翻译面板将出现在页面上。您还可以单击 <strong>浮动图标
+页面上显示的</strong> 。</p>
+<div class="img-placeholder">
+<img alt="打开面板" src="./images/floating-icon.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">选择您的语言</span>
+<div class="step-body">
+<p>使用面板顶部的两种语言下拉菜单：</p>
+<ul>
+<li><strong>“我的语言”</strong> ——语言 <em>你</em> 说话（例如越南语）。</li>
+<li><strong>“他们的语言”</strong> ——语言 <em>其他</em> 说出您想要翻译的内容（例如英语）。</li>
+</ul>
+<div class="img-placeholder">
+<img alt="语言选择" src="./images/language.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">4</span>
+<span class="step-title">按开始按钮</span>
+<div class="step-body">
+<p>单击 <strong>开始</strong> 按钮（播放图标）。</p>
+<p>您的浏览器可能会请求捕获音频的权限 - 单击 <strong>“允许”</strong> and select the tab you want to capture.</p>
+<div class="img-placeholder">
+<img alt="开始按钮" src="./images/press-start.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">5</span>
+<span class="step-title">See translations in real time</span>
+<div class="step-body">
+<p>当人们说话时，你会看到 <strong>原文</strong> 和 <strong>翻译文本</strong> 出现在成绩单区域。 Lines are automatically grouped by speaker.</p>
+<div class="img-placeholder">
+<img alt="实时翻译" src="./images/translate-real.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">自动滚动</div>
+<p>记录会自动滚动以显示最新文本。如果您向上滚动以阅读较早的文本，自动滚动会暂停。单击 <strong>“滚动到最新”</strong> 按钮跳回实时文本。</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="controls">控件：暂停、恢复、结束</h2>
+<p class="section-intro">了解翻译会话控制。</p>
+<table>
+<thead>
+<tr><th>按钮</th><th>它的作用</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>开始</strong> (▶)</td><td>Begins a new translation session.清除任何以前的记录。</td></tr>
+<tr><td><strong>暂停</strong> (⏸)</td><td>Temporarily stops translation.成绩单被保留。音频捕获继续，但文本暂停。</td></tr>
+<tr><td><strong>简历</strong> (▶)</td><td>暂停后继续翻译。新文本出现在先前内容之后。</td></tr>
+<tr><td><strong>结束</strong> (⏹)</td><td>完全停止会话。文字记录将保留在屏幕上，直到您开始新的会话。结束音频捕获，关闭麦克风和旁白。</td></tr>
+</tbody>
+</table>
+<hr class="section-divider"/>
+<h2 id="language-selection">更改语言</h2>
+<p class="section-intro">您可以随时更改翻译语言。</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">单击语言下拉列表</span>
+<div class="step-body">
+<p>单击 <strong>“我的语言”</strong> 或
+面板顶部的 <strong>“他们的语言”</strong> 下拉菜单。</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">选择新语言</span>
+<div class="step-body">
+<p>列表支持 <strong>60 多种语言</strong> 按字母顺序排序。滚动或键入以搜索您的语言。单击以选择它。</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">翻译自动重新开始</span>
+<div class="step-body">
+<p>如果会话处于活动状态，更改语言将自动使用新语言对重新启动翻译。您的语言选择将被保存以供下次使用。</p>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="microphone">打开你的麦克风</h2>
+<p class="section-intro">启用您的麦克风，以便您自己的演讲也会与会议/视频音频一起翻译。</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">单击麦克风按钮</span>
+<div class="step-body">
+<p>在控制栏中，单击 <strong>麦克风图标</strong>。当麦克风打开时，该图标将变为活动状态（突出显示）。</p>
+<div class="img-placeholder">
+<img alt="麦克风按钮" src="./images/micro.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">允许麦克风访问</span>
+<div class="step-body">
+<p>如果这是第一次，您的浏览器将请求麦克风权限。点击 <strong>“允许”</strong>.</p>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">提示</div>
+<p>麦克风正在 <strong>默认关闭</strong> 当您打开面板时。仅当您希望转录和翻译您自己的演讲时才打开它。当您按下 <strong>结束</strong>，麦克风自动关闭。</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="font-size">更改字体大小</h2>
+<p class="section-intro">调整文字大小以方便阅读。</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">单击字体大小按钮</span>
+<div class="step-body">
+<p>在控制栏中，单击 <strong>字体大小按钮</strong> （Aa 图标）。将出现一个具有三种尺寸的菜单：</p>
+<ul>
+<li><strong>小</strong> ——紧凑的视图，适合更多文本</li>
+<li><strong>中</strong> —默认平衡尺寸</li>
+<li><strong>大</strong> ——更容易从远处阅读</li>
+</ul>
+<p>单击您的首选尺寸。更改会立即应用并保存以供下次使用。</p>
+<div class="img-placeholder">
+<img alt="字体大小选择器" src="./images/font.png"/>
+</div>
+</div>
+</div>
+<hr class="section-divider"/>
+<!-- ────────────────────────────────────────── -->
+<!-- FEATURES                                   -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="speaker-names">发言者姓名</h2>
+<p class="section-intro">为发言者指定真实姓名，以便您可以轻松识别谁在文字记录中说了些什么。 <span class="badge badge-free">免费</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">打开“更多”菜单</span>
+<div class="step-body">
+<p>在控制栏中，单击 <strong>“更多”</strong> 按钮（⋯图标）。然后点击 <strong>“扬声器设置”</strong> 按钮。</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">打开“扬声器设置”对话框</span>
+<div class="step-body">
+<p>扬声器设置对话框将打开。</p>
+<div class="img-placeholder">
+<img alt="扬声器设置对话框" src="./images/speaker.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">分配名称</span>
+<div class="step-body">
+<p>您将看到检测到的扬声器列表（扬声器 1、扬声器 2 等）。在每个名字旁边输入真实姓名（例如“John”、“Sarah”）。点击 <strong>“添加行”</strong> 如果您需要更多。</p>
+<p>点击 <strong>“保存”</strong>。所有转录行——过去的和未来的——现在都将使用您指定的名称。</p>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="narration">旁白（文本转语音）</h2>
+<p class="section-intro">让翻译大声朗读给您听，这样您就可以听而不是读。这就是“讲述他们的声音”功能。 <span class="badge badge-pro">临</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">打开旁白设置</span>
+<div class="step-body">
+<p>在控制栏中，单击 <strong>旁白按钮</strong> （扬声器图标）。 “旁白设置”对话框打开。</p>
+<div class="img-placeholder">
+<img alt="旁白设置" src="./images/narration-setting.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">选择 TTS 提供商和语音</span>
+<div class="step-body">
+<p>选择您的语音提供商：</p>
+<ul>
+<li><strong>谷歌翻译</strong> （免费）— 无需任何 API 密钥即可工作。 60 多种语言的优质语音。</li>
+<li><strong>OpenAI</strong> (高级) — 更高质量、更自然的声音。需要 OpenAI API 密钥。</li>
+</ul>
+<p>选择一个 <strong>声音
+从下拉菜单中选择 </strong> ，然后单击 <strong>“测试”</strong> 预览它的声音。</p>
+<p>调整 <strong>语速</strong> 和 <strong>音量</strong> 如果需要的话。</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">开始旁白</span>
+<div class="step-body">
+<p>点击 <strong>“讲述他们的声音”
+对话框中的</strong> 按钮。现在，每当出现翻译时，都会大声朗读给您听。</p>
+<p>要停止，请再次单击旁白按钮，然后单击 <strong>“停止”</strong>.</p>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="narrate-my-voice">讲述我的声音（口译模式）</h2>
+<p class="section-intro">用您的语言讲话并向其他会议参与者播放翻译后的声音 - 就像拥有私人口译员一样。 <span class="badge badge-pro">临</span></p>
+<div class="callout callout-warn">
+<div class="callout-label">要求</div>
+<p>此功能适用于 <strong>Google Meet</strong>, <strong>缩放（网页）</strong>, <strong>Microsoft Teams（网络）</strong>，以及 <strong>WhatsApp 网页版</strong>。你需要你的 <strong>麦克风已启用</strong> 和翻译会议 <strong>正在运行
+控制栏中的 </strong>.</p>
+</div>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">打开旁白设置</span>
+<div class="step-body">
+<p>单击 <strong>旁白按钮</strong>  打开“旁白设置”对话框。</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">配置“讲述我的声音”</span>
+<div class="step-body">
+<p>在对话框中，找到 <strong>“讲述我的声音”</strong> 部分。选择您喜欢的语音和提供商（Google 或 OpenAI）。您可以设置一个 <strong>不同的声音</strong> 为“我的声音”和“他们的声音”旁白。</p>
+<p>点击 <strong>“测试”</strong> 预览您选择的声音。</p>
+<div class="img-placeholder">
+<img alt="讲述我的声音" src="./images/my-voice-setting.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">开始“讲述我的声音”</span>
+<div class="step-body">
+<p>点击 <strong>“开始讲述我的声音”</strong>。当你说话时，你的话是：</p>
+<ol>
+<li>以您的语言转录</li>
+<li>翻译成其他语言</li>
+<li>在会议中大声讲话，以便其他人听到您翻译的声音</li>
+</ol>
+<p>播放翻译后的音频时，您的麦克风会自动静音，以防止出现回声。</p>
+<div class="img-placeholder">
+<img alt="开始讲述我的声音" src="./images/narrate-my-voice.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">4</span>
+<span class="step-title">停止旁白</span>
+<div class="step-body">
+<p>单击旁白按钮，然后 <strong>“停止”</strong>，或按 <strong>结束</strong> 停止整个会话（这也会停止旁白）。</p>
+</div>
+</div>
+<div class="callout callout-note">
+<div class="callout-label">注意</div>
+<p>你只能运行 <strong>一次一种旁白模式</strong> ——“讲述我的声音”或“讲述他们的声音”，不能同时两者。工具栏图标会发生变化以显示哪种模式处于活动状态。</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="send-chat">通过聊天发送翻译</h2>
+<p class="section-intro">在会议聊天中自动将翻译后的演讲作为短信发送。 <span class="badge badge-pro">临</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">启用“通过聊天发送”</span>
+<div class="step-body">
+<p>在控制栏中查找 <strong>聊天发送按钮</strong> （麦克风图标旁边）。单击它即可打开 - 按钮会转动 <strong>绿色</strong> 激活时。</p>
+<div class="img-placeholder">
+<img alt="发送聊天" src="./images/send-via-chat.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">说话并自动发送</span>
+<div class="step-body">
+<p>打开麦克风并运行翻译会话后，当您讲话时，您的翻译文本会自动插入到会议的聊天输入中并发送。</p>
+<p>这适用于 <strong>Google Meet</strong>, <strong>缩放（网页）</strong>，以及 <strong>Microsoft Teams（网络）</strong>.</p>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">提示</div>
+<p>当“讲述我的声音”不适用于您的平台时，或者如果您想要同时进行语音旁白和文本聊天翻译，这非常有用。</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="subtitle-mode">字幕模式</h2>
+<p class="section-intro">切换到最小的电影风格字幕栏，仅在屏幕底部显示最新的翻译。 <span class="badge badge-pro">临</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">启用字幕模式</span>
+<div class="step-body">
+<p>在翻译器面板的标题栏中，单击 <strong>字幕图标</strong> （隐藏式字幕图标）。</p>
+<p>整个面板将被屏幕底部的细长字幕栏取代。</p>
+<div class="img-placeholder">
+<img alt="字幕模式" src="./images/subtitle.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">自定义字幕栏</span>
+<div class="step-body">
+<p>单击 <strong>调整图标
+字幕栏上的</strong> （设置档位）调整：</p>
+<ul>
+<li><strong>不透明度</strong> — 滑动以使栏或多或少透明。</li>
+<li><strong>字体大小</strong> — 选择小、中或大文本。</li>
+</ul>
+<p>您还可以 <strong>拖动</strong> 移动字幕栏，然后 <strong>调整大小</strong> 通过拖动边缘来实现。</p>
+<div class="img-placeholder">
+<img alt="字幕设置" src="./images/customize-subtitle-bar.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">退出字幕模式</span>
+<div class="step-body">
+<p>单击 <strong>关闭按钮
+字幕栏上的 </strong> (✕) 可返回完整翻译面板。</p>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="inline-assistant">内嵌人工智能助手</h2>
+<p class="section-intro">直接从记录中获取人工智能驱动的解释并根据对话上下文生成答案。 <span class="badge badge-pro">临</span></p>
+<div class="callout callout-warn">
+<div class="callout-label">要求</div>
+<p>内联人工智能助手需要一个 <strong>OpenAI API 密钥</strong> 在设置中配置。</p>
+</div>
+<h3>解释一行</h3>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">将鼠标悬停在转录行上</span>
+<div class="step-body">
+<p>当您将鼠标悬停在记录中的任何行上时， <strong>人工智能图标
+出现</strong> (🤖)。</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">点击AI图标并选择“解释”</span>
+<div class="step-body">
+<p>AI 助手在单独的窗口中打开。它将使用完整的文字记录上下文和选定的行来为您提供详细的解释。</p>
+<div class="img-placeholder">
+<img alt="解释一下" src="./images/ai-explain.png"/>
+</div>
+</div>
+</div>
+<h3>生成答案</h3>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">点击AI图标并选择“生成答案”</span>
+<div class="step-body">
+<p>人工智能助手将根据对话内容生成建议答案。它甚至可以使用网络搜索来提供更准确的答案。</p>
+<div class="img-placeholder">
+<img alt="生成答案" src="./images/ai-help-answer.png"/>
+</div>
+</div>
+</div>
+<h3>打开助手面板</h3>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">单击控制栏中的“助手”按钮</span>
+<div class="step-body">
+<p>您也可以直接从桌面打开AI助手面板 <strong>助理按钮
+控制栏中的</strong> （🤖图标）。这将打开一个可拖动的聊天窗口，您可以在其中键入任何问题。助理可以访问完整的文字记录作为上下文。</p>
+<div class="img-placeholder">
+<img alt="助理小组" src="./images/ai.png"/>
+</div>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="context-setting">上下文设置</h2>
+<p class="section-intro">提供有关对话主题的上下文以提高翻译准确性。 <span class="badge badge-free">免费</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">打开上下文设置
+控制栏中的</span>
+<div class="step-body">
+<p>单击 <strong>“更多”</strong> 按钮(⋯)，然后单击 <strong>“上下文”</strong>.</p>
+<div class="img-placeholder">
+<img alt="上下文设置" src="./images/context.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">填写上下文字段</span>
+<div class="step-body">
+<p>您可以提供：</p>
+<ul>
+<li><strong>域/主题</strong> ——对话的内容（例如“医学会议”、“软件工程站立”）。</li>
+<li><strong>关键术语</strong> ——可能难以识别的技术术语、专有名词或行话（例如“Kubernetes、API 网关、微服务”）。</li>
+<li><strong>演讲者信息</strong> — 参与者的姓名和角色（例如，“Smith 博士 — 心脏病专家，主讲”）。</li>
+</ul>
+<p>点击 <strong>“申请”</strong> 将此上下文发送到当前会话的翻译引擎。</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">保存预设（可选）</span>
+<div class="step-body">
+<p>如果您有类似主题的定期会议，请单击 <strong>“保存预设”</strong> 保存当前上下文。下次，只需加载预设即可，而不必再次输入所有内容。</p>
+<p>您还可以 <strong>导入/导出</strong> 预设为 JSON 文件以共享或备份它们。</p>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">YouTube 自动填充</div>
+<p>使用实时翻译器时 <strong>YouTube</strong>，上下文字段可以是 <strong>自动填充</strong> 包含视频的标题和说明。这有助于翻译引擎更好地理解视频的主题。</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="download-transcript">下载文字记录</h2>
+<p class="section-intro">将翻译后的文字记录保存为文件，以供以后参考或在其他工具中使用。 <span class="badge badge-pro">临</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">单击下载按钮</span>
+<div class="step-body">
+<p>翻译会话结束后（或翻译会话期间），单击 <strong>下载按钮</strong> （↓图标）。 “下载脚本”对话框打开。</p>
+<div class="img-placeholder">
+<img alt="下载文字记录" src="./images/download-transcript.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">选择格式</span>
+<div class="step-body">
+<p>选择您的首选格式：</p>
+<table>
+<thead>
+<tr><th>格式</th><th>最适合</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>TXT</strong></td><td>带有时间戳和演讲者姓名的简单文本文件。易于阅读。</td></tr>
+<tr><td><strong>JSON</strong></td><td>结构化数据格式。适合与其他工具或脚本一起处理。</td></tr>
+<tr><td><strong>SRT（原始）</strong></td><td>带有原始语言文本的字幕文件。用于视频编辑软件。</td></tr>
+<tr><td><strong>SRT（已翻译）</strong></td><td>包含翻译文本的字幕文件。用于视频编辑软件。</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">下载文件</span>
+<div class="step-body">
+<p>单击您选择的格式的下载按钮。该文件在您的浏览器中生成并保存到您的默认下载文件夹中。</p>
+</div>
+</div>
+<div class="callout callout-note">
+<div class="callout-label">隐私</div>
+<p>生成脚本文件 <strong>完全在您的浏览器中</strong>。下载过程中不会将任何转录数据发送到任何服务器。</p>
+</div>
+<hr class="section-divider"/>
+<!-- ────────────────────────────────────────── -->
+<!-- MORE                                       -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="auto-update">自动更新检查</h2>
+<p class="section-intro">每次您打开扩展程序时，它都会自动检查更新。</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">寻找更新徽章</span>
+<div class="step-body">
+<p>当有新版本可用时，您将看到 <strong>“有更新”
+翻译器面板标题栏中的 </strong>  徽章。</p>
+<div class="img-placeholder">
+<img alt="有更新" src="./images/update-badge.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">点击更新</span>
+<div class="step-body">
+<p>单击徽章即可进入安装页面，您可以在其中下载最新版本。遵循同样的 <a href="#installation">安装步骤</a> 更新。</p>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="troubleshooting">故障排除</h2>
+<p class="section-intro">常见问题以及如何解决这些问题。</p>
+<h3>“没有 Soniox API 密钥”消息</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">解决方案</span>
+<div class="step-body">
+<p>您尚未输入您的 Soniox API 密钥。前往 <a href="#enter-keys">输入您的 API 密钥</a> 进行设置。</p>
+</div>
+</div>
+<h3>没有捕获任何音频</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">解决方案</span>
+<div class="step-body">
+<ul>
+<li>确保您点击了 <strong>“允许”</strong> 当浏览器请求音频捕获权限时。</li>
+<li>确保您选择了 <strong>正确的选项卡</strong> 出现提示时进行分享。</li>
+<li>尝试刷新页面并再次打开翻译器。</li>
+<li>检查会议/视频是否确实有音频播放。</li>
+</ul>
+</div>
+</div>
+<h3>翻译似乎不准确</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">解决方案</span>
+<div class="step-body">
+<ul>
+<li>确保 <strong>“他们的语言”</strong> 下拉菜单设置为所讲的正确语言。</li>
+<li>使用 <a href="#context-setting">上下文设置</a> 提供主题信息和关键术语。</li>
+<li>确保音频质量清晰——背景噪音会影响准确性。</li>
+</ul>
+</div>
+</div>
+<h3>“讲述我的声音”-其他人听不到翻译</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">解决方案</span>
+<div class="step-body">
+<ul>
+<li>确认您正在使用 <strong>支持的平台</strong> （Google Meet、Zoom Web、Teams Web、WhatsApp Web）。</li>
+<li>确保翻译会话已启动 <strong>正在运行
+控制栏中的 </strong> 和你的 <strong>麦克风已打开</strong>.</li>
+<li>检查您是否有 <strong>专业许可证</strong> 已激活。</li>
+<li>尝试刷新会议页面并重新开始。</li>
+</ul>
+</div>
+</div>
+<h3>OpenAI 功能不起作用</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">解决方案</span>
+<div class="step-body">
+<ul>
+<li>验证您的 <strong>OpenAI API 密钥</strong> 已正确输入 <a href="#enter-keys">设置</a>.</li>
+<li>确保您的 OpenAI 帐户已 <strong>计费设置</strong> 有足够的学分。</li>
+<li>如果不需要 OpenAI 功能，请使用 <strong>谷歌翻译语音</strong>  用于旁白（免费，无需 API 密钥）。</li>
+</ul>
+</div>
+</div>
+<h3>扩展程序未出现在网站上</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">解决方案</span>
+<div class="step-body">
+<ul>
+<li>实时翻译仅适用于 <a href="#supported-platforms">支持的平台</a>。它不会出现在不受支持的网站上。</li>
+<li>如果该网站受支持但扩展名不显示，请尝试 <strong>正在刷新页面</strong>.</li>
+<li>确保扩展名是 <strong>已启用</strong> 在浏览器的扩展程序管理页面中。</li>
+</ul>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="contact">联系与支持</h2>
+<p class="section-intro">需要帮助吗？有问题或建议吗？</p>
+<p>联系开发商：</p>
+<ul>
+<li><strong>电子邮件：</strong> <a href="mailto:ezsolu.io@gmail.com">ezsolu.io@gmail.com</a></li>
+<li><strong>网站：</strong> <a href="https://translate.ezitech.io" target="_blank">https://translate.ezitech.io</a></li>
+<li><strong>WhatsApp:</strong> <a href="https://wa.me/84355561599" target="_blank">+84 355 561 599</a></li>
+<li><strong>电报：</strong> <a href="https://t.me/ezi_tech" target="_blank">EziTech</a></li>
+</ul>
+<div class="callout callout-tip">
+<div class="callout-label">欢迎反馈</div>
+<p>如果您对新功能或改进有任何想法，我们很乐意听取您的意见。请向我们发送电子邮件并提出您的建议！</p>
+</div>
+<footer style="margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--c-border); font-size: 0.82rem; color: var(--c-text-secondary);">
+<p>© 2026 Doan Pham。 Live Translator 是一个独立的浏览器扩展，不隶属于 Google、Zoom、Microsoft、Soniox 或 OpenAI。</p>
+</footer>
+</main>
+</div>
+<!-- ═══ Scripts ═══ -->
+<script>
+(function () {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const menuBtn = document.getElementById('menuBtn');
+  const languageSelect = document.getElementById('languageSelect');
+  const links = sidebar.querySelectorAll('a[href^="#"]');
+
+  if (menuBtn) {
+    menuBtn.addEventListener('click', function () {
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('open');
+    });
+  }
+
+  overlay.addEventListener('click', function () {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+  });
+
+  if (languageSelect) {
+    const currentFile = window.location.pathname.split('/').pop() || 'instruction.html';
+    languageSelect.value = currentFile in {
+      'instruction.html': true,
+      'instruction-zh.html': true,
+      'instruction-hi.html': true,
+      'instruction-es.html': true,
+      'instruction-fr.html': true,
+      'instruction-ar.html': true,
+      'instruction-pt.html': true,
+      'instruction-ru.html': true
+    } ? currentFile : 'instruction.html';
+
+    languageSelect.addEventListener('change', function (event) {
+      const target = event.target.value;
+      if (target) {
+        window.location.href = target;
+      }
+    });
+  }
+
+  links.forEach(function (link) {
+    link.addEventListener('click', function () {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('open');
+    });
+  });
+
+  function setActive() {
+    var scrollY = window.scrollY || document.documentElement.scrollTop;
+    var current = null;
+    links.forEach(function (link) {
+      var id = link.getAttribute('href').slice(1);
+      var el = document.getElementById(id);
+      if (el && el.offsetTop - 100 <= scrollY) {
+        current = link;
+      }
+    });
+    links.forEach(function (l) { l.classList.remove('active'); });
+    if (current) current.classList.add('active');
+  }
+
+  window.addEventListener('scroll', setActive, { passive: true });
+  setActive();
+})();
+</script>
+</body>
+</html>

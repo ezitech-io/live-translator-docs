@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>دليل المستخدم — مترجم مباشر</title>
+<meta content="دليل المستخدم الكامل لامتداد متصفح Live Translator. تعرف على كيفية تثبيت مفاتيح API وتكوينها وترجمة الاجتماعات في الوقت الفعلي واستخدام السرد والترجمات وجميع الميزات." name="description"/>
+<link href="./icons/icon-128x128.png" rel="icon" sizes="128x128" type="image/png"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sidebar-w: 280px;
+      --header-h: 56px;
+      --c-bg: #ffffff;
+      --c-sidebar-bg: #f8f9fb;
+      --c-sidebar-border: #e5e7eb;
+      --c-text: #1a1a2e;
+      --c-text-secondary: #64748b;
+      --c-accent: #667eea;
+      --c-accent-light: #eef2ff;
+      --c-accent-hover: #5a6fd6;
+      --c-border: #e5e7eb;
+      --c-code-bg: #f1f5f9;
+      --c-tip-bg: #eff6ff;
+      --c-tip-border: #3b82f6;
+      --c-warn-bg: #fefce8;
+      --c-warn-border: #eab308;
+      --c-note-bg: #f0fdf4;
+      --c-note-border: #22c55e;
+      --c-step-bg: #f8fafc;
+      --c-img-bg: #f1f5f9;
+      --radius: 8px;
+    }
+
+    html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 20px); }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--c-text);
+      background: var(--c-bg);
+    }
+
+    /* ── Header ── */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--header-h);
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--c-border);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 12px;
+    }
+
+    .site-header .logo {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .site-header h1 {
+      font-size: 1rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .site-header .home-link {
+      font-size: 0.8rem;
+      color: var(--c-accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .site-header .home-link:hover { text-decoration: underline; }
+
+    .site-header .header-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .site-header .language-select {
+      border: 1px solid var(--c-border);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--c-text);
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 6px 10px;
+      line-height: 1.2;
+      max-width: 185px;
+    }
+
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      color: var(--c-text);
+    }
+
+    .hamburger svg { display: block; }
+
+    /* ── Layout ── */
+    .layout {
+      display: flex;
+      margin-top: var(--header-h);
+      min-height: calc(100vh - var(--header-h));
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      position: fixed;
+      top: var(--header-h);
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-w);
+      background: var(--c-sidebar-bg);
+      border-right: 1px solid var(--c-sidebar-border);
+      overflow-y: auto;
+      padding: 20px 0;
+      z-index: 90;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.3);
+      z-index: 89;
+    }
+
+    .sidebar nav { padding: 0 12px; }
+
+    .sidebar .nav-group { margin-bottom: 8px; }
+
+    .sidebar .nav-group-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--c-text-secondary);
+      padding: 10px 12px 4px;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      color: var(--c-text-secondary);
+      text-decoration: none;
+      border-radius: 6px;
+      line-height: 1.5;
+      transition: all 0.15s ease;
+    }
+
+    .sidebar a:hover {
+      background: var(--c-accent-light);
+      color: var(--c-accent);
+    }
+
+    .sidebar a.active {
+      background: var(--c-accent-light);
+      color: var(--c-accent);
+      font-weight: 600;
+    }
+
+    /* ── Content ── */
+    .content {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      max-width: 820px;
+      padding: 40px 48px 100px;
+    }
+
+    /* ── Typography ── */
+    .content h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin: 56px 0 8px;
+      padding-top: 20px;
+      color: var(--c-text);
+    }
+
+    .content h2:first-child { margin-top: 0; }
+
+    .content h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 36px 0 8px;
+      color: var(--c-text);
+    }
+
+    .content h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 24px 0 6px;
+      color: var(--c-text);
+    }
+
+    .content p { margin: 0 0 14px; }
+
+    .content ul, .content ol {
+      margin: 0 0 16px;
+      padding-left: 24px;
+    }
+
+    .content li { margin-bottom: 6px; }
+
+    .content a { color: var(--c-accent); }
+    .content a:hover { color: var(--c-accent-hover); }
+
+    .content code {
+      background: var(--c-code-bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.88em;
+      font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+    }
+
+    .content strong { font-weight: 600; }
+
+    .section-intro {
+      font-size: 0.95rem;
+      color: var(--c-text-secondary);
+      margin-bottom: 24px;
+    }
+
+    /* ── Steps ── */
+    .step {
+      background: var(--c-step-bg);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin: 16px 0;
+      position: relative;
+    }
+
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      background: var(--c-accent);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+
+    .step-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: inline;
+    }
+
+    .step-body { margin-top: 10px; }
+
+    /* ── Image placeholder ── */
+    .img-placeholder {
+      background: var(--c-img-bg);
+      border-radius: var(--radius);
+      text-align: center;
+      color: var(--c-text-secondary);
+      font-size: 0.82rem;
+      margin: 14px 0;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .img-placeholder svg {
+      width: 32px;
+      height: 32px;
+      opacity: 0.4;
+    }
+
+    .img-placeholder img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+    }
+
+    /* ── Callout boxes ── */
+    .callout {
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .callout p { margin: 0; }
+    .callout p + p { margin-top: 8px; }
+
+    .callout-tip {
+      background: var(--c-tip-bg);
+      border-left: 4px solid var(--c-tip-border);
+    }
+
+    .callout-warn {
+      background: var(--c-warn-bg);
+      border-left: 4px solid var(--c-warn-border);
+    }
+
+    .callout-note {
+      background: var(--c-note-bg);
+      border-left: 4px solid var(--c-note-border);
+    }
+
+    .callout-label {
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+
+    .callout-tip .callout-label { color: #2563eb; }
+    .callout-warn .callout-label { color: #ca8a04; }
+    .callout-note .callout-label { color: #16a34a; }
+
+    /* ── Table ── */
+    .content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 0.88rem;
+    }
+
+    .content th, .content td {
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--c-border);
+    }
+
+    .content th {
+      background: var(--c-sidebar-bg);
+      font-weight: 600;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--c-text-secondary);
+    }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 8px;
+      border-radius: 10px;
+      vertical-align: middle;
+    }
+
+    .badge-free { background: #dcfce7; color: #166534; }
+    .badge-pro { background: #fef3c7; color: #92400e; }
+
+    /* ── Separator ── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--c-border);
+      margin: 48px 0;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 960px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-overlay.open { display: block; }
+      .content { margin-left: 0; padding: 28px 20px 80px; }
+      .hamburger { display: block; }
+    }
+
+    @media (max-width: 600px) {
+      .content h2 { font-size: 1.25rem; }
+      .content h3 { font-size: 1.05rem; }
+      .step { padding: 16px 18px; }
+    }
+  </style>
+<!-- Google tag (gtag.js) -->
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-T7YFE7XLLF"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-T7YFE7XLLF');
+  </script>
+</head>
+<body>
+<!-- ═══ Header ═══ -->
+<header class="site-header">
+<img alt="مترجم مباشر" height="32" src="./icons/icon-128x128.png" width="32"/>
+<h1>مترجم مباشر — دليل المستخدم</h1>
+<div class="header-actions">
+<select aria-label="Select language guide version" class="language-select" id="languageSelect">
+<option value="instruction.html">🇺🇸 - English</option>
+<option value="instruction-zh.html">🇨🇳 - Chinese</option>
+<option value="instruction-hi.html">🇮🇳 - Hindi</option>
+<option value="instruction-es.html">🇪🇸 - Spanish</option>
+<option value="instruction-fr.html">🇫🇷 - French</option>
+<option value="instruction-ar.html">🇸🇦 - Arabic</option>
+<option value="instruction-pt.html">🇵🇹 - Portuguese</option>
+<option value="instruction-ru.html">🇷🇺 - Russian</option>
+</select>
+<a class="home-link" href="https://translate.ezitech.io">العودة إلى الصفحة الرئيسية</a>
+</div>
+</header>
+<!-- ═══ Sidebar overlay (mobile) ═══ -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<!-- ═══ Layout ═══ -->
+<div class="layout">
+<!-- ═══ Sidebar ═══ -->
+<aside class="sidebar" id="sidebar">
+<nav>
+<div class="nav-group">
+<div class="nav-group-title">البدء</div>
+<a href="#installation">التثبيت</a>
+<a href="#supported-platforms">المنصات المدعومة</a>
+<a href="#overview">نظرة عامة على الامتداد</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">إعداد مفاتيح واجهة برمجة التطبيقات</div>
+<a href="#soniox-key">احصل على مفتاح Soniox API</a>
+<a href="#openai-key">الحصول على مفتاح OpenAI API (اختياري)</a>
+<a href="#enter-keys">أدخل مفاتيح API الخاصة بك</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">الترخيص والمحترف</div>
+<a href="#buy-license">شراء مفتاح الترخيص</a>
+<a href="#activate-license">قم بتنشيط الترخيص الخاص بك</a>
+<a href="#free-vs-pro">الميزات المجانية مقابل الميزات الاحترافية</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">الاستخدام الأساسي</div>
+<a href="#start-translation">ابدأ جلسة الترجمة</a>
+<a href="#controls">الضوابط: إيقاف مؤقت، استئناف، إنهاء</a>
+<a href="#language-selection">تغيير اللغات</a>
+<a href="#microphone">قم بتشغيل الميكروفون</a>
+<a href="#font-size">تغيير حجم الخط</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">المميزات</div>
+<a href="#speaker-names">أسماء المتحدثين</a>
+<a href="#narration">السرد (تحويل النص إلى كلام)</a>
+<a href="#narrate-my-voice">أروي صوتي (مترجم)</a>
+<a href="#send-chat">أرسل الترجمة عبر الدردشة</a>
+<a href="#subtitle-mode">وضع الترجمة</a>
+<a href="#inline-assistant">مساعد الذكاء الاصطناعي المضمن</a>
+<a href="#context-setting">إعدادات السياق</a>
+<a href="#download-transcript">تحميل النسخة</a>
+</div>
+<div class="nav-group">
+<div class="nav-group-title">المزيد</div>
+<a href="#auto-update">التحقق من التحديث التلقائي</a>
+<a href="#troubleshooting">استكشاف الأخطاء وإصلاحها</a>
+<a href="#contact">الاتصال والدعم</a>
+</div>
+</nav>
+</aside>
+<!-- ═══ Content ═══ -->
+<main class="content">
+<!-- ────────────────────────────────────────── -->
+<!-- GETTING STARTED                            -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="installation">التثبيت</h2>
+<p class="section-intro">قم بتثبيت ملحق Live Translator على أي متصفح يستند إلى Chromium (Chrome وEdge وBrave وArc وOpera وما إلى ذلك).</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">افتح موقع Live Translator</span>
+<div class="step-body">
+<p>اذهب إلى <a href="https://translate.ezitech.io" target="_blank">https://translate.ezitech.io</a> في متصفحك.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">انقر فوق الزر "تثبيت".</span>
+<div class="step-body">
+<p>انقر فوق <strong>إضافة إلى Chrome</strong> زر. سيؤدي هذا إلى تنزيل ملف الامتداد.</p>
+<div class="img-placeholder">
+<img alt="إضافة إلى Chrome" src="./images/add-to-chrome.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">قم بتمكين وضع المطور في متصفحك</span>
+<div class="step-body">
+<p>افتح صفحة إدارة الإضافات في متصفحك:</p>
+<ul>
+<li><strong>كروم/شجاع/قوس:</strong> النوع <code>chrome://extensions</code>  في شريط العناوين واضغط على Enter.</li>
+<li><strong>الحافة:</strong> النوع <code>edge://extensions</code>  في شريط العناوين واضغط على Enter.</li>
+</ul>
+<p>التبديل <strong>وضع المطور</strong> ON في الزاوية العلوية اليمنى من الصفحة.</p>
+<div class="img-placeholder">
+<img alt="تمكين وضع المطور" src="./images/enable-dev-mode.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">4</span>
+<span class="step-title">قم بتثبيت ملف الامتداد</span>
+<div class="step-body">
+<p>قم بسحب وإسقاط الملف الذي تم تنزيله <code>.zip</code> ملف على صفحة الامتدادات.</p>
+<div class="img-placeholder">
+<img alt="تثبيت الامتداد" src="./images/drag-drop.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-note">
+<div class="callout-label">تم!</div>
+<p>يجب أن تشاهد الآن أيقونة Live Translator في شريط أدوات المتصفح. تم تثبيت الامتداد وجاهز للتكوين.</p>
+</div>
+<hr class="section-divider"/>
+<!-- Supported Platforms -->
+<h2 id="supported-platforms">المنصات المدعومة</h2>
+<p class="section-intro">يعمل المترجم المباشر على هذه المواقع والمنصات. ما عليك سوى فتح أي من هذه المواقع والنقر على أيقونة الامتداد لبدء الترجمة.</p>
+<table>
+<thead>
+<tr><th>المنصة</th><th>ما يمكنك فعله</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>جوجل ميت</strong></td><td>ترجمة الاجتماعات، سرد صوتك، إرسال الدردشة</td></tr>
+<tr><td><strong>تكبير/تصغير (الويب)</strong></td><td>ترجمة الاجتماعات، سرد صوتك، إرسال الدردشة</td></tr>
+<tr><td><strong>مايكروسوفت تيمز (الويب)</strong></td><td>ترجمة الاجتماعات، سرد صوتك، إرسال الدردشة</td></tr>
+<tr><td><strong>يوتيوب</strong></td><td>ترجمة مقاطع الفيديو وملء السياق تلقائيًا من عنوان الفيديو</td></tr>
+<tr><td><strong>واتساب ويب</strong></td><td>ترجمة المكالمات، نطق صوتك</td></tr>
+<tr><td><strong>الفيسبوك</strong></td><td>ترجمة مقاطع الفيديو والبث المباشر</td></tr>
+<tr><td><strong>تيك توك</strong></td><td>ترجمة الفيديوهات</td></tr>
+<tr><td><strong>دوين</strong></td><td>ترجمة الفيديوهات</td></tr>
+<tr><td><strong>فيميو</strong></td><td>ترجمة الفيديوهات</td></tr>
+<tr><td><strong>ديلي موشن</strong></td><td>ترجمة الفيديوهات</td></tr>
+<tr><td><strong>يوديمي</strong></td><td>ترجمة فيديوهات الدورة</td></tr>
+<tr><td><strong>دومستيكا</strong></td><td>ترجمة فيديوهات الدورة</td></tr>
+</tbody>
+</table>
+<div class="callout callout-tip">
+<div class="callout-label">نصيحة</div>
+<p>يلتقط الامتداد <strong>علامة التبويب الصوت</strong> مباشرة، لذا فهو يعمل مع أي صوت يتم تشغيله في علامة تبويب المتصفح على المواقع المدعومة - لا حاجة إلى إعداد ميكروفون منفصل لصوت الطرف الآخر.</p>
+</div>
+<hr class="section-divider"/>
+<!-- Extension Overview -->
+<h2 id="overview">نظرة عامة على الامتداد</h2>
+<p class="section-intro">نظرة سريعة على الواجهة الرئيسية وأين يوجد كل شيء.</p>
+<div class="img-placeholder" style="min-height: 200px;">
+<img alt="نظرة عامة على الامتداد" src="./images/extension-overview.png"/>
+</div>
+<p>تحتوي لوحة Live Translator على هذه المجالات الرئيسية:</p>
+<ul>
+<li><strong>شريط العنوان</strong> — زر الإعدادات، تبديل وضع الترجمة، زر الإغلاق. إذا كان هناك تحديث متاح، فسترى شارة هنا.</li>
+<li><strong>محدد اللغة</strong> — قائمتان منسدلتان: "لغتي" (اللغة التي تتحدث بها) و"لغتهم" (اللغة التي تريد الترجمة منها).</li>
+<li><strong>منطقة النص</strong>  — حيث يظهر النص المترجم في الوقت الفعلي، ويتم تنظيمه حسب المتحدث.</li>
+<li><strong>شريط التحكم</strong>  — زر البدء/الإيقاف/الإيقاف المؤقت، وتبديل الميكروفون، وإعدادات السرد، ومساعد الذكاء الاصطناعي، وحجم الخط، والتنزيل، والمزيد من الخيارات.</li>
+</ul>
+<div class="callout callout-tip">
+<div class="callout-label">نصيحة</div>
+<p>يمكنك ذلك <strong>اسحب اللوحة</strong> بواسطة شريط العنوان الخاص به لنقله إلى أي مكان على الشاشة، و <strong>تغيير الحجم</strong> عن طريق سحب الحواف. بهذه الطريقة لن يتم حظر المحتوى المهم أثناء الاجتماعات أو مقاطع الفيديو.</p>
+</div>
+<hr class="section-divider"/>
+<!-- ────────────────────────────────────────── -->
+<!-- API KEYS SETUP                             -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="soniox-key">احصل على مفتاح Soniox API</h2>
+<p class="section-intro">يوفر Soniox محرك التعرف على الكلام والترجمة في الوقت الفعلي. أنت بحاجة إلى مفتاح Soniox API لاستخدام Live Translator. <span class="badge badge-free">مطلوب</span></p>
+<div class="callout callout-warn">
+<div class="callout-label">هام</div>
+<p>مفتاح Soniox API هو <strong>مطلوب</strong> لكي يعمل التمديد. بدونها، لا يمكن للامتداد نسخ أو ترجمة أي صوت.</p>
+</div>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">اذهب إلى موقع سونيوكس</span>
+<div class="step-body">
+<p>مفتوح <a href="https://console.soniox.com/signup" target="_blank">https://console.soniox.com/signup</a> في متصفحك. أنشئ حسابًا باستخدام بريدك الإلكتروني أو تسجيل الدخول إلى Google.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">احصل على مفتاح API الخاص بك</span>
+<div class="step-body">
+<p>بعد تسجيل الدخول، انتقل إلى قسم واجهة برمجة التطبيقات (API) في لوحة تحكم Soniox الخاصة بك. يمكنك أيضًا الذهاب مباشرة إلى <a href="https://soniox.com/docs/stt/get-started#get-api-key" target="_blank">دليل البدء من شركة Sonyox</a> للحصول على تعليمات خطوة بخطوة.</p>
+<p>انسخ مفتاح API الخاص بك — ستحتاج إليه في الخطوات التالية.</p>
+<div class="img-placeholder">
+<img alt="الحصول على مفتاح API" src="./images/create-soniox-api.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">إضافة الفوترة (مطلوبة لاستخدام واجهة برمجة التطبيقات)</span>
+<div class="step-body">
+<p>أضف طريقة دفع إلى حساب Soniox الخاص بك. يمكنك استخدام بطاقة الائتمان أو PayPal أو طرق الدفع الأخرى. تعمل واجهة برمجة تطبيقات Soniox بنظام الدفع أولاً بأول — فأنت تدفع فقط مقابل ما تستخدمه.</p>
+<div class="img-placeholder">
+<img alt="أضف طريقة الدفع" src="./images/payment-soniox.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">ملاحظة</div>
+<p>تحتاج إلى إيداع حد أدنى قدره دولار واحد في حسابك لاستخدام واجهة برمجة التطبيقات. يمكنك إيداع المزيد إذا كنت ترغب في ذلك.</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="openai-key">الحصول على مفتاح OpenAI API (اختياري)</h2>
+<p class="section-intro">مفتاح OpenAI API هو <strong>اختياري</strong>  — أنت بحاجة إليه فقط إذا كنت تريد استخدام أصوات OpenAI للسرد أو ميزة Inline AI Assistant. <span class="badge badge-pro">برو</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">انتقل إلى منصة OpenAI</span>
+<div class="step-body">
+<p>مفتوح <a href="https://platform.openai.com/api-keys" target="_blank">https://platform.openai.com/api-keys</a> في متصفحك.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">إنشاء حساب أو تسجيل الدخول</span>
+<div class="step-body">
+<p>إذا لم يكن لديك حساب OpenAI، فانقر فوق <strong>"التسجيل"</strong> وإنشاء واحد. إذا كان لديك واحدة بالفعل، قم بتسجيل الدخول.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">إنشاء مفتاح API جديد</span>
+<div class="step-body">
+<p>انقر <strong>"+ إنشاء مفتاح سري جديد"</strong>، وأطلق عليه اسمًا مثل "Live Translator"، ثم انقر <strong>"إنشاء مفتاح سري"</strong>.</p>
+<p><strong>انسخ المفتاح واحفظه على الفور</strong>  — سوف يعرضها OpenAI مرة واحدة فقط.</p>
+<div class="img-placeholder">
+<img alt="إنشاء مفتاح OpenAI API" src="./images/openai-key.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">4</span>
+<span class="step-title">إضافة الفوترة (مطلوبة لاستخدام واجهة برمجة التطبيقات)</span>
+<div class="step-body">
+<p>اذهب إلى <a href="https://platform.openai.com/account/billing" target="_blank">إعدادات الفوترة</a> وإضافة طريقة الدفع. يتم الدفع مقابل الاستخدام في OpenAI API، فأنت تدفع فقط مقابل ما تستخدمه.</p>
+<div class="img-placeholder">
+<img alt="إنشاء مفتاح OpenAI API" src="./images/openai-billing.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-note">
+<div class="callout-label">ملاحظة</div>
+<p>إذا كنت تريد السرد فقط (تحويل النص إلى كلام)، فيمكنك استخدام <strong>ترجمة جوجل للأصوات مجانًا</strong> بدلاً من ذلك. مفتاح OpenAI مطلوب فقط إذا كنت تريد أصوات OpenAI المتميزة أو ميزة AI Assistant.</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="enter-keys">أدخل مفاتيح API الخاصة بك</h2>
+<p class="section-intro">بمجرد حصولك على مفاتيح API الخاصة بك، أدخلها في صفحة إعدادات Live Translator.</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">افتح إعدادات المترجم المباشر</span>
+<div class="step-body">
+<p>يمكنك فتح الإعدادات بأي من الطرق التالية:</p>
+<ul>
+<li>انقر فوق <strong>رمز الترس</strong> (⚙) في الجزء العلوي الأيمن من لوحة المترجم.</li>
+<li>انقر بزر الماوس الأيمن على أيقونة Live Translator في شريط الأدوات → <strong>"الخيارات"</strong>.</li>
+<li>انتقل إلى صفحة ملحقات متصفحك → ابحث عن مترجم مباشر → <strong>"التفاصيل"</strong> → <strong>"خيارات الامتداد"</strong>.</li>
+</ul>
+<div class="img-placeholder">
+<img alt="صفحة الإعدادات" src="./images/gear.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">أدخل مفتاح Soniox API الخاص بك</span>
+<div class="step-body">
+<p>في صفحة الإعدادات، اضغط على <strong>"سونيوكس"</strong> في الشريط الجانبي الأيسر. الصق مفتاح Soniox API في حقل الإدخال. يتم حفظ المفتاح تلقائيًا.</p>
+<div class="img-placeholder">
+<img alt="إعدادات سونيوكس" src="./images/enter-soniox-key.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">أدخل مفتاح OpenAI API الخاص بك (اختياري)</span>
+<div class="step-body">
+<p>اضغط على <strong>"أوبن آي آي"</strong> في الشريط الجانبي الأيسر. الصق مفتاح OpenAI API في حقل الإدخال. يتم حفظ المفتاح تلقائيًا.</p>
+<div class="img-placeholder">
+<img alt="فتح إعدادات الذكاء الاصطناعي" src="./images/enter-openai-key.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-note">
+<div class="callout-label">ملاحظة أمنية</div>
+<p>يتم تخزين مفاتيح API الخاصة بك <strong>محليًا على جهازك فقط</strong> استخدام تخزين الامتداد الآمن في Chrome. ولا يتم إرسالها مطلقًا إلى خوادم Live Translator - فهي تُستخدم فقط للتواصل مباشرةً مع Soniox وOpenAI.</p>
+</div>
+<hr class="section-divider"/>
+<!-- ────────────────────────────────────────── -->
+<!-- LICENSE & PRO                              -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="buy-license">شراء مفتاح الترخيص</h2>
+<p class="section-intro">يفتح مفتاح الترخيص ميزات Pro مثل السرد وتنزيل SRT ومساعد الذكاء الاصطناعي والمزيد.</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">اذهب إلى صفحة الشراء</span>
+<div class="step-body">
+<p> قم بزيارة الصفحة الرئيسية للمترجم المباشر على <a href="https://translate.ezitech.io/#pricing" target="_blank">https://translate.ezitech.io/#pricing</a> وانتقل إلى <strong>التسعير</strong> القسم، أو انقر فوق <strong>"شراء ترخيص"</strong> الرابط في صفحة إعدادات الإضافة.</p>
+<div class="img-placeholder">
+<img alt="صفحة الشراء" src="./images/pricing.jpeg"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">اختر خطتك</span>
+<div class="step-body">
+<p>اختر إما:</p>
+<ul>
+<li><strong>شهريا</strong>  — 5.99 دولارًا شهريًا</li>
+<li><strong>سنويا</strong>  — 59 دولارًا سنويًا (وفر ~18%)</li>
+</ul>
+<p>يمكنك الحصول على <strong>تجربة مجانية لمدة 7 أيام</strong> لتجربة ميزات Pro. بعد انتهاء الفترة التجريبية، يمكنك شراء ترخيص لمواصلة استخدام ميزات Pro.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">أكمل الدفع</span>
+<div class="step-body">
+<p>ستتم إعادة توجيهك إلى صفحة الدفع القطبية. أدخل بريدك الإلكتروني وتفاصيل الدفع، ثم أكمل عملية الشراء.</p>
+<div class="img-placeholder">
+<img alt="صفحة الدفع" src="./images/purchase.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">4</span>
+<span class="step-title">استلم مفتاح الترخيص الخاص بك</span>
+<div class="step-body">
+<p>بعد الدفع، سوف تتلقى <strong>مفتاح الترخيص</strong> عبر البريد الإلكتروني. يبدو مفتاح الترخيص كرمز طويل (على سبيل المثال، <code>LT-XXXX-XXXX-XXXX-XXXX</code>). انسخ هذا المفتاح.</p>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">سياسة استرداد الأموال</div>
+<p>يمكنك طلب استرداد الأموال خلال <strong>30 يوما</strong> من تاريخ السداد عن طريق الاتصال <a href="mailto:phampdoan@gmail.com">phampdoan@gmail.com</a>.</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="activate-license">قم بتنشيط الترخيص الخاص بك</h2>
+<p class="section-intro">بعد الشراء، قم بتنشيط مفتاح الترخيص الخاص بك في إعدادات الامتداد.</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">أدخل مفتاح الترخيص الخاص بك وقم بتنشيطه</span>
+<div class="step-body">
+<p>افتح إعدادات الامتداد (رمز الترس أو انقر بزر الماوس الأيمن → خيارات). انقر فوق <strong>"الترخيص"</strong> في الشريط الجانبي الأيسر. الصق مفتاح الترخيص الخاص بك في حقل الإدخال وانقر فوق <strong>"تفعيل"</strong>. سوف يتحقق الامتداد من ترخيصك مع الخادم.</p>
+<div class="img-placeholder">
+<img alt="تفعيل الترخيص" src="./images/enter-license-key.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">التحقق من التنشيط</span>
+<div class="step-body">
+<p>بمجرد التنشيط، سترى حالة الترخيص الخاص بك، والبريد الإلكتروني المرتبط بالترخيص، وتاريخ انتهاء الصلاحية. تم الآن فتح جميع ميزات Pro.</p>
+<div class="img-placeholder">
+<img alt="تفعيل الترخيص" src="./images/license-activated.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-warn">
+<div class="callout-label">تبديل الأجهزة؟</div>
+<p>إذا قمت مسبقًا بتنشيط الترخيص على جهاز آخر، فيمكنك استخدام <strong>""فرض التنشيط""</strong> خيار لنقل الترخيص إلى جهازك الحالي. يمكن أن يكون كل ترخيص نشطًا على جهاز واحد فقط في كل مرة.</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="free-vs-pro">الميزات المجانية مقابل الميزات الاحترافية</h2>
+<p class="section-intro">إليك ما يمكنك فعله بالإصدار المجاني وما يتطلب ترخيص Pro.</p>
+<table>
+<thead>
+<tr><th>الميزة</th><th>مجاني</th><th>برو</th></tr>
+</thead>
+<tbody>
+<tr><td>الترجمة في الوقت الحقيقي</td><td>✓</td><td>✓</td></tr>
+<tr><td>أكثر من 60 لغة</td><td>✓</td><td>✓</td></tr>
+<tr><td>أسماء المتحدثين</td><td>✓</td><td>✓</td></tr>
+<tr><td>قم بسحب اللوحة وتغيير حجمها وتصغيرها</td><td>✓</td><td>✓</td></tr>
+<tr><td>التحكم في حجم الخط</td><td>✓</td><td>✓</td></tr>
+<tr><td>تنزيل النص (TXT/JSON)</td><td>—</td><td>✓</td></tr>
+<tr><td>تحميل النص (SRT)</td><td>—</td><td>✓</td></tr>
+<tr><td>روي صوتهم (TTS)</td><td>—</td><td>✓</td></tr>
+<tr><td>أروي صوتي (مترجم)</td><td>—</td><td>✓</td></tr>
+<tr><td>أرسل الترجمة عبر الدردشة</td><td>—</td><td>✓</td></tr>
+<tr><td>وضع الترجمة</td><td>—</td><td>✓</td></tr>
+<tr><td>مساعد الذكاء الاصطناعي المضمن</td><td>—</td><td>✓</td></tr>
+<tr><td>إعدادات السياق</td><td>✓</td><td>✓</td></tr>
+<tr><td>أسماء المتحدثين</td><td>✓</td><td>✓</td></tr>
+</tbody>
+</table>
+<hr class="section-divider"/>
+<!-- ────────────────────────────────────────── -->
+<!-- BASIC USAGE                                -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="start-translation">ابدأ جلسة الترجمة</h2>
+<p class="section-intro">تعرف على كيفية بدء الترجمة في اجتماع أو فيديو.</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">افتح موقع ويب مدعومًا</span>
+<div class="step-body">
+<p>اذهب إلى أي <a href="#supported-platforms">المنصة المدعومة</a> (على سبيل المثال، Google Meet وZoom وYouTube وما إلى ذلك) والانضمام إلى اجتماع أو تشغيل مقطع فيديو.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">افتح لوحة المترجم المباشر</span>
+<div class="step-body">
+<p>انقر فوق <strong>أيقونة المترجم المباشر</strong> في شريط أدوات المتصفح. ستظهر لوحة المترجم على الصفحة. يمكنك أيضًا النقر فوق <strong>أيقونة عائمة</strong> الذي يظهر في الصفحة.</p>
+<div class="img-placeholder">
+<img alt="افتح اللوحة" src="./images/floating-icon.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">اختر لغاتك</span>
+<div class="step-body">
+<p>استخدم القائمتين المنسدلتين للغتين في أعلى اللوحة:</p>
+<ul>
+<li><strong>"لغتي"</strong>  — اللغة <em>أنت</em> التحدث (على سبيل المثال، الفيتنامية).</li>
+<li><strong>"لغتهم"</strong>  — اللغة <em>غيرها</em> التحدث الذي تريد ترجمته (على سبيل المثال، الإنجليزية).</li>
+</ul>
+<div class="img-placeholder">
+<img alt="اختيار اللغة" src="./images/language.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">4</span>
+<span class="step-title">اضغط على زر ابدأ</span>
+<div class="step-body">
+<p>انقر فوق <strong>ابدأ</strong> زر (أيقونة التشغيل) في شريط التحكم الموجود أسفل اللوحة.</p>
+<p>قد يطلب متصفحك الإذن لالتقاط الصوت – انقر <strong>"السماح"</strong> وحدد علامة التبويب التي تريد التقاطها.</p>
+<div class="img-placeholder">
+<img alt="زر البدء" src="./images/press-start.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">5</span>
+<span class="step-title">شاهد الترجمات في الوقت الفعلي</span>
+<div class="step-body">
+<p>عندما يتحدث الناس، سوف ترى كلاً من <strong>النص الأصلي</strong> و <strong>نص مترجم</strong> تظهر في منطقة النص. يتم تجميع الخطوط تلقائيًا حسب مكبر الصوت.</p>
+<div class="img-placeholder">
+<img alt="ترجمة فورية" src="./images/translate-real.png"/>
+</div>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">التمرير التلقائي</div>
+<p>يتم تمرير النص تلقائيًا لإظهار النص الأحدث. إذا قمت بالتمرير لأعلى لقراءة النص السابق، فسيتوقف التمرير تلقائيًا مؤقتًا. انقر فوق <strong>"التمرير إلى الأحدث"</strong> زر الذي يبدو وكأنه يقفز مرة أخرى إلى النص المباشر.</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="controls">الضوابط: إيقاف مؤقت، استئناف، إنهاء</h2>
+<p class="section-intro">فهم ضوابط جلسة الترجمة.</p>
+<table>
+<thead>
+<tr><th>زر</th><th>ما يفعله</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>ابدأ</strong> (▶)</td><td>يبدأ جلسة ترجمة جديدة. مسح أي نص سابق.</td></tr>
+<tr><td><strong>وقفة</strong> (⏸)</td><td>يوقف الترجمة مؤقتًا. يتم الاحتفاظ بالنسخة. يستمر التقاط الصوت ولكن يتم إيقاف النص مؤقتًا.</td></tr>
+<tr><td><strong>السيرة الذاتية</strong> (▶)</td><td>تستمر الترجمة بعد توقف مؤقت. يظهر النص الجديد بعد المحتوى السابق.</td></tr>
+<tr><td><strong>انتهى</strong> (⏹)</td><td>يوقف الجلسة تماما. يتم الاحتفاظ بالنص على الشاشة حتى تبدأ جلسة جديدة. إنهاء التقاط الصوت، وإيقاف تشغيل الميكروفون والسرد.</td></tr>
+</tbody>
+</table>
+<hr class="section-divider"/>
+<h2 id="language-selection">تغيير اللغات</h2>
+<p class="section-intro">يمكنك تغيير لغات الترجمة في أي وقت.</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">انقر فوق القائمة المنسدلة للغة</span>
+<div class="step-body">
+<p>انقر فوق إما <strong>"لغتي"</strong> أو <strong>"لغتهم"</strong> القائمة المنسدلة في أعلى اللوحة.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">اختر لغة جديدة</span>
+<div class="step-body">
+<p>القائمة تدعم <strong>أكثر من 60 لغة</strong> مرتبة أبجديًا. قم بالتمرير أو الكتابة للبحث عن لغتك. انقر لتحديده.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">يتم إعادة تشغيل الترجمة تلقائيًا</span>
+<div class="step-body">
+<p>إذا كانت الجلسة نشطة، فسيؤدي تغيير اللغة إلى إعادة تشغيل الترجمة تلقائيًا باستخدام زوج اللغة الجديد. يتم حفظ اختيارك للغة للمرة القادمة.</p>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="microphone">قم بتشغيل الميكروفون</h2>
+<p class="section-intro">قم بتمكين الميكروفون الخاص بك حتى تتم ترجمة كلامك أيضًا إلى جانب صوت الاجتماع/الفيديو.</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">انقر فوق زر الميكروفون</span>
+<div class="step-body">
+<p>في شريط التحكم، انقر فوق <strong>رمز الميكروفون</strong>. يصبح الرمز نشطًا (مميزًا) عندما يكون الميكروفون قيد التشغيل.</p>
+<div class="img-placeholder">
+<img alt="زر الميكروفون" src="./images/micro.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">السماح بالوصول إلى الميكروفون</span>
+<div class="step-body">
+<p>إذا كانت هذه هي المرة الأولى، فسيطلب متصفحك إذن الميكروفون. انقر <strong>"السماح"</strong>.</p>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">نصيحة</div>
+<p>الميكروفون <strong>متوقف بشكل افتراضي</strong> عند فتح اللوحة. قم بتشغيله فقط إذا كنت تريد نسخ خطابك وترجمته. عندما تضغط <strong>انتهى</strong>، يتم إيقاف تشغيل الميكروفون تلقائيًا.</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="font-size">تغيير حجم الخط</h2>
+<p class="section-intro">اضبط حجم النص النصي لقراءة مريحة.</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">انقر فوق زر حجم الخط</span>
+<div class="step-body">
+<p>في شريط التحكم، انقر فوق <strong>زر حجم الخط</strong> (أيقونة أ). تظهر قائمة بثلاثة أحجام:</p>
+<ul>
+<li><strong>صغير</strong>  — عرض مضغوط، يناسب المزيد من النص</li>
+<li><strong>متوسطة</strong>  — الحجم المتوازن الافتراضي</li>
+<li><strong>كبيرة</strong>  — أسهل في القراءة من مسافة بعيدة</li>
+</ul>
+<p>انقر على الحجم المفضل لديك. يتم تطبيق التغيير على الفور ويتم حفظه في المرة القادمة.</p>
+<div class="img-placeholder">
+<img alt="محدد حجم الخط" src="./images/font.png"/>
+</div>
+</div>
+</div>
+<hr class="section-divider"/>
+<!-- ────────────────────────────────────────── -->
+<!-- FEATURES                                   -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="speaker-names">أسماء المتحدثين</h2>
+<p class="section-intro">قم بتعيين أسماء حقيقية للمتحدثين حتى تتمكن بسهولة من التعرف على من قال ماذا في النص. <span class="badge badge-free">مجاني</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">افتح قائمة "المزيد".</span>
+<div class="step-body">
+<p>في شريط التحكم، انقر فوق <strong>"المزيد"</strong> زر (⋯ أيقونة). ثم انقر فوق <strong>"إعدادات مكبر الصوت"</strong> زر.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">افتح مربع حوار "إعدادات السماعة".</span>
+<div class="step-body">
+<p>سيتم فتح مربع حوار إعدادات السماعة.</p>
+<div class="img-placeholder">
+<img alt="مربع حوار إعدادات مكبر الصوت" src="./images/speaker.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">تخصيص الأسماء</span>
+<div class="step-body">
+<p>سترى قائمة بمكبرات الصوت المكتشفة (مكبر الصوت 1، مكبر الصوت 2، وما إلى ذلك). اكتب اسمًا حقيقيًا بجوار كل اسم (على سبيل المثال، "جون"، "سارة"). انقر <strong>"إضافة صف"</strong> إذا كنت بحاجة إلى المزيد.</p>
+<p>انقر <strong>"حفظ"</strong>. ستستخدم الآن جميع سطور النص - الماضية والمستقبلية - الأسماء التي قمت بتعيينها.</p>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="narration">السرد (تحويل النص إلى كلام)</h2>
+<p class="section-intro">اطلب من الترجمات أن تقرأها بصوت عالٍ حتى تتمكن من الاستماع بدلاً من القراءة. هذه هي ميزة "سرد أصواتهم". <span class="badge badge-pro">برو</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">افتح إعدادات السرد</span>
+<div class="step-body">
+<p>في شريط التحكم، انقر فوق <strong>زر السرد</strong> (أيقونة مكبر الصوت). يتم فتح مربع حوار إعدادات السرد.</p>
+<div class="img-placeholder">
+<img alt="إعدادات السرد" src="./images/narration-setting.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">اختر مزود تحويل النص إلى كلام (TTS) والصوت</span>
+<div class="step-body">
+<p>اختر مزود الصوت الخاص بك:</p>
+<ul>
+<li><strong>ترجمة جوجل</strong> (مجاني) — يعمل بدون أي مفتاح API. أصوات ذات نوعية جيدة في أكثر من 60 لغة.</li>
+<li><strong>أوبن إيه آي</strong> (ممتاز) - جودة أعلى، أصوات أكثر طبيعية. يتطلب مفتاح OpenAI API.</li>
+</ul>
+<p>اختر أ <strong>صوت</strong> من القائمة المنسدلة وانقر <strong>"اختبار"</strong> لمعاينة كيف يبدو الأمر.</p>
+<p>ضبط <strong>سرعة الصوت</strong> و <strong>الحجم</strong> إذا لزم الأمر.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">ابدأ بالرواية</span>
+<div class="step-body">
+<p>انقر <strong>""الحديث عن أصواتهم""</strong> زر في مربع الحوار. الآن، عندما تظهر الترجمة، سيتم قراءتها لك بصوت عالٍ.</p>
+<p>للتوقف، انقر فوق زر السرد مرة أخرى وانقر <strong>"توقف"</strong>.</p>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="narrate-my-voice">أروي صوتي (وضع المترجم الفوري)</h2>
+<p class="section-intro">تحدث بلغتك وقم بتشغيل صوتك المترجم للمشاركين الآخرين في الاجتماع - كما لو كان لديك مترجم شخصي. <span class="badge badge-pro">برو</span></p>
+<div class="callout callout-warn">
+<div class="callout-label">المتطلبات</div>
+<p>تعمل هذه الميزة <strong>جوجل ميت</strong>, <strong>تكبير/تصغير (الويب)</strong>, <strong>مايكروسوفت تيمز (الويب)</strong>، و <strong>واتساب ويب</strong>. أنت بحاجة إلى الخاص بك <strong>تم تمكين الميكروفون</strong> وجلسة ترجمة <strong>يجري</strong>.</p>
+</div>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">افتح إعدادات السرد</span>
+<div class="step-body">
+<p>انقر فوق <strong>زر السرد</strong> في شريط التحكم لفتح مربع حوار إعدادات السرد.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">تكوين "راوي صوتي"</span>
+<div class="step-body">
+<p>في مربع الحوار، ابحث عن <strong>"أروي صوتي"</strong> قسم. اختر الصوت والمزود المفضل لديك (Google أو OpenAI). يمكنك تعيين أ <strong>صوت مختلف</strong>  لرواية “صوتي” و”صوتهم”.</p>
+<p>انقر <strong>"اختبار"</strong> لمعاينة الصوت المحدد.</p>
+<div class="img-placeholder">
+<img alt="أروي صوتي" src="./images/my-voice-setting.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">بدء "سرد صوتي"</span>
+<div class="step-body">
+<p>انقر <strong>"بدء رواية صوتي"</strong>. عندما تتكلم فإن كلماتك هي:</p>
+<ol>
+<li>منقول بلغتك</li>
+<li>مترجم إلى اللغة الأخرى</li>
+<li>تحدث بصوت عالٍ في الاجتماع حتى يسمع الشخص الآخر صوتك المترجم</li>
+</ol>
+<p>يتم كتم صوت الميكروفون تلقائيًا أثناء تشغيل الصوت المترجم لمنع صدى الصوت.</p>
+<div class="img-placeholder">
+<img alt='ابدأ "سرد صوتي".' src="./images/narrate-my-voice.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">4</span>
+<span class="step-title">وقف الحديث</span>
+<div class="step-body">
+<p>انقر فوق زر السرد ثم <strong>"توقف"</strong>، أو اضغط <strong>انتهى</strong> لإيقاف الجلسة بأكملها (والذي يوقف السرد أيضًا).</p>
+</div>
+</div>
+<div class="callout callout-note">
+<div class="callout-label">ملاحظة</div>
+<p>يمكنك الركض فقط <strong>وضع السرد واحد في كل مرة</strong>  — إما "أروي صوتي" أو "أروي أصواتهم"، وليس كلاهما في وقت واحد. يتغير رمز شريط الأدوات لإظهار الوضع النشط.</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="send-chat">أرسل الترجمة عبر الدردشة</h2>
+<p class="section-intro">أرسل كلامك المترجم تلقائيًا كرسائل نصية في دردشة الاجتماع. <span class="badge badge-pro">برو</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">تمكين "الإرسال عبر الدردشة"</span>
+<div class="step-body">
+<p>في شريط التحكم، ابحث عن <strong>زر إرسال الدردشة</strong> (بجانب أيقونة الميكروفون). انقر فوقه للتبديل - يتحول الزر <strong>الأخضر</strong> عندما يكون نشطا.</p>
+<div class="img-placeholder">
+<img alt="أرسل الدردشة" src="./images/send-via-chat.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">تكلم ويرسل تلقائيا</span>
+<div class="step-body">
+<p>مع تشغيل الميكروفون وتشغيل جلسة الترجمة، عندما تتحدث، يتم إدراج النص المترجم تلقائيًا في مدخلات الدردشة الخاصة بالاجتماع وإرساله.</p>
+<p>هذا يعمل <strong>جوجل ميت</strong>, <strong>تكبير/تصغير (الويب)</strong>، و <strong>مايكروسوفت تيمز (الويب)</strong>.</p>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">نصيحة</div>
+<p>يكون هذا مفيدًا عندما لا يكون "Narrate My Voice" متاحًا لنظامك الأساسي، أو إذا كنت تريد السرد الصوتي وترجمة الدردشة النصية في وقت واحد.</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="subtitle-mode">وضع الترجمة</h2>
+<p class="section-intro">قم بالتبديل إلى شريط الترجمة البسيط الذي يشبه الفيلم والذي يعرض فقط أحدث ترجمة في الجزء السفلي من الشاشة. <span class="badge badge-pro">برو</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">تمكين وضع الترجمة</span>
+<div class="step-body">
+<p>في شريط عنوان لوحة المترجم، انقر فوق <strong>رمز الترجمة</strong> (أيقونة التسميات التوضيحية المغلقة).</p>
+<p>سيتم استبدال اللوحة الكاملة بشريط ترجمة رفيع في الجزء السفلي من الشاشة.</p>
+<div class="img-placeholder">
+<img alt="وضع الترجمة" src="./images/subtitle.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">تخصيص شريط الترجمة</span>
+<div class="step-body">
+<p>انقر فوق <strong>رمز النغمة</strong> (ترس الإعدادات) على شريط الترجمة لضبط:</p>
+<ul>
+<li><strong>التعتيم</strong> — قم بالتمرير لجعل الشريط أكثر أو أقل شفافية.</li>
+<li><strong>حجم الخط</strong> — اختر من بين نص صغير أو متوسط أو كبير.</li>
+</ul>
+<p>يمكنك أيضًا <strong>اسحب</strong> شريط الترجمة لتحريكه، و <strong>تغيير الحجم</strong> ذلك عن طريق سحب الحواف.</p>
+<div class="img-placeholder">
+<img alt="إعداد الترجمة" src="./images/customize-subtitle-bar.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">الخروج من وضع الترجمة</span>
+<div class="step-body">
+<p>انقر فوق <strong>زر الإغلاق</strong> (✕) على شريط الترجمة للعودة إلى لوحة المترجم الكاملة.</p>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="inline-assistant">مساعد الذكاء الاصطناعي المضمن</h2>
+<p class="section-intro">احصل على تفسيرات مدعومة بالذكاء الاصطناعي وإجابات تم إنشاؤها بناءً على سياق المحادثة، مباشرة من النص. <span class="badge badge-pro">برو</span></p>
+<div class="callout callout-warn">
+<div class="callout-label">الشرط</div>
+<p> يتطلب مساعد الذكاء الاصطناعي المضمن <strong>مفتاح OpenAI API</strong>  ليتم تهيئتها في الإعدادات.</p>
+</div>
+<h3>شرح سطر</h3>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">قم بالتمرير فوق سطر النص</span>
+<div class="step-body">
+<p>عندما تقوم بالتمرير فوق أي سطر في النص، يتم حذف <strong>رمز الذكاء الاصطناعي
+يظهر </strong> (🤖).</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">انقر على أيقونة الذكاء الاصطناعي واختر "شرح"</span>
+<div class="step-body">
+<p>يفتح مساعد الذكاء الاصطناعي في نافذة منفصلة. سيستخدم سياق النص الكامل والسطر المحدد لتزويدك بشرح مفصل.</p>
+<div class="img-placeholder">
+<img alt="شرح" src="./images/ai-explain.png"/>
+</div>
+</div>
+</div>
+<h3>إنشاء إجابة</h3>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">انقر على أيقونة الذكاء الاصطناعي واختر "إنشاء إجابة"</span>
+<div class="step-body">
+<p>سيقوم مساعد الذكاء الاصطناعي بإنشاء إجابة مقترحة بناءً على ما قيل في المحادثة. ويمكنه أيضًا استخدام بحث الويب لتقديم إجابات أكثر دقة.</p>
+<div class="img-placeholder">
+<img alt="إنشاء الإجابة" src="./images/ai-help-answer.png"/>
+</div>
+</div>
+</div>
+<h3>افتح لوحة المساعد</h3>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">انقر فوق زر المساعد في شريط التحكم</span>
+<div class="step-body">
+<p>يمكنك أيضًا فتح لوحة مساعد الذكاء الاصطناعي مباشرة من <strong>زر المساعد</strong> (أيقونة 🤖) في شريط التحكم. يؤدي هذا إلى فتح نافذة دردشة قابلة للسحب حيث يمكنك كتابة أي سؤال. المساعد لديه حق الوصول إلى النص الكامل كسياق.</p>
+<div class="img-placeholder">
+<img alt="الفريق المساعد" src="./images/ai.png"/>
+</div>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="context-setting">إعدادات السياق</h2>
+<p class="section-intro">توفير سياق حول موضوع المحادثة لتحسين دقة الترجمة. <span class="badge badge-free">مجاني</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">افتح إعدادات السياق</span>
+<div class="step-body">
+<p>انقر فوق <strong>"المزيد"</strong> زر (⋯) في شريط التحكم، ثم انقر <strong>"السياق"</strong>.</p>
+<div class="img-placeholder">
+<img alt="إعداد السياق" src="./images/context.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">املأ حقول السياق</span>
+<div class="step-body">
+<p>يمكنك تقديم:</p>
+<ul>
+<li><strong>المجال / الموضوع</strong>  — موضوع المحادثة (على سبيل المثال، "مؤتمر طبي"، "وضع هندسة البرمجيات").</li>
+<li><strong>المصطلحات الأساسية</strong> — المصطلحات التقنية أو أسماء العلم أو المصطلحات التي قد يصعب التعرف عليها (على سبيل المثال، "Kubernetes، بوابة API، الخدمات الصغيرة").</li>
+<li><strong>معلومات المتحدث</strong>  — أسماء المشاركين وأدوارهم (على سبيل المثال، "دكتور سميث - طبيب قلب، تقديم العرض").</li>
+</ul>
+<p>انقر <strong>"تطبيق"</strong> لإرسال هذا السياق إلى محرك الترجمة للدورة الحالية.</p>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">حفظ الإعدادات المسبقة (اختياري)</span>
+<div class="step-body">
+<p>إذا كان لديك اجتماعات متكررة بمواضيع مشابهة، فانقر فوق <strong>"حفظ الإعداد المسبق"</strong> لحفظ السياق الحالي. في المرة القادمة، ما عليك سوى تحميل الإعداد المسبق بدلاً من كتابة كل شيء مرة أخرى.</p>
+<p>يمكنك أيضًا <strong>استيراد/تصدير</strong> الإعدادات المسبقة كملفات JSON لمشاركتها أو نسخها احتياطيًا.</p>
+</div>
+</div>
+<div class="callout callout-tip">
+<div class="callout-label">الملء التلقائي في YouTube</div>
+<p>عند استخدام المترجم المباشر <strong>يوتيوب</strong>، يمكن أن تكون حقول السياق <strong>يتم ملؤها تلقائيًا</strong> مع عنوان الفيديو ووصفه. وهذا يساعد محرك الترجمة على فهم موضوع الفيديو بشكل أفضل.</p>
+</div>
+<hr class="section-divider"/>
+<h2 id="download-transcript">تحميل النسخة</h2>
+<p class="section-intro">احفظ النصوص المترجمة كملفات للرجوع إليها لاحقًا أو استخدامها في أدوات أخرى. <span class="badge badge-pro">برو</span></p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">انقر فوق زر التنزيل</span>
+<div class="step-body">
+<p>بعد جلسة الترجمة (أو أثناء إحداها)، انقر فوق <strong>زر التنزيل</strong> (رمز ↓) في شريط التحكم. يتم فتح مربع حوار تنزيل النص.</p>
+<div class="img-placeholder">
+<img alt="تحميل النسخة" src="./images/download-transcript.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">اختر التنسيق</span>
+<div class="step-body">
+<p>اختر التنسيق المفضل لديك:</p>
+<table>
+<thead>
+<tr><th>التنسيق</th><th>الأفضل لـ</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>TXT</strong></td><td>ملف نصي بسيط يحتوي على الطوابع الزمنية وأسماء المتحدثين. سهلة القراءة.</td></tr>
+<tr><td><strong>JSON</strong></td><td>تنسيق البيانات المنظمة. جيد للمعالجة باستخدام أدوات أو نصوص برمجية أخرى.</td></tr>
+<tr><td><strong>SRT (الأصل)</strong></td><td>ملف الترجمة مع نص اللغة الأصلية. استخدامها في برامج تحرير الفيديو.</td></tr>
+<tr><td><strong>SRT (مترجمة)</strong></td><td>ملف الترجمة مع النص المترجم. استخدامها في برامج تحرير الفيديو.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="step">
+<span class="step-number">3</span>
+<span class="step-title">تحميل الملف</span>
+<div class="step-body">
+<p>انقر فوق زر التنزيل للتنسيق الذي اخترته. يتم إنشاء الملف في متصفحك وحفظه في مجلد التنزيل الافتراضي.</p>
+</div>
+</div>
+<div class="callout callout-note">
+<div class="callout-label">الخصوصية</div>
+<p>يتم إنشاء ملفات النص <strong>موجود بالكامل في متصفحك</strong>. لا يتم إرسال أي بيانات نصية إلى أي خادم أثناء عملية التنزيل.</p>
+</div>
+<hr class="section-divider"/>
+<!-- ────────────────────────────────────────── -->
+<!-- MORE                                       -->
+<!-- ────────────────────────────────────────── -->
+<h2 id="auto-update">التحقق من التحديث التلقائي</h2>
+<p class="section-intro">يقوم الامتداد تلقائيًا بالتحقق من التحديثات في كل مرة تفتحه.</p>
+<div class="step">
+<span class="step-number">1</span>
+<span class="step-title">ابحث عن شارة التحديث</span>
+<div class="step-body">
+<p>عندما يتوفر إصدار جديد، سترى رسالة <strong>"التحديث متاح"</strong> شارة في شريط العنوان بلوحة المترجم.</p>
+<div class="img-placeholder">
+<img alt="التحديث متاح" src="./images/update-badge.png"/>
+</div>
+</div>
+</div>
+<div class="step">
+<span class="step-number">2</span>
+<span class="step-title">انقر للتحديث</span>
+<div class="step-body">
+<p>انقر فوق الشارة ليتم نقلك إلى صفحة التثبيت حيث يمكنك تنزيل أحدث إصدار. اتبع نفس الشيء <a href="#installation">خطوات التثبيت</a> للتحديث.</p>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="troubleshooting">استكشاف الأخطاء وإصلاحها</h2>
+<p class="section-intro">المشكلات الشائعة وكيفية حلها.</p>
+<h3> رسالة "لا يوجد مفتاح Soniox API".</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">الحل</span>
+<div class="step-body">
+<p>لم تقم بإدخال مفتاح Soniox API الخاص بك بعد. اذهب الى <a href="#enter-keys">أدخل مفاتيح API الخاصة بك</a> لإعداده.</p>
+</div>
+</div>
+<h3>لا يتم التقاط أي صوت</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">الحل</span>
+<div class="step-body">
+<ul>
+<li>تأكد من النقر <strong>"السماح"</strong> عندما طلب المتصفح إذن التقاط الصوت.</li>
+<li>تأكد من تحديد <strong>علامة التبويب الصحيحة</strong> للمشاركة عند المطالبة بذلك.</li>
+<li>حاول تحديث الصفحة وفتح المترجم مرة أخرى.</li>
+<li>تأكد من تشغيل الصوت في الاجتماع/الفيديو بالفعل.</li>
+</ul>
+</div>
+</div>
+<h3>الترجمة تبدو غير دقيقة</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">الحل</span>
+<div class="step-body">
+<ul>
+<li>تأكد من <strong>"لغتهم"</strong> تم تعيين القائمة المنسدلة على اللغة الصحيحة التي يتم التحدث بها.</li>
+<li>استعمال <a href="#context-setting">إعدادات السياق</a> لتوفير معلومات الموضوع والمصطلحات الأساسية.</li>
+<li>تأكد من أن جودة الصوت واضحة — يمكن أن تؤثر ضوضاء الخلفية على الدقة.</li>
+</ul>
+</div>
+</div>
+<h3>"Narrate My Voice" - لا يستطيع الآخرون سماع الترجمة</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">الحل</span>
+<div class="step-body">
+<ul>
+<li>تأكد من أنك على <strong>المنصة المدعومة</strong> (Google Meet، Zoom Web، Teams Web، WhatsApp Web).</li>
+<li>تأكد من جلسة الترجمة <strong>يجري</strong> وخاصتك <strong>الميكروفون قيد التشغيل</strong>.</li>
+<li>تأكد من أن لديك <strong>الترخيص الاحترافي</strong> مفعل.</li>
+<li>حاول تحديث صفحة الاجتماع والبدء من جديد.</li>
+</ul>
+</div>
+</div>
+<h3>ميزات OpenAI لا تعمل</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">الحل</span>
+<div class="step-body">
+<ul>
+<li>التحقق من حسابك <strong>مفتاح OpenAI API</strong> تم إدخاله بشكل صحيح <a href="#enter-keys">الإعدادات</a>.</li>
+<li>تأكد من وجود حساب OpenAI الخاص بك <strong>إعداد الفواتير</strong> بأرصدة كافية.</li>
+<li>إذا لم تكن بحاجة إلى ميزات OpenAI، فاستخدم <strong>ترجمة جوجل للأصوات</strong> للسرد بدلاً من ذلك (مجاني، لا حاجة إلى مفتاح API).</li>
+</ul>
+</div>
+</div>
+<h3>الامتداد لا يظهر على موقع الويب</h3>
+<div class="step">
+<span class="step-number">!</span>
+<span class="step-title">الحل</span>
+<div class="step-body">
+<ul>
+<li>المترجم المباشر يعمل فقط على <a href="#supported-platforms">الأنظمة الأساسية المدعومة</a>. ولن يظهر على مواقع الويب غير المدعومة.</li>
+<li>إذا كان الموقع مدعومًا ولكن الامتداد لا يظهر، فحاول <strong>تحديث الصفحة</strong>.</li>
+<li>تأكد من الامتداد <strong>ممكّن</strong> في صفحة إدارة الملحقات في متصفحك.</li>
+</ul>
+</div>
+</div>
+<hr class="section-divider"/>
+<h2 id="contact">الاتصال والدعم</h2>
+<p class="section-intro">هل تحتاج إلى مساعدة؟ هل لديك سؤال أو اقتراح؟</p>
+<p>اتصل بالمطور:</p>
+<ul>
+<li><strong>البريد الإلكتروني:</strong> <a href="mailto:ezsolu.io@gmail.com">ezsolu.io@gmail.com</a></li>
+<li><strong>الموقع الإلكتروني:</strong> <a href="https://translate.ezitech.io" target="_blank">https://translate.ezitech.io</a></li>
+<li><strong>واتساب:</strong> <a href="https://wa.me/84355561599" target="_blank">+84 355 561 599</a></li>
+<li><strong>البرقية :</strong> <a href="https://t.me/ezi_tech" target="_blank">إيزي تك</a></li>
+</ul>
+<div class="callout callout-tip">
+<div class="callout-label">أهلا بالتعليقات</div>
+<p>إذا كانت لديك أفكار لميزات أو تحسينات جديدة، فنحن نحب أن نسمع منك. أرسل لنا بريدًا إلكترونيًا يتضمن اقتراحاتك!</p>
+</div>
+<footer style="margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--c-border); font-size: 0.82rem; color: var(--c-text-secondary);">
+<p>© 2026 دوان فام. Live Translator هو امتداد متصفح مستقل ولا ينتمي إلى Google أو Zoom أو Microsoft أو Soniox أو OpenAI.</p>
+</footer>
+</main>
+</div>
+<!-- ═══ Scripts ═══ -->
+<script>
+(function () {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const menuBtn = document.getElementById('menuBtn');
+  const languageSelect = document.getElementById('languageSelect');
+  const links = sidebar.querySelectorAll('a[href^="#"]');
+
+  if (menuBtn) {
+    menuBtn.addEventListener('click', function () {
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('open');
+    });
+  }
+
+  overlay.addEventListener('click', function () {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+  });
+
+  if (languageSelect) {
+    const currentFile = window.location.pathname.split('/').pop() || 'instruction.html';
+    languageSelect.value = currentFile in {
+      'instruction.html': true,
+      'instruction-zh.html': true,
+      'instruction-hi.html': true,
+      'instruction-es.html': true,
+      'instruction-fr.html': true,
+      'instruction-ar.html': true,
+      'instruction-pt.html': true,
+      'instruction-ru.html': true
+    } ? currentFile : 'instruction.html';
+
+    languageSelect.addEventListener('change', function (event) {
+      const target = event.target.value;
+      if (target) {
+        window.location.href = target;
+      }
+    });
+  }
+
+  links.forEach(function (link) {
+    link.addEventListener('click', function () {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('open');
+    });
+  });
+
+  function setActive() {
+    var scrollY = window.scrollY || document.documentElement.scrollTop;
+    var current = null;
+    links.forEach(function (link) {
+      var id = link.getAttribute('href').slice(1);
+      var el = document.getElementById(id);
+      if (el && el.offsetTop - 100 <= scrollY) {
+        current = link;
+      }
+    });
+    links.forEach(function (l) { l.classList.remove('active'); });
+    if (current) current.classList.add('active');
+  }
+
+  window.addEventListener('scroll', setActive, { passive: true });
+  setActive();
+})();
+</script>
+</body>
+</html>
