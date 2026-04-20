@@ -78,6 +78,16 @@
     <section class="card">
       <h1>Changelog</h1>
       <br />
+      <h2>v0.13.1 (April 20, 2026)</h2>
+      <h3>What's new for you</h3>
+      <ul>
+        <li><strong>Browser local voice provider for Narrate their voice</strong> — You can now choose a <strong>Browser</strong> TTS provider and use local/browser-installed voices directly for speaker playback.</li>
+        <li><strong>Narrate My Voice keeps streaming injection path</strong> — My voice narration remains on OpenAI/Google streaming providers to preserve virtual mic injection reliability.</li>
+        <li><strong>Fixed long-queue sentence cutting</strong> — Browser narration queue handling was hardened to prevent skipped/truncated middle sentences in dense conversations.</li>
+        <li><strong>Reduced browser narration delay</strong> — Browser TTS batching/coalescing and provider-specific timing were tuned to lower repeated startup gaps between short segments.</li>
+        <li><strong>Faster and steadier speed behavior</strong> — Browser defaults are now optimized (<strong>1.75x default</strong>, <strong>1.5x minimum</strong>), and auto-sync effective speed no longer drops below <strong>1.5x</strong>.</li>
+      </ul>
+      <br />
       <h2>v0.12.2 (April 19, 2026)</h2>
       <h3>What's new for you</h3>
       <ul>
