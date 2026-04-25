@@ -78,6 +78,15 @@
     <section class="card">
       <h1>Changelog</h1>
       <br />
+      <h2>v0.14.7 (April 25, 2026)</h2>
+      <h3>What's new for you</h3>
+      <ul>
+        <li><strong>OpenAI warning is now shown only when needed</strong> — The extension no longer warns for missing OpenAI key at session start. You now see the warning only when using OpenAI-dependent actions (Narration with OpenAI voice, AI Assistant, and AI downloads).</li>
+        <li><strong>Cleaner state when YouTube caption narration is active</strong> — When narration switches to YouTube translated captions and Soniox is intentionally paused, the status now stays in <strong>Paused</strong> instead of showing a false <strong>Request timeout</strong> error.</li>
+        <li><strong>Close button now fully shuts down active voice features</strong> — Pressing the <strong>X</strong> closes the translator session and correctly stops active narration flows, including Narrate My Voice runtime state.</li>
+        <li><strong>Immediate original-volume recovery on close</strong> — If narration had ducked the original video volume, the extension now restores the original level before closing the translator panel.</li>
+      </ul>
+      <br />
       <h2>v0.14.3 (April 23, 2026)</h2>
       <h3>What's new for you</h3>
       <ul>

@@ -1,1490 +1,2397 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
-<head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Hướng dẫn sử dụng — Live Translator</title>
-<meta content="Hướng dẫn sử dụng đầy đủ cho tiện ích trình duyệt Live Translator. Tìm hiểu cách cài đặt, thiết lập API key, dịch cuộc họp trực tiếp, sử dụng tính năng đọc bản dịch, phụ đề và tất cả các tính năng khác." name="description"/>
-<link href="./icons/icon-128x128.png" rel="icon" sizes="128x128" type="image/png"/>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --sidebar-w: 280px;
-      --header-h: 56px;
-      --c-bg: #ffffff;
-      --c-sidebar-bg: #f8f9fb;
-      --c-sidebar-border: #e5e7eb;
-      --c-text: #1a1a2e;
-      --c-text-secondary: #64748b;
-      --c-accent: #667eea;
-      --c-accent-light: #eef2ff;
-      --c-accent-hover: #5a6fd6;
-      --c-border: #e5e7eb;
-      --c-code-bg: #f1f5f9;
-      --c-tip-bg: #eff6ff;
-      --c-tip-border: #3b82f6;
-      --c-warn-bg: #fefce8;
-      --c-warn-border: #eab308;
-      --c-note-bg: #f0fdf4;
-      --c-note-border: #22c55e;
-      --c-step-bg: #f8fafc;
-      --c-img-bg: #f1f5f9;
-      --radius: 8px;
-    }
-
-    html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 20px); }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      font-size: 15px;
-      line-height: 1.7;
-      color: var(--c-text);
-      background: var(--c-bg);
-    }
-
-    /* ── Header ── */
-    .site-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: var(--header-h);
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--c-border);
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      padding: 0 24px;
-      gap: 12px;
-    }
-
-    .site-header .logo {
-      width: 28px;
-      height: 28px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      border-radius: 6px;
-      flex-shrink: 0;
-    }
-
-    .site-header h1 {
-      font-size: 1rem;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .site-header .home-link {
-      font-size: 0.8rem;
-      color: var(--c-accent);
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .site-header .home-link:hover { text-decoration: underline; }
-
-    .site-header .header-actions {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .site-header .language-select {
-      border: 1px solid var(--c-border);
-      border-radius: 6px;
-      background: #fff;
-      color: var(--c-text);
-      font-size: 0.78rem;
-      font-weight: 500;
-      padding: 6px 10px;
-      line-height: 1.2;
-      max-width: 185px;
-    }
-
-    .hamburger {
-      display: none;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 4px;
-      color: var(--c-text);
-    }
-
-    .hamburger svg { display: block; }
-
-    /* ── Layout ── */
-    .layout {
-      display: flex;
-      margin-top: var(--header-h);
-      min-height: calc(100vh - var(--header-h));
-    }
-
-    /* ── Sidebar ── */
-    .sidebar {
-      position: fixed;
-      top: var(--header-h);
-      left: 0;
-      bottom: 0;
-      width: var(--sidebar-w);
-      background: var(--c-sidebar-bg);
-      border-right: 1px solid var(--c-sidebar-border);
-      overflow-y: auto;
-      padding: 20px 0;
-      z-index: 90;
-      transition: transform 0.3s ease;
-    }
-
-    .sidebar-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.3);
-      z-index: 89;
-    }
-
-    .sidebar nav { padding: 0 12px; }
-
-    .sidebar .nav-group { margin-bottom: 8px; }
-
-    .sidebar .nav-group-title {
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--c-text-secondary);
-      padding: 10px 12px 4px;
-    }
-
-    .sidebar a {
-      display: block;
-      padding: 6px 12px;
-      font-size: 0.82rem;
-      color: var(--c-text-secondary);
-      text-decoration: none;
-      border-radius: 6px;
-      line-height: 1.5;
-      transition: all 0.15s ease;
-    }
-
-    .sidebar a:hover {
-      background: var(--c-accent-light);
-      color: var(--c-accent);
-    }
-
-    .sidebar a.active {
-      background: var(--c-accent-light);
-      color: var(--c-accent);
-      font-weight: 600;
-    }
-
-    /* ── Content ── */
-    .content {
-      margin-left: var(--sidebar-w);
-      flex: 1;
-      max-width: 820px;
-      padding: 40px 48px 100px;
-    }
-
-    /* ── Typography ── */
-    .content h2 {
-      font-size: 1.5rem;
-      font-weight: 800;
-      margin: 56px 0 8px;
-      padding-top: 20px;
-      color: var(--c-text);
-    }
-
-    .content h2:first-child { margin-top: 0; }
-
-    .content h3 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      margin: 36px 0 8px;
-      color: var(--c-text);
-    }
-
-    .content h4 {
-      font-size: 1rem;
-      font-weight: 600;
-      margin: 24px 0 6px;
-      color: var(--c-text);
-    }
-
-    .content p { margin: 0 0 14px; }
-
-    .content ul, .content ol {
-      margin: 0 0 16px;
-      padding-left: 24px;
-    }
-
-    .content li { margin-bottom: 6px; }
-
-    .content a { color: var(--c-accent); }
-    .content a:hover { color: var(--c-accent-hover); }
-
-    .content code {
-      background: var(--c-code-bg);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.88em;
-      font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
-    }
-
-    .content strong { font-weight: 600; }
-
-    .section-intro {
-      font-size: 0.95rem;
-      color: var(--c-text-secondary);
-      margin-bottom: 24px;
-    }
-
-    /* ── Steps ── */
-    .step {
-      background: var(--c-step-bg);
-      border: 1px solid var(--c-border);
-      border-radius: var(--radius);
-      padding: 20px 24px;
-      margin: 16px 0;
-      position: relative;
-    }
-
-    .step-number {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 26px;
-      height: 26px;
-      background: var(--c-accent);
-      color: #fff;
-      border-radius: 50%;
-      font-size: 0.78rem;
-      font-weight: 700;
-      margin-right: 10px;
-      flex-shrink: 0;
-    }
-
-    .step-title {
-      font-weight: 600;
-      font-size: 0.95rem;
-      display: inline;
-    }
-
-    .step-body { margin-top: 10px; }
-
-    /* ── Image placeholder ── */
-    .img-placeholder {
-      background: var(--c-img-bg);
-      border-radius: var(--radius);
-      text-align: center;
-      color: var(--c-text-secondary);
-      font-size: 0.82rem;
-      margin: 14px 0;
-      min-height: 120px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .img-placeholder svg {
-      width: 32px;
-      height: 32px;
-      opacity: 0.4;
-    }
-
-    .img-placeholder img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 6px;
-    }
-
-    /* ── Callout boxes ── */
-    .callout {
-      border-radius: var(--radius);
-      padding: 14px 18px;
-      margin: 16px 0;
-      font-size: 0.9rem;
-      line-height: 1.6;
-    }
-
-    .callout p { margin: 0; }
-    .callout p + p { margin-top: 8px; }
-
-    .callout-tip {
-      background: var(--c-tip-bg);
-      border-left: 4px solid var(--c-tip-border);
-    }
-
-    .callout-warn {
-      background: var(--c-warn-bg);
-      border-left: 4px solid var(--c-warn-border);
-    }
-
-    .callout-note {
-      background: var(--c-note-bg);
-      border-left: 4px solid var(--c-note-border);
-    }
-
-    .callout-label {
-      font-weight: 700;
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 4px;
-    }
-
-    .callout-tip .callout-label { color: #2563eb; }
-    .callout-warn .callout-label { color: #ca8a04; }
-    .callout-note .callout-label { color: #16a34a; }
-
-    /* ── Table ── */
-    .content table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 16px 0;
-      font-size: 0.88rem;
-    }
-
-    .content th, .content td {
-      text-align: left;
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--c-border);
-    }
-
-    .content th {
-      background: var(--c-sidebar-bg);
-      font-weight: 600;
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--c-text-secondary);
-    }
-
-    /* ── Badge ── */
-    .badge {
-      display: inline-block;
-      font-size: 0.68rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      padding: 2px 8px;
-      border-radius: 10px;
-      vertical-align: middle;
-    }
-
-    .badge-free { background: #dcfce7; color: #166534; }
-    .badge-pro { background: #fef3c7; color: #92400e; }
-
-    /* ── Separator ── */
-    .section-divider {
-      border: none;
-      border-top: 1px solid var(--c-border);
-      margin: 48px 0;
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 960px) {
-      .sidebar { transform: translateX(-100%); }
-      .sidebar.open { transform: translateX(0); }
-      .sidebar-overlay.open { display: block; }
-      .content { margin-left: 0; padding: 28px 20px 80px; }
-      .hamburger { display: block; }
-    }
-
-    @media (max-width: 600px) {
-      .content h2 { font-size: 1.25rem; }
-      .content h3 { font-size: 1.05rem; }
-      .step { padding: 16px 18px; }
-    }
-  </style>
-<!-- Google tag (gtag.js) -->
-<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-T7YFE7XLLF"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-T7YFE7XLLF');
-  </script>
-</head>
-<body>
-<!-- ═══ Header ═══ -->
-<header class="site-header">
-<img alt="Live Translator" height="32" src="./icons/icon-128x128.png" width="32"/>
-<h1>Live Translator — Hướng dẫn sử dụng</h1>
-<div class="header-actions">
-<select aria-label="Select language guide version" class="language-select" id="languageSelect">
-<option value="instruction.html">🇺🇸 - English</option>
-      <option value="instruction-vi.html">🇻🇳 - Vietnamese</option>
-<option value="instruction-zh.html">🇨🇳 - Chinese</option>
-<option value="instruction-hi.html">🇮🇳 - Hindi</option>
-<option value="instruction-es.html">🇪🇸 - Spanish</option>
-<option value="instruction-fr.html">🇫🇷 - French</option>
-<option value="instruction-ar.html">🇸🇦 - Arabic</option>
-<option value="instruction-pt.html">🇵🇹 - Portuguese</option>
-<option value="instruction-ru.html">🇷🇺 - Russian</option>
-</select>
-<a class="home-link" href="https://translate.ezitech.io">Quay lại trang chủ</a>
-</div>
-</header>
-<!-- ═══ Sidebar overlay (mobile) ═══ -->
-<div class="sidebar-overlay" id="sidebarOverlay"></div>
-<!-- ═══ Layout ═══ -->
-<div class="layout">
-<!-- ═══ Sidebar ═══ -->
-<aside class="sidebar" id="sidebar">
-<nav>
-<div class="nav-group">
-<div class="nav-group-title">Bắt đầu</div>
-<a href="#installation">Cài đặt</a>
-<a href="#supported-platforms">Nền tảng hỗ trợ</a>
-<a href="#overview">Tổng quan tiện ích</a>
-</div>
-<div class="nav-group">
-<div class="nav-group-title">Thiết lập API Key</div>
-<a href="#soniox-key">Lấy API Key Soniox</a>
-<a href="#openai-key">Lấy API Key OpenAI (không bắt buộc)</a>
-<a href="#enter-keys">Nhập API Key vào tiện ích</a>
-</div>
-<div class="nav-group">
-<div class="nav-group-title">License &amp; Pro</div>
-<a href="#buy-license">Mua License Key</a>
-<a href="#activate-license">Kích hoạt License</a>
-<a href="#free-vs-pro">So sánh Free và Pro</a>
-</div>
-<div class="nav-group">
-<div class="nav-group-title">Cách sử dụng cơ bản</div>
-<a href="#start-translation">Bắt đầu phiên dịch</a>
-<a href="#controls">Điều khiển: Tạm dừng, Tiếp tục, Kết thúc</a>
-<a href="#language-selection">Đổi ngôn ngữ</a>
-<a href="#microphone">Bật micro</a>
-<a href="#font-size">Thay đổi cỡ chữ</a>
-</div>
-<div class="nav-group">
-<div class="nav-group-title">Tính năng</div>
-<a href="#speaker-names">Tên người nói</a>
-<a href="#narration">Đọc bản dịch (Text-to-Speech)</a>
-<a href="#youtube-caption-narration">Thuyết minh theo caption YouTube</a>
-<a href="#narrate-my-voice">Phát âm giọng tôi (Phiên dịch)</a>
-<a href="#send-chat">Gửi bản dịch qua chat</a>
-<a href="#subtitle-mode">Chế độ phụ đề</a>
-<a href="#inline-assistant">Trợ lý AI tích hợp</a>
-<a href="#context-setting">Cài đặt ngữ cảnh</a>
-<a href="#download-transcript">Tải bản ghi</a>
-</div>
-<div class="nav-group">
-<div class="nav-group-title">Thêm</div>
-<a href="#auto-update">Tự động kiểm tra cập nhật</a>
-<a href="#troubleshooting">Xử lý sự cố</a>
-<a href="#contact">Liên hệ &amp; Hỗ trợ</a>
-</div>
-</nav>
-</aside>
-<!-- ═══ Content ═══ -->
-<main class="content">
-<!-- ────────────────────────────────────────── -->
-<!-- GETTING STARTED                            -->
-<!-- ────────────────────────────────────────── -->
-<h2 id="installation">Cài đặt</h2>
-<p class="section-intro">Cài đặt tiện ích Live Translator trên các trình duyệt nhân Chromium (Chrome, Edge, Brave, Arc, Opera, v.v.).</p>
-<div class="step">
-<span class="step-number">1</span>
-<span class="step-title">Mở trang web Live Translator</span>
-<div class="step-body">
-<p>Truy cập <a href="https://translate.ezitech.io" target="_blank">https://translate.ezitech.io</a> trên trình duyệt của bạn.</p>
-</div>
-</div>
-<div class="step">
-<span class="step-number">2</span>
-<span class="step-title">Bấm nút "Cài đặt"</span>
-<div class="step-body">
-<p>Bấm nút <strong>Add To Chrome</strong>. File tiện ích sẽ được tải về máy bạn.</p>
-<div class="img-placeholder">
-<img alt="Add To Chrome" src="./images/add-to-chrome.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">3</span>
-<span class="step-title">Bật Developer Mode (Chế độ nhà phát triển) trên trình duyệt</span>
-<div class="step-body">
-<p>Mở trang quản lý tiện ích của trình duyệt:</p>
-<ul>
-<li><strong>Chrome/Brave/Arc:</strong> Gõ <code>chrome://extensions</code> vào thanh địa chỉ rồi nhấn Enter.</li>
-<li><strong>Edge:</strong> Gõ <code>edge://extensions</code> vào thanh địa chỉ rồi nhấn Enter.</li>
-</ul>
-<p>Bật công tắc <strong>Developer mode</strong> ở góc trên bên phải trang.</p>
-<div class="img-placeholder">
-<img alt="Bật Developer Mode" src="./images/enable-dev-mode.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">4</span>
-<span class="step-title">Cài đặt file tiện ích</span>
-<div class="step-body">
-<p>Kéo và thả file <code>.zip</code> vừa tải về vào trang quản lý tiện ích.</p>
-<div class="img-placeholder">
-<img alt="Cài đặt tiện ích" src="./images/drag-drop.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="callout callout-note">
-<div class="callout-label">Xong!</div>
-<p>Bạn sẽ thấy biểu tượng Live Translator xuất hiện trên thanh công cụ trình duyệt. Tiện ích đã được cài đặt và sẵn sàng để thiết lập.</p>
-</div>
-<hr class="section-divider"/>
-<!-- Supported Platforms -->
-<h2 id="supported-platforms">Nền tảng hỗ trợ</h2>
-<p class="section-intro">Live Translator hoạt động trên các trang web và nền tảng dưới đây. Bạn chỉ cần mở bất kỳ trang nào trong danh sách và bấm vào biểu tượng tiện ích để bắt đầu dịch.</p>
-<table>
-<thead>
-<tr><th>Nền tảng</th><th>Bạn có thể làm gì</th></tr>
-</thead>
-<tbody>
-<tr><td><strong>Google Meet</strong></td><td>Dịch cuộc họp, phát âm giọng bạn, gửi bản dịch qua chat</td></tr>
-<tr><td><strong>Zoom (Web)</strong></td><td>Dịch cuộc họp, phát âm giọng bạn, gửi bản dịch qua chat</td></tr>
-<tr><td><strong>Microsoft Teams (Web)</strong></td><td>Dịch cuộc họp, phát âm giọng bạn, gửi bản dịch qua chat</td></tr>
-<tr><td><strong>YouTube</strong></td><td>Dịch video, tự động điền ngữ cảnh từ tiêu đề video</td></tr>
-<tr><td><strong>WhatsApp Web</strong></td><td>Dịch cuộc gọi, phát âm giọng bạn</td></tr>
-<tr><td><strong>Facebook</strong></td><td>Dịch video và livestream</td></tr>
-<tr><td><strong>TikTok</strong></td><td>Dịch video</td></tr>
-<tr><td><strong>Douyin</strong></td><td>Dịch video</td></tr>
-<tr><td><strong>Vimeo</strong></td><td>Dịch video</td></tr>
-<tr><td><strong>Dailymotion</strong></td><td>Dịch video</td></tr>
-<tr><td><strong>Udemy</strong></td><td>Dịch video khóa học</td></tr>
-<tr><td><strong>Domestika</strong></td><td>Dịch video khóa học</td></tr>
-</tbody>
-</table>
-<div class="callout callout-tip">
-<div class="callout-label">Mẹo</div>
-<p>Tiện ích thu <strong>âm thanh trực tiếp từ tab trình duyệt</strong>, nên nó hoạt động với mọi âm thanh đang phát trên các trang được hỗ trợ — bạn không cần phải thiết lập micro riêng để nghe âm thanh của người khác.</p>
-</div>
-<hr class="section-divider"/>
-<!-- Extension Overview -->
-<h2 id="overview">Tổng quan tiện ích</h2>
-<p class="section-intro">Giới thiệu nhanh về giao diện chính và vị trí của từng phần.</p>
-<div class="img-placeholder" style="min-height: 200px;">
-<img alt="Tổng quan tiện ích" src="./images/extension-overview.png" loading="lazy"/>
-</div>
-<p>Bảng điều khiển Live Translator gồm các phần chính sau:</p>
-<ul>
-<li><strong>Thanh tiêu đề</strong> — Nút cài đặt, nút chuyển sang chế độ phụ đề, nút đóng. Nếu có bản cập nhật mới, sẽ hiện thông báo ở đây.</li>
-<li><strong>Chọn ngôn ngữ</strong> — Hai ô chọn: "Ngôn ngữ của tôi" (ngôn ngữ bạn nói) và "Ngôn ngữ của họ" (ngôn ngữ bạn muốn dịch sang tiếng bạn).</li>
-<li><strong>Khu vực hiển thị bản dịch</strong> — Nơi hiển thị văn bản dịch theo thời gian thực, được phân theo từng người nói.</li>
-<li><strong>Thanh điều khiển</strong> — Nút Bắt đầu/Dừng/Tạm dừng, bật/tắt micro, cài đặt đọc bản dịch, trợ lý AI, cỡ chữ, tải bản ghi, và các tùy chọn khác.</li>
-</ul>
-<div class="callout callout-tip">
-<div class="callout-label">Mẹo</div>
-<p>Bạn có thể <strong>kéo bảng điều khiển</strong> bằng thanh tiêu đề để di chuyển đến bất kỳ vị trí nào trên màn hình, và <strong>thay đổi kích thước</strong> bằng cách kéo các cạnh. Như vậy bảng sẽ không che mất nội dung quan trọng khi bạn đang họp hoặc xem video.</p>
-</div>
-<hr class="section-divider"/>
-<!-- ────────────────────────────────────────── -->
-<!-- API KEYS SETUP                             -->
-<!-- ────────────────────────────────────────── -->
-<h2 id="soniox-key">Lấy API Key Soniox</h2>
-<p class="section-intro">Soniox là dịch vụ nhận dạng giọng nói và dịch thuật theo thời gian thực. Bạn cần có API key của Soniox để sử dụng Live Translator. <span class="badge badge-free">Bắt buộc</span></p>
-<div class="callout callout-warn">
-<div class="callout-label">Quan trọng</div>
-<p>API key Soniox là <strong>bắt buộc</strong> để tiện ích hoạt động. Nếu không có, tiện ích sẽ không thể nhận diện giọng nói hay dịch bất kỳ âm thanh nào.</p>
-</div>
-<div class="step">
-<span class="step-number">1</span>
-<span class="step-title">Truy cập trang web Soniox</span>
-<div class="step-body">
-<p>Mở <a href="https://console.soniox.com/signup" target="_blank">https://console.soniox.com/signup</a> trên trình duyệt. Tạo tài khoản bằng email hoặc đăng nhập bằng Google.</p>
-</div>
-</div>
-<div class="step">
-<span class="step-number">2</span>
-<span class="step-title">Lấy API key</span>
-<div class="step-body">
-<p>Sau khi đăng nhập, vào phần API trên trang quản lý Soniox. Bạn cũng có thể xem hướng dẫn chi tiết tại <a href="https://soniox.com/docs/stt/get-started#get-api-key" target="_blank">trang hướng dẫn của Soniox</a>.</p>
-<p>Sao chép API key — bạn sẽ cần nó ở các bước tiếp theo.</p>
-<div class="img-placeholder">
-<img alt="Lấy API Key" src="./images/create-soniox-api.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">3</span>
-<span class="step-title">Thêm phương thức thanh toán (bắt buộc để dùng API)</span>
-<div class="step-body">
-<p>Thêm phương thức thanh toán vào tài khoản Soniox. Bạn có thể dùng thẻ tín dụng, PayPal, hoặc các hình thức khác. Soniox API tính phí theo mức sử dụng — bạn chỉ trả tiền cho phần mình dùng thôi.</p>
-<div class="img-placeholder">
-<img alt="Thêm phương thức thanh toán" src="./images/payment-soniox.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="callout callout-tip">
-<div class="callout-label">Lưu ý</div>
-<p>Bạn cần nạp tối thiểu $1 vào tài khoản để bắt đầu sử dụng API. Bạn có thể nạp thêm nếu muốn.</p>
-</div>
-<hr class="section-divider"/>
-<h2 id="openai-key">Lấy API Key OpenAI (không bắt buộc)</h2>
-<p class="section-intro">API key OpenAI là <strong>không bắt buộc</strong> — bạn chỉ cần nó nếu muốn sử dụng giọng đọc cao cấp của OpenAI hoặc tính năng Trợ lý AI tích hợp. <span class="badge badge-pro">Pro</span></p>
-<div class="step">
-<span class="step-number">1</span>
-<span class="step-title">Truy cập trang OpenAI Platform</span>
-<div class="step-body">
-<p>Mở <a href="https://platform.openai.com/api-keys" target="_blank">https://platform.openai.com/api-keys</a> trên trình duyệt.</p>
-</div>
-</div>
-<div class="step">
-<span class="step-number">2</span>
-<span class="step-title">Tạo tài khoản hoặc đăng nhập</span>
-<div class="step-body">
-<p>Nếu chưa có tài khoản OpenAI, bấm <strong>"Sign Up"</strong> để tạo mới. Nếu đã có rồi, đăng nhập bình thường.</p>
-</div>
-</div>
-<div class="step">
-<span class="step-number">3</span>
-<span class="step-title">Tạo API key mới</span>
-<div class="step-body">
-<p>Bấm <strong>"+ Create new secret key"</strong>, đặt tên ví dụ "Live Translator", rồi bấm <strong>"Create secret key"</strong>.</p>
-<p><strong>Hãy sao chép và lưu key ngay lập tức</strong> — OpenAI chỉ hiển thị key một lần duy nhất, sau đó bạn sẽ không xem lại được.</p>
-<div class="img-placeholder">
-<img alt="Tạo API Key OpenAI" src="./images/openai-key.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">4</span>
-<span class="step-title">Thêm phương thức thanh toán (bắt buộc để dùng API)</span>
-<div class="step-body">
-<p>Vào <a href="https://platform.openai.com/account/billing" target="_blank">phần Billing (thanh toán)</a> và thêm phương thức thanh toán. OpenAI API cũng tính phí theo mức sử dụng — bạn chỉ trả tiền cho phần mình dùng.</p>
-<div class="img-placeholder">
-<img alt="Thanh toán OpenAI" src="./images/openai-billing.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="callout callout-note">
-<div class="callout-label">Lưu ý</div>
-<p>Nếu bạn chỉ cần tính năng đọc bản dịch thành giọng nói, bạn có thể dùng <strong>giọng đọc miễn phí của Google Translate</strong> mà không cần API key nào. API key OpenAI chỉ cần thiết khi bạn muốn dùng giọng đọc cao cấp của OpenAI hoặc tính năng Trợ lý AI.</p>
-</div>
-<hr class="section-divider"/>
-<h2 id="enter-keys">Nhập API Key vào tiện ích</h2>
-<p class="section-intro">Sau khi có API key, hãy nhập chúng vào trang cài đặt của Live Translator.</p>
-<div class="step">
-<span class="step-number">1</span>
-<span class="step-title">Mở cài đặt Live Translator</span>
-<div class="step-body">
-<p>Bạn có thể mở cài đặt bằng một trong các cách sau:</p>
-<ul>
-<li>Bấm <strong>biểu tượng bánh răng</strong> (⚙) ở góc trên bên phải bảng dịch.</li>
-<li>Nhấp chuột phải vào biểu tượng Live Translator trên thanh công cụ → chọn <strong>"Options"</strong>.</li>
-<li>Vào trang quản lý tiện ích của trình duyệt → tìm Live Translator → bấm <strong>"Details"</strong> → <strong>"Extension options"</strong>.</li>
-</ul>
-<div class="img-placeholder">
-<img alt="Trang cài đặt" src="./images/gear.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">2</span>
-<span class="step-title">Nhập API key Soniox</span>
-<div class="step-body">
-<p>Trong trang cài đặt, bấm vào <strong>"Soniox"</strong> ở thanh bên trái. Dán API key Soniox vào ô nhập. Key sẽ được lưu tự động.</p>
-<div class="img-placeholder">
-<img alt="Cài đặt Soniox" src="./images/enter-soniox-key.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">3</span>
-<span class="step-title">Nhập API key OpenAI (không bắt buộc)</span>
-<div class="step-body">
-<p>Bấm vào <strong>"OpenAI"</strong> ở thanh bên trái. Dán API key OpenAI vào ô nhập. Key cũng được lưu tự động.</p>
-<div class="img-placeholder">
-<img alt="Cài đặt OpenAI" src="./images/enter-openai-key.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="callout callout-note">
-<div class="callout-label">Về bảo mật</div>
-<p>API key của bạn được lưu trữ <strong>hoàn toàn trên máy bạn</strong> thông qua bộ nhớ bảo mật của trình duyệt Chrome. Chúng không bao giờ được gửi đến máy chủ của Live Translator — chỉ được dùng để kết nối trực tiếp với Soniox và OpenAI mà thôi.</p>
-</div>
-<hr class="section-divider"/>
-<!-- ────────────────────────────────────────── -->
-<!-- LICENSE & PRO                              -->
-<!-- ────────────────────────────────────────── -->
-<h2 id="buy-license">Mua License Key</h2>
-<p class="section-intro">License key sẽ mở khóa các tính năng Pro như đọc bản dịch thành giọng nói, tải file SRT, trợ lý AI, và nhiều tính năng khác.</p>
-<div class="step">
-<span class="step-number">1</span>
-<span class="step-title">Truy cập trang mua hàng</span>
-<div class="step-body">
-<p>Vào trang chủ Live Translator tại <a href="https://translate.ezitech.io/#pricing" target="_blank">https://translate.ezitech.io/#pricing</a> và kéo xuống phần <strong>Bảng giá</strong>, hoặc bấm vào link <strong>"Purchase a license"</strong> trong trang cài đặt của tiện ích.</p>
-<div class="img-placeholder">
-<img alt="Trang mua hàng" src="./images/pricing.jpeg" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">2</span>
-<span class="step-title">Chọn gói phù hợp</span>
-<div class="step-body">
-<p>Bạn có thể chọn:</p>
-<ul>
-<li><strong>Theo tháng</strong> — $5.99/tháng</li>
-<li><strong>Theo năm</strong> — $59/năm (tiết kiệm khoảng 18%)</li>
-</ul>
-<p>Bạn có thể <strong>dùng thử miễn phí 7 ngày</strong> để trải nghiệm các tính năng Pro. Sau khi hết thời gian dùng thử, bạn mua license để tiếp tục sử dụng.</p>
-</div>
-</div>
-<div class="step">
-<span class="step-number">3</span>
-<span class="step-title">Hoàn tất thanh toán</span>
-<div class="step-body">
-<p>Bạn sẽ được chuyển đến trang thanh toán Polar. Nhập email và thông tin thanh toán, sau đó hoàn tất giao dịch.</p>
-<div class="img-placeholder">
-<img alt="Trang thanh toán" src="./images/purchase.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">4</span>
-<span class="step-title">Nhận license key qua email</span>
-<div class="step-body">
-<p>Sau khi thanh toán, bạn sẽ nhận được <strong>license key</strong> qua email. License key là một mã dài có dạng <code>LT-XXXX-XXXX-XXXX-XXXX</code>. Hãy sao chép mã này.</p>
-</div>
-</div>
-<div class="callout callout-tip">
-<div class="callout-label">Chính sách hoàn tiền</div>
-<p>Bạn có thể yêu cầu hoàn tiền trong vòng <strong>30 ngày</strong> kể từ ngày thanh toán bằng cách liên hệ <a href="mailto:phampdoan@gmail.com">phampdoan@gmail.com</a>.</p>
-</div>
-<hr class="section-divider"/>
-<h2 id="activate-license">Kích hoạt License</h2>
-<p class="section-intro">Sau khi mua, hãy kích hoạt license key trong cài đặt tiện ích.</p>
-<div class="step">
-<span class="step-number">1</span>
-<span class="step-title">Nhập và kích hoạt license key</span>
-<div class="step-body">
-<p>Mở cài đặt tiện ích (bấm biểu tượng bánh răng hoặc chuột phải → Options). Bấm vào <strong>"License"</strong> ở thanh bên trái. Dán license key vào ô nhập và bấm <strong>"Activate"</strong>. Tiện ích sẽ xác minh license với máy chủ.</p>
-<div class="img-placeholder">
-<img alt="Kích hoạt License" src="./images/enter-license-key.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">2</span>
-<span class="step-title">Xác nhận kích hoạt thành công</span>
-<div class="step-body">
-<p>Sau khi kích hoạt xong, bạn sẽ thấy trạng thái license, email liên kết, và ngày hết hạn. Tất cả tính năng Pro đã được mở khóa.</p>
-<div class="img-placeholder">
-<img alt="Kích hoạt License" src="./images/license-activated.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="callout callout-warn">
-<div class="callout-label">Đổi thiết bị?</div>
-<p>Nếu trước đó bạn đã kích hoạt license trên thiết bị khác, bạn có thể dùng tùy chọn <strong>"Force Activate"</strong> để chuyển license sang thiết bị hiện tại. Mỗi license chỉ dùng được trên một thiết bị tại một thời điểm.</p>
-</div>
-<hr class="section-divider"/>
-<h2 id="free-vs-pro">So sánh Free và Pro</h2>
-<p class="section-intro">Dưới đây là những gì bạn dùng được với bản miễn phí và những gì cần license Pro.</p>
-<table>
-<thead>
-<tr><th>Tính năng</th><th>Free</th><th>Pro</th></tr>
-</thead>
-<tbody>
-<tr><td>Dịch theo thời gian thực</td><td>✓</td><td>✓</td></tr>
-<tr><td>Hỗ trợ 60+ ngôn ngữ</td><td>✓</td><td>✓</td></tr>
-<tr><td>Hiển thị tên người nói</td><td>✓</td><td>✓</td></tr>
-<tr><td>Kéo, thay đổi kích thước, thu nhỏ bảng</td><td>✓</td><td>✓</td></tr>
-<tr><td>Thay đổi cỡ chữ</td><td>✓</td><td>✓</td></tr>
-<tr><td>Tải bản ghi (TXT/JSON)</td><td>—</td><td>✓</td></tr>
-<tr><td>Tải bản ghi (SRT)</td><td>—</td><td>✓</td></tr>
-<tr><td>Đọc bản dịch của họ (TTS)</td><td>—</td><td>✓</td></tr>
-<tr><td>Phát âm giọng tôi (Phiên dịch)</td><td>—</td><td>✓</td></tr>
-<tr><td>Gửi bản dịch qua chat</td><td>—</td><td>✓</td></tr>
-<tr><td>Chế độ phụ đề</td><td>—</td><td>✓</td></tr>
-<tr><td>Trợ lý AI tích hợp</td><td>—</td><td>✓</td></tr>
-<tr><td>Cài đặt ngữ cảnh</td><td>✓</td><td>✓</td></tr>
-<tr><td>Tên người nói</td><td>✓</td><td>✓</td></tr>
-</tbody>
-</table>
-<hr class="section-divider"/>
-<!-- ────────────────────────────────────────── -->
-<!-- BASIC USAGE                                -->
-<!-- ────────────────────────────────────────── -->
-<h2 id="start-translation">Bắt đầu phiên dịch</h2>
-<p class="section-intro">Hướng dẫn cách bắt đầu dịch trong cuộc họp hoặc video.</p>
-<div class="step">
-<span class="step-number">1</span>
-<span class="step-title">Mở một trang web được hỗ trợ</span>
-<div class="step-body">
-<p>Truy cập bất kỳ <a href="#supported-platforms">nền tảng được hỗ trợ</a> nào (ví dụ: Google Meet, Zoom, YouTube, v.v.) và tham gia cuộc họp hoặc mở video.</p>
-</div>
-</div>
-<div class="step">
-<span class="step-number">2</span>
-<span class="step-title">Mở bảng Live Translator</span>
-<div class="step-body">
-<p>Bấm vào <strong>biểu tượng Live Translator</strong> trên thanh công cụ trình duyệt. Bảng dịch sẽ hiện ra trên trang. Bạn cũng có thể bấm vào <strong>biểu tượng nổi</strong> xuất hiện trên trang.</p>
-<div class="img-placeholder">
-<img alt="Mở bảng dịch" src="./images/floating-icon.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">3</span>
-<span class="step-title">Chọn ngôn ngữ</span>
-<div class="step-body">
-<p>Dùng hai ô chọn ngôn ngữ ở đầu bảng:</p>
-<ul>
-<li><strong>"My language" (Ngôn ngữ của tôi)</strong> — Ngôn ngữ <em>bạn</em> nói (ví dụ: Tiếng Việt).</li>
-<li><strong>"Their language" (Ngôn ngữ của họ)</strong> — Ngôn ngữ <em>người khác</em> đang nói mà bạn muốn dịch (ví dụ: Tiếng Anh).</li>
-</ul>
-<div class="img-placeholder">
-<img alt="Chọn ngôn ngữ" src="./images/language.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">4</span>
-<span class="step-title">Bấm nút Bắt đầu</span>
-<div class="step-body">
-<p>Bấm nút <strong>Start</strong> (biểu tượng ▶) trên thanh điều khiển ở cuối bảng.</p>
-<p>Trình duyệt có thể hỏi quyền thu âm thanh — bấm <strong>"Allow" (Cho phép)</strong> và chọn tab bạn muốn thu âm.</p>
-<div class="img-placeholder">
-<img alt="Nút Bắt đầu" src="./images/press-start.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">5</span>
-<span class="step-title">Xem bản dịch theo thời gian thực</span>
-<div class="step-body">
-<p>Khi có người nói, bạn sẽ thấy cả <strong>văn bản gốc</strong> và <strong>bản dịch</strong> hiện ra trong khu vực hiển thị. Các dòng sẽ tự động được nhóm theo từng người nói.</p>
-<div class="img-placeholder">
-<img alt="Dịch theo thời gian thực" src="./images/translate-real.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="callout callout-tip">
-<div class="callout-label">Tự động cuộn</div>
-<p>Bản ghi sẽ tự cuộn xuống để hiển thị nội dung mới nhất. Nếu bạn cuộn lên để đọc lại phần trước, tính năng tự động cuộn sẽ tạm dừng. Bấm nút <strong>"Scroll to latest" (Cuộn xuống cuối)</strong> để quay lại phần mới nhất.</p>
-</div>
-<hr class="section-divider"/>
-<h2 id="controls">Điều khiển: Tạm dừng, Tiếp tục, Kết thúc</h2>
-<p class="section-intro">Tìm hiểu các nút điều khiển phiên dịch.</p>
-<table>
-<thead>
-<tr><th>Nút</th><th>Chức năng</th></tr>
-</thead>
-<tbody>
-<tr><td><strong>Start — Bắt đầu</strong> (▶)</td><td>Bắt đầu phiên dịch mới. Xóa toàn bộ bản ghi trước đó.</td></tr>
-<tr><td><strong>Pause — Tạm dừng</strong> (⏸)</td><td>Tạm ngừng dịch. Bản ghi vẫn được giữ lại. Tiện ích vẫn thu âm nhưng không hiển thị văn bản mới.</td></tr>
-<tr><td><strong>Resume — Tiếp tục</strong> (▶)</td><td>Tiếp tục dịch sau khi tạm dừng. Văn bản mới sẽ hiện tiếp sau nội dung trước đó.</td></tr>
-<tr><td><strong>End — Kết thúc</strong> (⏹)</td><td>Dừng hoàn toàn phiên dịch. Bản ghi vẫn hiển thị trên màn hình cho đến khi bạn bắt đầu phiên mới. Ngừng thu âm, tắt micro và tắt đọc bản dịch.</td></tr>
-</tbody>
-</table>
-<hr class="section-divider"/>
-<h2 id="language-selection">Đổi ngôn ngữ</h2>
-<p class="section-intro">Bạn có thể thay đổi ngôn ngữ dịch bất cứ lúc nào.</p>
-<div class="step">
-<span class="step-number">1</span>
-<span class="step-title">Bấm vào ô chọn ngôn ngữ</span>
-<div class="step-body">
-<p>Bấm vào ô <strong>"My language" (Ngôn ngữ của tôi)</strong> hoặc <strong>"Their language" (Ngôn ngữ của họ)</strong> ở đầu bảng.</p>
-</div>
-</div>
-<div class="step">
-<span class="step-number">2</span>
-<span class="step-title">Chọn ngôn ngữ mới</span>
-<div class="step-body">
-<p>Danh sách hỗ trợ <strong>hơn 60 ngôn ngữ</strong> được sắp xếp theo thứ tự bảng chữ cái. Bạn có thể cuộn hoặc gõ để tìm kiếm. Bấm vào ngôn ngữ muốn chọn.</p>
-</div>
-</div>
-<div class="step">
-<span class="step-number">3</span>
-<span class="step-title">Phiên dịch sẽ tự động khởi động lại</span>
-<div class="step-body">
-<p>Nếu đang có phiên dịch hoạt động, việc đổi ngôn ngữ sẽ tự động khởi động lại phiên dịch với cặp ngôn ngữ mới. Ngôn ngữ bạn chọn sẽ được nhớ cho lần sau.</p>
-</div>
-</div>
-<hr class="section-divider"/>
-<h2 id="microphone">Bật micro</h2>
-<p class="section-intro">Bật micro để giọng nói của bạn cũng được dịch cùng với âm thanh của cuộc họp/video.</p>
-<div class="step">
-<span class="step-number">1</span>
-<span class="step-title">Bấm nút micro</span>
-<div class="step-body">
-<p>Trên thanh điều khiển, bấm vào <strong>biểu tượng micro</strong>. Biểu tượng sẽ sáng lên khi micro đang bật.</p>
-<div class="img-placeholder">
-<img alt="Nút micro" src="./images/micro.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">2</span>
-<span class="step-title">Cho phép truy cập micro</span>
-<div class="step-body">
-<p>Nếu đây là lần đầu, trình duyệt sẽ hỏi quyền sử dụng micro. Bấm <strong>"Allow" (Cho phép)</strong>.</p>
-</div>
-</div>
-<div class="callout callout-tip">
-<div class="callout-label">Mẹo</div>
-<p>Micro <strong>mặc định ở trạng thái tắt</strong> khi bạn mở bảng dịch. Chỉ bật khi bạn muốn giọng nói của mình cũng được nhận diện và dịch. Khi bạn bấm <strong>End (Kết thúc)</strong>, micro sẽ tự động tắt.</p>
-</div>
-<hr class="section-divider"/>
-<h2 id="font-size">Thay đổi cỡ chữ</h2>
-<p class="section-intro">Chỉnh cỡ chữ của bản dịch cho dễ đọc hơn.</p>
-<div class="step">
-<span class="step-number">1</span>
-<span class="step-title">Bấm nút cỡ chữ</span>
-<div class="step-body">
-<p>Trên thanh điều khiển, bấm vào <strong>nút cỡ chữ</strong> (biểu tượng Aa). Sẽ hiện ra menu với ba lựa chọn:</p>
-<ul>
-<li><strong>Small (Nhỏ)</strong> — Gọn gàng, hiển thị nhiều nội dung hơn</li>
-<li><strong>Medium (Vừa)</strong> — Kích thước mặc định, cân đối</li>
-<li><strong>Large (Lớn)</strong> — Dễ đọc hơn khi ngồi xa màn hình</li>
-</ul>
-<p>Bấm vào cỡ chữ bạn muốn. Thay đổi sẽ được áp dụng ngay và nhớ cho lần sau.</p>
-<div class="img-placeholder">
-<img alt="Chọn cỡ chữ" src="./images/font.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<hr class="section-divider"/>
-<!-- ────────────────────────────────────────── -->
-<!-- FEATURES                                   -->
-<!-- ────────────────────────────────────────── -->
-<h2 id="speaker-names">Tên người nói</h2>
-<p class="section-intro">Đặt tên thật cho từng người nói để dễ phân biệt ai nói gì trong bản ghi. <span class="badge badge-free">Miễn phí</span></p>
-<div class="step">
-<span class="step-number">1</span>
-<span class="step-title">Mở menu "More" (Thêm)</span>
-<div class="step-body">
-<p>Trên thanh điều khiển, bấm nút <strong>"More"</strong> (biểu tượng ⋯). Sau đó bấm nút <strong>"Speaker Settings"</strong>.</p>
-</div>
-</div>
-<div class="step">
-<span class="step-number">2</span>
-<span class="step-title">Mở hộp thoại "Speaker Settings"</span>
-<div class="step-body">
-<p>Hộp thoại cài đặt người nói sẽ mở ra.</p>
-<div class="img-placeholder">
-<img alt="Hộp thoại cài đặt người nói" src="./images/speaker.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">3</span>
-<span class="step-title">Đặt tên cho từng người</span>
-<div class="step-body">
-<p>Bạn sẽ thấy danh sách các người nói được nhận diện (Speaker 1, Speaker 2, v.v.). Gõ tên thật bên cạnh (ví dụ: "Hùng", "Lan"). Bấm <strong>"Add row"</strong> nếu cần thêm dòng.</p>
-<p>Bấm <strong>"Save"</strong>. Toàn bộ bản ghi — cả phần trước và sau — sẽ hiển thị tên bạn đã đặt.</p>
-</div>
-</div>
-<hr class="section-divider"/>
-<h2 id="narration">Đọc bản dịch (Text-to-Speech)</h2>
-<p class="section-intro">Để tiện ích đọc to bản dịch cho bạn nghe, thay vì phải đọc bằng mắt. Đây là tính năng "Narrate Their Voice" (Đọc bản dịch của họ). <span class="badge badge-pro">Pro</span></p>
-<div class="step">
-<span class="step-number">1</span>
-<span class="step-title">Mở cài đặt đọc bản dịch</span>
-<div class="step-body">
-<p>Trên thanh điều khiển, bấm <strong>nút đọc bản dịch</strong> (biểu tượng loa). Hộp thoại cài đặt sẽ mở ra.</p>
-<div class="img-placeholder">
-<img alt="Cài đặt đọc bản dịch" src="./images/narration-setting.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">2</span>
-<span class="step-title">Chọn nhà cung cấp giọng đọc</span>
-<div class="step-body">
-<p>Chọn nguồn giọng đọc:</p>
-<ul>
-<li><strong>Google Translate</strong> (Miễn phí) — Không cần API key. Giọng đọc chất lượng tốt, hỗ trợ hơn 60 ngôn ngữ.</li>
-<li><strong>OpenAI</strong> (Cao cấp) — Giọng đọc tự nhiên hơn, chất lượng cao hơn. Cần có API key OpenAI.</li>
-</ul>
-<p>Chọn <strong>giọng đọc</strong> từ danh sách và bấm <strong>"Test"</strong> để nghe thử.</p>
-<p>Chỉnh <strong>tốc độ đọc</strong> và <strong>âm lượng</strong> nếu cần.</p>
-</div>
-</div>
-<div class="step">
-<span class="step-number">3</span>
-<span class="step-title">Bật đọc bản dịch</span>
-<div class="step-body">
-<p>Bấm nút <strong>"Narrate Their Voice"</strong> trong hộp thoại. Từ giờ, mỗi khi có bản dịch mới xuất hiện, tiện ích sẽ đọc to cho bạn nghe.</p>
-<p>Để tắt, bấm lại nút đọc bản dịch và chọn <strong>"Stop"</strong>.</p>
-</div>
-</div>
-<hr class="section-divider"/>
-<h2 id="youtube-caption-narration">Thuyết minh theo caption YouTube</h2>
-<p class="section-intro">Dùng caption dịch của YouTube làm nguồn cho thuyết minh, để tiện ích đọc đúng ngôn ngữ bạn đã chọn sẵn trên YouTube. Tính năng này có thể giúp tiết kiệm tới <strong>99,9%</strong> chi phí Soniox khi dùng trên YouTube. <span class="badge badge-pro">Pro</span></p>
-
-<div class="callout callout-warn">
-  <div class="callout-label">Đúng thứ tự thao tác</div>
-  <p>Để tính năng chạy đúng, bạn cần chọn ngôn ngữ caption trên YouTube trước, rồi mới bật thuyết minh trong extension.</p>
-</div>
-
-<div class="step">
-  <span class="step-number">1</span>
-  <span class="step-title">Bật và chọn caption dịch trên YouTube trước</span>
-  <div class="step-body">
-    <p>Trong trình phát YouTube, bật caption và chọn ngôn ngữ caption dịch bạn muốn nghe (ví dụ: tiếng Việt).</p>
-    <div class="img-placeholder">
-      <img src="./images/setting-caption.png" alt="Narrate My Voice" loading="lazy" />
-    </div>
-  </div>
-</div>
-
-<div class="step">
-  <span class="step-number">2</span>
-  <span class="step-title">Bật tự nhận diện trong cài đặt Narration</span>
-  <div class="step-body">
-    <p>Mở cài đặt Narration của extension và bật <strong>Auto detect translated caption</strong>.</p>
-    <div class="img-placeholder">
-      <img src="./images/auto-detect-ytb-caption.png" alt="Narrate My Voice" loading="lazy" />
-    </div>
-  </div>
-</div>
-
-<div class="step">
-  <span class="step-number">3</span>
-  <span class="step-title">Bắt đầu thuyết minh</span>
-  <div class="step-body">
-    <p>Bấm <strong>"Narrate Their Voice"</strong>. Hệ thống sẽ đọc theo đúng ngôn ngữ caption dịch bạn đã chọn trên YouTube.</p>
-  </div>
-</div>
-
-<div class="callout callout-tip">
-  <div class="callout-label">Ví dụ</div>
-  <p>Nếu bạn muốn nghe thuyết minh tiếng Việt, hãy bật caption tiếng Việt trên YouTube trước. Sau đó bật <strong>Auto detect translated caption</strong> và bấm <strong>"Narrate Their Voice"</strong>.</p>
-</div>
-
-<hr class="section-divider"/>
-
-<h2 id="narrate-my-voice">Phát âm giọng tôi (Chế độ phiên dịch)</h2>
-<p class="section-intro">Nói bằng ngôn ngữ của bạn và để tiện ích phát bản dịch giọng nói cho những người khác trong cuộc họp nghe — giống như có một phiên dịch viên riêng. <span class="badge badge-pro">Pro</span></p>
-<div class="callout callout-warn">
-<div class="callout-label">Yêu cầu</div>
-<p>Tính năng này hoạt động trên <strong>Google Meet</strong>, <strong>Zoom (Web)</strong>, <strong>Microsoft Teams (Web)</strong> và <strong>WhatsApp Web</strong>. Bạn cần <strong>bật micro</strong> và đang có phiên dịch <strong>đang chạy</strong>.</p>
-</div>
-<div class="step">
-<span class="step-number">1</span>
-<span class="step-title">Mở cài đặt đọc bản dịch</span>
-<div class="step-body">
-<p>Bấm <strong>nút đọc bản dịch</strong> trên thanh điều khiển để mở hộp thoại cài đặt.</p>
-</div>
-</div>
-<div class="step">
-<span class="step-number">2</span>
-<span class="step-title">Thiết lập "Narrate My Voice" (Phát âm giọng tôi)</span>
-<div class="step-body">
-<p>Trong hộp thoại, tìm phần <strong>"Narrate My Voice"</strong>. Chọn giọng đọc và nhà cung cấp (Google hoặc OpenAI). Bạn có thể đặt <strong>giọng đọc khác nhau</strong> cho "My voice" (giọng tôi) và "Their voice" (giọng họ).</p>
-<p>Bấm <strong>"Test"</strong> để nghe thử giọng đã chọn.</p>
-<div class="img-placeholder">
-<img alt="Phát âm giọng tôi" src="./images/my-voice-setting.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">3</span>
-<span class="step-title">Bật "Narrate My Voice"</span>
-<div class="step-body">
-<p>Bấm <strong>"Start Narrate My Voice"</strong>. Khi bạn nói, lời của bạn sẽ được:</p>
-<ol>
-<li>Chuyển thành văn bản bằng ngôn ngữ của bạn</li>
-<li>Dịch sang ngôn ngữ đối phương</li>
-<li>Phát thành giọng nói trong cuộc họp để người kia nghe được bản dịch</li>
-</ol>
-<p>Micro của bạn sẽ tự động tắt tạm khi đang phát bản dịch để tránh bị vọng lại.</p>
-<div class="img-placeholder">
-<img alt="Bắt đầu phát âm giọng tôi" src="./images/narrate-my-voice.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">4</span>
-<span class="step-title">Tắt phát âm</span>
-<div class="step-body">
-<p>Bấm nút đọc bản dịch và chọn <strong>"Stop"</strong>, hoặc bấm <strong>End (Kết thúc)</strong> để dừng toàn bộ phiên (sẽ tự động tắt phát âm luôn).</p>
-</div>
-</div>
-<div class="callout callout-note">
-<div class="callout-label">Lưu ý</div>
-<p>Bạn chỉ có thể chạy <strong>một chế độ đọc bản dịch tại một thời điểm</strong> — hoặc "Narrate My Voice" (Phát âm giọng tôi) hoặc "Narrate Their Voice" (Đọc bản dịch của họ), không chạy cả hai cùng lúc. Biểu tượng trên thanh điều khiển sẽ thay đổi để cho bạn biết chế độ nào đang bật.</p>
-</div>
-<hr class="section-divider"/>
-<h2 id="send-chat">Gửi bản dịch qua chat</h2>
-<p class="section-intro">Tự động gửi bản dịch lời nói của bạn thành tin nhắn văn bản trong khung chat của cuộc họp. <span class="badge badge-pro">Pro</span></p>
-<div class="step">
-<span class="step-number">1</span>
-<span class="step-title">Bật tính năng "Send via Chat"</span>
-<div class="step-body">
-<p>Trên thanh điều khiển, tìm <strong>nút gửi chat</strong> (nằm cạnh biểu tượng micro). Bấm vào để bật — nút sẽ chuyển sang <strong>màu xanh</strong> khi đang hoạt động.</p>
-<div class="img-placeholder">
-<img alt="Gửi qua chat" src="./images/send-via-chat.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">2</span>
-<span class="step-title">Nói và bản dịch sẽ tự động gửi đi</span>
-<div class="step-body">
-<p>Khi micro đang bật và phiên dịch đang chạy, mỗi khi bạn nói, văn bản đã dịch sẽ tự động được điền vào khung chat của cuộc họp và gửi đi.</p>
-<p>Tính năng này hoạt động trên <strong>Google Meet</strong>, <strong>Zoom (Web)</strong> và <strong>Microsoft Teams (Web)</strong>.</p>
-</div>
-</div>
-<div class="callout callout-tip">
-<div class="callout-label">Mẹo</div>
-<p>Tính năng này rất hữu ích khi nền tảng của bạn chưa hỗ trợ "Narrate My Voice", hoặc khi bạn muốn vừa phát âm bản dịch VÀ gửi tin nhắn chat cùng lúc.</p>
-</div>
-<hr class="section-divider"/>
-<h2 id="subtitle-mode">Chế độ phụ đề</h2>
-<p class="section-intro">Chuyển sang thanh phụ đề gọn gàng kiểu phim, chỉ hiển thị bản dịch mới nhất ở cuối màn hình. <span class="badge badge-pro">Pro</span></p>
-<div class="step">
-<span class="step-number">1</span>
-<span class="step-title">Bật chế độ phụ đề</span>
-<div class="step-body">
-<p>Trên thanh tiêu đề của bảng dịch, bấm vào <strong>biểu tượng phụ đề</strong> (biểu tượng CC).</p>
-<p>Bảng dịch đầy đủ sẽ được thay bằng một thanh phụ đề mỏng ở cuối màn hình.</p>
-<div class="img-placeholder">
-<img alt="Chế độ phụ đề" src="./images/subtitle.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">2</span>
-<span class="step-title">Tùy chỉnh thanh phụ đề</span>
-<div class="step-body">
-<p>Bấm <strong>biểu tượng cài đặt</strong> (bánh răng) trên thanh phụ đề để chỉnh:</p>
-<ul>
-<li><strong>Độ trong suốt</strong> — Kéo thanh trượt để thanh phụ đề trong suốt hơn hoặc đậm hơn.</li>
-<li><strong>Cỡ chữ</strong> — Chọn nhỏ, vừa, hoặc lớn.</li>
-</ul>
-<p>Bạn cũng có thể <strong>kéo</strong> thanh phụ đề để di chuyển, và <strong>thay đổi kích thước</strong> bằng cách kéo các cạnh.</p>
-<div class="img-placeholder">
-<img alt="Cài đặt phụ đề" src="./images/customize-subtitle-bar.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">3</span>
-<span class="step-title">Thoát chế độ phụ đề</span>
-<div class="step-body">
-<p>Bấm <strong>nút đóng</strong> (✕) trên thanh phụ đề để quay lại bảng dịch đầy đủ.</p>
-</div>
-</div>
-<hr class="section-divider"/>
-<h2 id="inline-assistant">Trợ lý AI tích hợp</h2>
-<p class="section-intro">Nhận giải thích và gợi ý câu trả lời từ AI dựa trên nội dung cuộc trò chuyện, ngay trong bản ghi. <span class="badge badge-pro">Pro</span></p>
-<div class="callout callout-warn">
-<div class="callout-label">Yêu cầu</div>
-<p>Trợ lý AI tích hợp cần có <strong>API key OpenAI</strong> đã được nhập trong phần cài đặt.</p>
-</div>
-<h3>Giải thích một dòng</h3>
-<div class="step">
-<span class="step-number">1</span>
-<span class="step-title">Di chuột qua một dòng trong bản ghi</span>
-<div class="step-body">
-<p>Khi bạn di chuột qua bất kỳ dòng nào trong bản ghi, sẽ hiện ra <strong>biểu tượng AI</strong> (🤖).</p>
-</div>
-</div>
-<div class="step">
-<span class="step-number">2</span>
-<span class="step-title">Bấm biểu tượng AI và chọn "Explain"</span>
-<div class="step-body">
-<p>Trợ lý AI sẽ mở trong một cửa sổ riêng. Nó sẽ dựa vào toàn bộ ngữ cảnh bản ghi và dòng bạn chọn để đưa ra giải thích chi tiết.</p>
-<div class="img-placeholder">
-<img alt="Giải thích" src="./images/ai-explain.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<h3>Tạo câu trả lời gợi ý</h3>
-<div class="step">
-<span class="step-number">1</span>
-<span class="step-title">Bấm biểu tượng AI và chọn "Generate Answer"</span>
-<div class="step-body">
-<p>Trợ lý AI sẽ tạo một câu trả lời gợi ý dựa trên nội dung cuộc trò chuyện. AI còn có thể tìm kiếm trên web để đưa ra câu trả lời chính xác hơn.</p>
-<div class="img-placeholder">
-<img alt="Tạo câu trả lời" src="./images/ai-help-answer.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<h3>Mở bảng Trợ lý AI</h3>
-<div class="step">
-<span class="step-number">1</span>
-<span class="step-title">Bấm nút Trợ lý trên thanh điều khiển</span>
-<div class="step-body">
-<p>Bạn cũng có thể mở bảng Trợ lý AI trực tiếp từ <strong>nút trợ lý</strong> (biểu tượng 🤖) trên thanh điều khiển. Sẽ mở ra một cửa sổ chat có thể kéo thả, nơi bạn gõ bất kỳ câu hỏi nào. Trợ lý có quyền truy cập vào toàn bộ bản ghi để hiểu ngữ cảnh.</p>
-<div class="img-placeholder">
-<img alt="Bảng Trợ lý AI" src="./images/ai.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<hr class="section-divider"/>
-<h2 id="context-setting">Cài đặt ngữ cảnh</h2>
-<p class="section-intro">Cung cấp thông tin về chủ đề cuộc trò chuyện để bản dịch chính xác hơn. <span class="badge badge-free">Miễn phí</span></p>
-<div class="step">
-<span class="step-number">1</span>
-<span class="step-title">Mở cài đặt ngữ cảnh</span>
-<div class="step-body">
-<p>Bấm nút <strong>"More"</strong> (⋯) trên thanh điều khiển, sau đó bấm <strong>"Context"</strong>.</p>
-<div class="img-placeholder">
-<img alt="Cài đặt ngữ cảnh" src="./images/context.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">2</span>
-<span class="step-title">Điền thông tin ngữ cảnh</span>
-<div class="step-body">
-<p>Bạn có thể cung cấp:</p>
-<ul>
-<li><strong>Lĩnh vực / Chủ đề</strong> — Cuộc trò chuyện nói về gì (ví dụ: "Hội nghị y khoa", "Họp kỹ thuật phần mềm").</li>
-<li><strong>Thuật ngữ quan trọng</strong> — Các từ chuyên ngành, tên riêng hoặc từ ngữ đặc thù khó nhận diện (ví dụ: "Kubernetes, API gateway, microservices").</li>
-<li><strong>Thông tin người nói</strong> — Tên và vai trò của người tham gia (ví dụ: "Bác sĩ Smith — bác sĩ tim mạch, đang thuyết trình").</li>
-</ul>
-<p>Bấm <strong>"Apply"</strong> để gửi ngữ cảnh này cho hệ thống dịch trong phiên hiện tại.</p>
-</div>
-</div>
-<div class="step">
-<span class="step-number">3</span>
-<span class="step-title">Lưu mẫu (không bắt buộc)</span>
-<div class="step-body">
-<p>Nếu bạn thường họp về các chủ đề giống nhau, bấm <strong>"Save Preset"</strong> để lưu ngữ cảnh hiện tại thành mẫu. Lần sau chỉ cần chọn lại mẫu thay vì gõ lại từ đầu.</p>
-<p>Bạn cũng có thể <strong>Import/Export</strong> (nhập/xuất) các mẫu dưới dạng file JSON để chia sẻ hoặc sao lưu.</p>
-</div>
-</div>
-<div class="callout callout-tip">
-<div class="callout-label">Tự động điền trên YouTube</div>
-<p>Khi dùng Live Translator trên <strong>YouTube</strong>, các trường ngữ cảnh có thể được <strong>tự động điền</strong> từ tiêu đề và mô tả video. Điều này giúp hệ thống dịch hiểu rõ hơn nội dung video đang phát.</p>
-</div>
-<hr class="section-divider"/>
-<h2 id="download-transcript">Tải bản ghi</h2>
-<p class="section-intro">Lưu bản ghi dịch thành file để xem lại sau hoặc dùng trong các công cụ khác. <span class="badge badge-pro">Pro</span></p>
-<div class="step">
-<span class="step-number">1</span>
-<span class="step-title">Bấm nút Tải xuống</span>
-<div class="step-body">
-<p>Sau khi kết thúc phiên dịch (hoặc đang trong phiên dịch), bấm <strong>nút tải xuống</strong> (biểu tượng ↓) trên thanh điều khiển. Hộp thoại tải bản ghi sẽ mở ra.</p>
-<div class="img-placeholder">
-<img alt="Tải bản ghi" src="./images/download-transcript.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">2</span>
-<span class="step-title">Chọn định dạng file</span>
-<div class="step-body">
-<p>Chọn định dạng bạn muốn:</p>
-<table>
-<thead>
-<tr><th>Định dạng</th><th>Phù hợp khi</th></tr>
-</thead>
-<tbody>
-<tr><td><strong>TXT</strong></td><td>File văn bản đơn giản với thời gian và tên người nói. Dễ đọc nhất.</td></tr>
-<tr><td><strong>JSON</strong></td><td>Dữ liệu có cấu trúc. Phù hợp để xử lý bằng các công cụ hoặc chương trình khác.</td></tr>
-<tr><td><strong>SRT (Bản gốc)</strong></td><td>File phụ đề chứa văn bản ngôn ngữ gốc. Dùng trong phần mềm chỉnh sửa video.</td></tr>
-<tr><td><strong>SRT (Bản dịch)</strong></td><td>File phụ đề chứa bản dịch. Dùng trong phần mềm chỉnh sửa video.</td></tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="step">
-<span class="step-number">3</span>
-<span class="step-title">Tải file về</span>
-<div class="step-body">
-<p>Bấm nút tải xuống cho định dạng bạn chọn. File sẽ được tạo ngay trên trình duyệt và lưu vào thư mục tải xuống mặc định.</p>
-</div>
-</div>
-<div class="callout callout-note">
-<div class="callout-label">Bảo mật</div>
-<p>File bản ghi được tạo <strong>hoàn toàn trên trình duyệt của bạn</strong>. Không có dữ liệu bản ghi nào được gửi đi bất kỳ máy chủ nào trong quá trình tải xuống.</p>
-</div>
-<hr class="section-divider"/>
-<!-- ────────────────────────────────────────── -->
-<!-- MORE                                       -->
-<!-- ────────────────────────────────────────── -->
-<h2 id="auto-update">Tự động kiểm tra cập nhật</h2>
-<p class="section-intro">Tiện ích sẽ tự động kiểm tra cập nhật mỗi khi bạn mở nó.</p>
-<div class="step">
-<span class="step-number">1</span>
-<span class="step-title">Để ý thông báo cập nhật</span>
-<div class="step-body">
-<p>Khi có phiên bản mới, bạn sẽ thấy thông báo <strong>"Update available"</strong> trên thanh tiêu đề của bảng dịch.</p>
-<div class="img-placeholder">
-<img alt="Có bản cập nhật" src="./images/update-badge.png" loading="lazy"/>
-</div>
-</div>
-</div>
-<div class="step">
-<span class="step-number">2</span>
-<span class="step-title">Bấm để cập nhật</span>
-<div class="step-body">
-<p>Bấm vào thông báo để được chuyển đến trang tải phiên bản mới nhất. Làm theo <a href="#installation">các bước cài đặt</a> giống như lúc đầu để cập nhật.</p>
-</div>
-</div>
-<hr class="section-divider"/>
-<h2 id="troubleshooting">Xử lý sự cố</h2>
-<p class="section-intro">Các vấn đề thường gặp và cách khắc phục.</p>
-<h3>Hiện thông báo "No Soniox API key"</h3>
-<div class="step">
-<span class="step-number">!</span>
-<span class="step-title">Cách khắc phục</span>
-<div class="step-body">
-<p>Bạn chưa nhập API key Soniox. Hãy xem phần <a href="#enter-keys">Nhập API Key vào tiện ích</a> để thiết lập.</p>
-</div>
-</div>
-<h3>Không thu được âm thanh</h3>
-<div class="step">
-<span class="step-number">!</span>
-<span class="step-title">Cách khắc phục</span>
-<div class="step-body">
-<ul>
-<li>Kiểm tra xem bạn đã bấm <strong>"Allow" (Cho phép)</strong> khi trình duyệt hỏi quyền thu âm chưa.</li>
-<li>Kiểm tra xem bạn đã chọn <strong>đúng tab</strong> cần chia sẻ khi được hỏi chưa.</li>
-<li>Thử tải lại trang và mở lại tiện ích dịch.</li>
-<li>Kiểm tra xem cuộc họp/video có đang phát âm thanh không.</li>
-</ul>
-</div>
-</div>
-<h3>Bản dịch không chính xác</h3>
-<div class="step">
-<span class="step-number">!</span>
-<span class="step-title">Cách khắc phục</span>
-<div class="step-body">
-<ul>
-<li>Kiểm tra ô <strong>"Their language" (Ngôn ngữ của họ)</strong> đã chọn đúng ngôn ngữ đang được nói chưa.</li>
-<li>Dùng <a href="#context-setting">Cài đặt ngữ cảnh</a> để cung cấp thêm thông tin về chủ đề và các thuật ngữ quan trọng.</li>
-<li>Đảm bảo âm thanh rõ ràng — tiếng ồn xung quanh có thể ảnh hưởng đến độ chính xác.</li>
-</ul>
-</div>
-</div>
-<h3>"Narrate My Voice" — người khác không nghe được bản dịch</h3>
-<div class="step">
-<span class="step-number">!</span>
-<span class="step-title">Cách khắc phục</span>
-<div class="step-body">
-<ul>
-<li>Xác nhận bạn đang dùng <strong>nền tảng được hỗ trợ</strong> (Google Meet, Zoom Web, Teams Web, WhatsApp Web).</li>
-<li>Kiểm tra phiên dịch <strong>đang chạy</strong> và <strong>micro đang bật</strong>.</li>
-<li>Kiểm tra bạn đã <strong>kích hoạt license Pro</strong> chưa.</li>
-<li>Thử tải lại trang cuộc họp và bắt đầu lại.</li>
-</ul>
-</div>
-</div>
-<h3>Tính năng OpenAI không hoạt động</h3>
-<div class="step">
-<span class="step-number">!</span>
-<span class="step-title">Cách khắc phục</span>
-<div class="step-body">
-<ul>
-<li>Kiểm tra <strong>API key OpenAI</strong> đã được nhập đúng trong <a href="#enter-keys">phần cài đặt</a> chưa.</li>
-<li>Kiểm tra tài khoản OpenAI đã <strong>thêm phương thức thanh toán</strong> và còn đủ số dư chưa.</li>
-<li>Nếu không cần dùng tính năng OpenAI, bạn có thể dùng <strong>giọng đọc của Google Translate</strong> để thay thế (miễn phí, không cần API key).</li>
-</ul>
-</div>
-</div>
-<h3>Tiện ích không hiện trên trang web</h3>
-<div class="step">
-<span class="step-number">!</span>
-<span class="step-title">Cách khắc phục</span>
-<div class="step-body">
-<ul>
-<li>Live Translator chỉ hoạt động trên <a href="#supported-platforms">các nền tảng được hỗ trợ</a>. Tiện ích sẽ không hiện trên các trang web khác.</li>
-<li>Nếu trang web được hỗ trợ nhưng tiện ích không hiện, hãy thử <strong>tải lại trang</strong>.</li>
-<li>Kiểm tra tiện ích đã được <strong>bật</strong> trong trang quản lý tiện ích của trình duyệt chưa.</li>
-</ul>
-</div>
-</div>
-<hr class="section-divider"/>
-<h2 id="contact">Liên hệ &amp; Hỗ trợ</h2>
-<p class="section-intro">Cần hỗ trợ? Có câu hỏi hay góp ý?</p>
-<p>Liên hệ với nhà phát triển:</p>
-<ul>
-<li><strong>Email:</strong> <a href="mailto:ezsolu.io@gmail.com">ezsolu.io@gmail.com</a></li>
-<li><strong>Website:</strong> <a href="https://translate.ezitech.io" target="_blank">https://translate.ezitech.io</a></li>
-<li><strong>WhatsApp:</strong> <a href="https://wa.me/84355561599" target="_blank">+84 355 561 599</a></li>
-<li><strong>Telegram:</strong> <a href="https://t.me/ezi_tech" target="_blank">EziTech</a></li>
-</ul>
-<div class="callout callout-tip">
-<div class="callout-label">Rất mong nhận phản hồi</div>
-<p>Nếu bạn có ý tưởng về tính năng mới hoặc cải tiến, chúng tôi rất muốn nghe từ bạn. Hãy gửi email với góp ý của bạn nhé!</p>
-</div>
-<footer style="margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--c-border); font-size: 0.82rem; color: var(--c-text-secondary);">
-<p>© 2026 Doan Pham. Live Translator là tiện ích trình duyệt độc lập, không liên kết với Google, Zoom, Microsoft, Soniox hay OpenAI.</p>
-</footer>
-</main>
-</div>
-<!-- ═══ Scripts ═══ -->
-<script>
-(function () {
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebarOverlay');
-  const menuBtn = document.getElementById('menuBtn');
-  const languageSelect = document.getElementById('languageSelect');
-  const links = sidebar.querySelectorAll('a[href^="#"]');
-
-  if (menuBtn) {
-    menuBtn.addEventListener('click', function () {
-      sidebar.classList.toggle('open');
-      overlay.classList.toggle('open');
-    });
-  }
-
-  overlay.addEventListener('click', function () {
-    sidebar.classList.remove('open');
-    overlay.classList.remove('open');
-  });
-
-  if (languageSelect) {
-    const currentFile = window.location.pathname.split('/').pop() || 'instruction.html';
-    languageSelect.value = currentFile in {
-      'instruction.html': true,
-      'instruction-vi.html': true,
-      'instruction-zh.html': true,
-      'instruction-hi.html': true,
-      'instruction-es.html': true,
-      'instruction-fr.html': true,
-      'instruction-ar.html': true,
-      'instruction-pt.html': true,
-      'instruction-ru.html': true
-    } ? currentFile : 'instruction.html';
-
-    languageSelect.addEventListener('change', function (event) {
-      const target = event.target.value;
-      if (target) {
-        window.location.href = target;
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Hướng dẫn sử dụng — Live Translator</title>
+    <meta
+      content="Hướng dẫn sử dụng đầy đủ cho tiện ích trình duyệt Live Translator. Tìm hiểu cách cài đặt, thiết lập API key, dịch cuộc họp trực tiếp, sử dụng tính năng đọc bản dịch, phụ đề và tất cả các tính năng khác."
+      name="description"
+    />
+    <link
+      href="./icons/icon-128x128.png"
+      rel="icon"
+      sizes="128x128"
+      type="image/png"
+    />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
       }
-    });
-  }
 
-  links.forEach(function (link) {
-    link.addEventListener('click', function () {
-      sidebar.classList.remove('open');
-      overlay.classList.remove('open');
-    });
-  });
-
-  function setActive() {
-    var scrollY = window.scrollY || document.documentElement.scrollTop;
-    var current = null;
-    links.forEach(function (link) {
-      var id = link.getAttribute('href').slice(1);
-      var el = document.getElementById(id);
-      if (el && el.offsetTop - 100 <= scrollY) {
-        current = link;
+      :root {
+        --sidebar-w: 280px;
+        --header-h: 56px;
+        --c-bg: #ffffff;
+        --c-sidebar-bg: #f8f9fb;
+        --c-sidebar-border: #e5e7eb;
+        --c-text: #1a1a2e;
+        --c-text-secondary: #64748b;
+        --c-accent: #667eea;
+        --c-accent-light: #eef2ff;
+        --c-accent-hover: #5a6fd6;
+        --c-border: #e5e7eb;
+        --c-code-bg: #f1f5f9;
+        --c-tip-bg: #eff6ff;
+        --c-tip-border: #3b82f6;
+        --c-warn-bg: #fefce8;
+        --c-warn-border: #eab308;
+        --c-note-bg: #f0fdf4;
+        --c-note-border: #22c55e;
+        --c-step-bg: #f8fafc;
+        --c-img-bg: #f1f5f9;
+        --radius: 8px;
       }
-    });
-    links.forEach(function (l) { l.classList.remove('active'); });
-    if (current) current.classList.add('active');
-  }
 
-  window.addEventListener('scroll', setActive, { passive: true });
-  setActive();
-})();
-</script>
-</body>
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: calc(var(--header-h) + 20px);
+      }
+
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        font-size: 15px;
+        line-height: 1.7;
+        color: var(--c-text);
+        background: var(--c-bg);
+      }
+
+      /* ── Header ── */
+      .site-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--header-h);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--c-border);
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        padding: 0 24px;
+        gap: 12px;
+      }
+
+      .site-header .logo {
+        width: 28px;
+        height: 28px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 6px;
+        flex-shrink: 0;
+      }
+
+      .site-header h1 {
+        font-size: 1rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .site-header .home-link {
+        font-size: 0.8rem;
+        color: var(--c-accent);
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .site-header .home-link:hover {
+        text-decoration: underline;
+      }
+
+      .site-header .header-actions {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .site-header .language-select {
+        border: 1px solid var(--c-border);
+        border-radius: 6px;
+        background: #fff;
+        color: var(--c-text);
+        font-size: 0.78rem;
+        font-weight: 500;
+        padding: 6px 10px;
+        line-height: 1.2;
+        max-width: 185px;
+      }
+
+      .hamburger {
+        display: none;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        color: var(--c-text);
+      }
+
+      .hamburger svg {
+        display: block;
+      }
+
+      /* ── Layout ── */
+      .layout {
+        display: flex;
+        margin-top: var(--header-h);
+        min-height: calc(100vh - var(--header-h));
+      }
+
+      /* ── Sidebar ── */
+      .sidebar {
+        position: fixed;
+        top: var(--header-h);
+        left: 0;
+        bottom: 0;
+        width: var(--sidebar-w);
+        background: var(--c-sidebar-bg);
+        border-right: 1px solid var(--c-sidebar-border);
+        overflow-y: auto;
+        padding: 20px 0;
+        z-index: 90;
+        transition: transform 0.3s ease;
+      }
+
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 89;
+      }
+
+      .sidebar nav {
+        padding: 0 12px;
+      }
+
+      .sidebar .nav-group {
+        margin-bottom: 8px;
+      }
+
+      .sidebar .nav-group-title {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--c-text-secondary);
+        padding: 10px 12px 4px;
+      }
+
+      .sidebar a {
+        display: block;
+        padding: 6px 12px;
+        font-size: 0.82rem;
+        color: var(--c-text-secondary);
+        text-decoration: none;
+        border-radius: 6px;
+        line-height: 1.5;
+        transition: all 0.15s ease;
+      }
+
+      .sidebar a:hover {
+        background: var(--c-accent-light);
+        color: var(--c-accent);
+      }
+
+      .sidebar a.active {
+        background: var(--c-accent-light);
+        color: var(--c-accent);
+        font-weight: 600;
+      }
+
+      /* ── Content ── */
+      .content {
+        margin-left: var(--sidebar-w);
+        flex: 1;
+        max-width: 820px;
+        padding: 40px 48px 100px;
+      }
+
+      /* ── Typography ── */
+      .content h2 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin: 56px 0 8px;
+        padding-top: 20px;
+        color: var(--c-text);
+      }
+
+      .content h2:first-child {
+        margin-top: 0;
+      }
+
+      .content h3 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin: 36px 0 8px;
+        color: var(--c-text);
+      }
+
+      .content h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 24px 0 6px;
+        color: var(--c-text);
+      }
+
+      .content p {
+        margin: 0 0 14px;
+      }
+
+      .content ul,
+      .content ol {
+        margin: 0 0 16px;
+        padding-left: 24px;
+      }
+
+      .content li {
+        margin-bottom: 6px;
+      }
+
+      .content a {
+        color: var(--c-accent);
+      }
+      .content a:hover {
+        color: var(--c-accent-hover);
+      }
+
+      .content code {
+        background: var(--c-code-bg);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.88em;
+        font-family: "SF Mono", "Fira Code", Consolas, monospace;
+      }
+
+      .content strong {
+        font-weight: 600;
+      }
+
+      .section-intro {
+        font-size: 0.95rem;
+        color: var(--c-text-secondary);
+        margin-bottom: 24px;
+      }
+
+      /* ── Steps ── */
+      .step {
+        background: var(--c-step-bg);
+        border: 1px solid var(--c-border);
+        border-radius: var(--radius);
+        padding: 20px 24px;
+        margin: 16px 0;
+        position: relative;
+      }
+
+      .step-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        background: var(--c-accent);
+        color: #fff;
+        border-radius: 50%;
+        font-size: 0.78rem;
+        font-weight: 700;
+        margin-right: 10px;
+        flex-shrink: 0;
+      }
+
+      .step-title {
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: inline;
+      }
+
+      .step-body {
+        margin-top: 10px;
+      }
+
+      /* ── Image placeholder ── */
+      .img-placeholder {
+        background: var(--c-img-bg);
+        border-radius: var(--radius);
+        text-align: center;
+        color: var(--c-text-secondary);
+        font-size: 0.82rem;
+        margin: 14px 0;
+        min-height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .img-placeholder svg {
+        width: 32px;
+        height: 32px;
+        opacity: 0.4;
+      }
+
+      .img-placeholder img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 6px;
+      }
+
+      /* ── Callout boxes ── */
+      .callout {
+        border-radius: var(--radius);
+        padding: 14px 18px;
+        margin: 16px 0;
+        font-size: 0.9rem;
+        line-height: 1.6;
+      }
+
+      .callout p {
+        margin: 0;
+      }
+      .callout p + p {
+        margin-top: 8px;
+      }
+
+      .callout-tip {
+        background: var(--c-tip-bg);
+        border-left: 4px solid var(--c-tip-border);
+      }
+
+      .callout-warn {
+        background: var(--c-warn-bg);
+        border-left: 4px solid var(--c-warn-border);
+      }
+
+      .callout-note {
+        background: var(--c-note-bg);
+        border-left: 4px solid var(--c-note-border);
+      }
+
+      .callout-label {
+        font-weight: 700;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 4px;
+      }
+
+      .callout-tip .callout-label {
+        color: #2563eb;
+      }
+      .callout-warn .callout-label {
+        color: #ca8a04;
+      }
+      .callout-note .callout-label {
+        color: #16a34a;
+      }
+
+      /* ── Table ── */
+      .content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0;
+        font-size: 0.88rem;
+      }
+
+      .content th,
+      .content td {
+        text-align: left;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--c-border);
+      }
+
+      .content th {
+        background: var(--c-sidebar-bg);
+        font-weight: 600;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--c-text-secondary);
+      }
+
+      /* ── Badge ── */
+      .badge {
+        display: inline-block;
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        padding: 2px 8px;
+        border-radius: 10px;
+        vertical-align: middle;
+      }
+
+      .badge-free {
+        background: #dcfce7;
+        color: #166534;
+      }
+      .badge-pro {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      /* ── Separator ── */
+      .section-divider {
+        border: none;
+        border-top: 1px solid var(--c-border);
+        margin: 48px 0;
+      }
+
+      /* ── Responsive ── */
+      @media (max-width: 960px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .sidebar-overlay.open {
+          display: block;
+        }
+        .content {
+          margin-left: 0;
+          padding: 28px 20px 80px;
+        }
+        .hamburger {
+          display: block;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .content h2 {
+          font-size: 1.25rem;
+        }
+        .content h3 {
+          font-size: 1.05rem;
+        }
+        .step {
+          padding: 16px 18px;
+        }
+      }
+    </style>
+    <!-- Google tag (gtag.js) -->
+    <script
+      async=""
+      src="https://www.googletagmanager.com/gtag/js?id=G-T7YFE7XLLF"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-T7YFE7XLLF");
+    </script>
+  </head>
+  <body>
+    <!-- ═══ Header ═══ -->
+    <header class="site-header">
+      <img
+        alt="Live Translator"
+        height="32"
+        src="./icons/icon-128x128.png"
+        width="32"
+      />
+      <h1>Live Translator — Hướng dẫn sử dụng</h1>
+      <div class="header-actions">
+        <select
+          aria-label="Select language guide version"
+          class="language-select"
+          id="languageSelect"
+        >
+          <option value="instruction.html">🇺🇸 - English</option>
+          <option value="instruction-vi.html">🇻🇳 - Vietnamese</option>
+          <option value="instruction-zh.html">🇨🇳 - Chinese</option>
+          <option value="instruction-hi.html">🇮🇳 - Hindi</option>
+          <option value="instruction-es.html">🇪🇸 - Spanish</option>
+          <option value="instruction-fr.html">🇫🇷 - French</option>
+          <option value="instruction-ar.html">🇸🇦 - Arabic</option>
+          <option value="instruction-pt.html">🇵🇹 - Portuguese</option>
+          <option value="instruction-ru.html">🇷🇺 - Russian</option>
+        </select>
+        <a class="home-link" href="https://translate.ezitech.io"
+          >Quay lại trang chủ</a
+        >
+      </div>
+    </header>
+    <!-- ═══ Sidebar overlay (mobile) ═══ -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <!-- ═══ Layout ═══ -->
+    <div class="layout">
+      <!-- ═══ Sidebar ═══ -->
+      <aside class="sidebar" id="sidebar">
+        <nav>
+          <div class="nav-group">
+            <div class="nav-group-title">Bắt đầu</div>
+            <a href="#installation">Cài đặt</a>
+            <a href="#supported-platforms">Nền tảng hỗ trợ</a>
+            <a href="#overview">Tổng quan tiện ích</a>
+          </div>
+          <div class="nav-group">
+            <div class="nav-group-title">Thiết lập API Key</div>
+            <a href="#soniox-key">Lấy API Key Soniox</a>
+            <a href="#openai-key">Lấy API Key OpenAI (không bắt buộc)</a>
+            <a href="#enter-keys">Nhập API Key vào tiện ích</a>
+          </div>
+          <div class="nav-group">
+            <div class="nav-group-title">License &amp; Pro</div>
+            <a href="#buy-license">Mua License Key</a>
+            <a href="#activate-license">Kích hoạt License</a>
+            <a href="#free-vs-pro">So sánh Free và Pro</a>
+          </div>
+          <div class="nav-group">
+            <div class="nav-group-title">Cách sử dụng cơ bản</div>
+            <a href="#start-translation">Bắt đầu phiên dịch</a>
+            <a href="#controls">Điều khiển: Tạm dừng, Tiếp tục, Kết thúc</a>
+            <a href="#language-selection">Đổi ngôn ngữ</a>
+            <a href="#microphone">Bật micro</a>
+            <a href="#font-size">Thay đổi cỡ chữ</a>
+          </div>
+          <div class="nav-group">
+            <div class="nav-group-title">Tính năng</div>
+            <a href="#speaker-names">Tên người nói</a>
+            <a href="#narration">Đọc bản dịch (Text-to-Speech)</a>
+            <a href="#youtube-caption-narration"
+              >Thuyết minh theo caption YouTube</a
+            >
+            <a href="#narrate-my-voice">Phát âm giọng tôi (Phiên dịch)</a>
+            <a href="#send-chat">Gửi bản dịch qua chat</a>
+            <a href="#subtitle-mode">Chế độ phụ đề</a>
+            <a href="#inline-assistant">Trợ lý AI tích hợp</a>
+            <a href="#context-setting">Cài đặt ngữ cảnh</a>
+            <a href="#download-transcript">Tải bản ghi</a>
+          </div>
+          <div class="nav-group">
+            <div class="nav-group-title">Thêm</div>
+            <a href="#auto-update">Tự động kiểm tra cập nhật</a>
+            <a href="#troubleshooting">Xử lý sự cố</a>
+            <a href="#contact">Liên hệ &amp; Hỗ trợ</a>
+          </div>
+        </nav>
+      </aside>
+      <!-- ═══ Content ═══ -->
+      <main class="content">
+        <!-- ────────────────────────────────────────── -->
+        <!-- GETTING STARTED                            -->
+        <!-- ────────────────────────────────────────── -->
+        <h2 id="installation">Cài đặt</h2>
+        <p class="section-intro">
+          Cài đặt tiện ích Live Translator trên các trình duyệt nhân Chromium
+          (Chrome, Edge, Brave, Arc, Opera, v.v.).
+        </p>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title">Cài từ Chrome Web Store</span>
+          <div class="step-body">
+            <p>
+              Mở trang chính thức của Live Translator:
+              <a
+                href="https://chromewebstore.google.com/detail/live-translator/pohbgdoejhnjneeokhfcfcpodhdllphh"
+                rel="noopener"
+                target="_blank"
+                >Live Translator trên Chrome Web Store</a
+              >, sau đó bấm <strong>Add to Chrome</strong> và xác nhận
+              <strong>Add extension</strong>.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Cài Live Translator từ Chrome Web Store"
+                src="./images/add-to-chrome.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="callout callout-note">
+          <div class="callout-label">Xong!</div>
+          <p>
+            Bạn sẽ thấy biểu tượng Live Translator xuất hiện trên thanh công cụ
+            trình duyệt. Tiện ích đã được cài đặt và sẵn sàng để thiết lập.
+          </p>
+        </div>
+        <hr class="section-divider" />
+        <!-- Supported Platforms -->
+        <h2 id="supported-platforms">Nền tảng hỗ trợ</h2>
+        <p class="section-intro">
+          Live Translator hoạt động trên các trang web và nền tảng dưới đây. Bạn
+          chỉ cần mở bất kỳ trang nào trong danh sách và bấm vào biểu tượng tiện
+          ích để bắt đầu dịch.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Nền tảng</th>
+              <th>Bạn có thể làm gì</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Google Meet</strong></td>
+              <td>Dịch cuộc họp, phát âm giọng bạn, gửi bản dịch qua chat</td>
+            </tr>
+            <tr>
+              <td><strong>Zoom (Web)</strong></td>
+              <td>Dịch cuộc họp, phát âm giọng bạn, gửi bản dịch qua chat</td>
+            </tr>
+            <tr>
+              <td><strong>Microsoft Teams (Web)</strong></td>
+              <td>Dịch cuộc họp, phát âm giọng bạn, gửi bản dịch qua chat</td>
+            </tr>
+            <tr>
+              <td><strong>YouTube</strong></td>
+              <td>Dịch video, tự động điền ngữ cảnh từ tiêu đề video</td>
+            </tr>
+            <tr>
+              <td><strong>WhatsApp Web</strong></td>
+              <td>Dịch cuộc gọi, phát âm giọng bạn</td>
+            </tr>
+            <tr>
+              <td><strong>Facebook</strong></td>
+              <td>Dịch video và livestream</td>
+            </tr>
+            <tr>
+              <td><strong>TikTok</strong></td>
+              <td>Dịch video</td>
+            </tr>
+            <tr>
+              <td><strong>Douyin</strong></td>
+              <td>Dịch video</td>
+            </tr>
+            <tr>
+              <td><strong>Vimeo</strong></td>
+              <td>Dịch video</td>
+            </tr>
+            <tr>
+              <td><strong>Dailymotion</strong></td>
+              <td>Dịch video</td>
+            </tr>
+            <tr>
+              <td><strong>Udemy</strong></td>
+              <td>Dịch video khóa học</td>
+            </tr>
+            <tr>
+              <td><strong>Domestika</strong></td>
+              <td>Dịch video khóa học</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="callout callout-tip">
+          <div class="callout-label">Mẹo</div>
+          <p>
+            Tiện ích thu <strong>âm thanh trực tiếp từ tab trình duyệt</strong>,
+            nên nó hoạt động với mọi âm thanh đang phát trên các trang được hỗ
+            trợ — bạn không cần phải thiết lập micro riêng để nghe âm thanh của
+            người khác.
+          </p>
+        </div>
+        <hr class="section-divider" />
+        <!-- Extension Overview -->
+        <h2 id="overview">Tổng quan tiện ích</h2>
+        <p class="section-intro">
+          Giới thiệu nhanh về giao diện chính và vị trí của từng phần.
+        </p>
+        <div class="img-placeholder" style="min-height: 200px">
+          <img
+            alt="Tổng quan tiện ích"
+            src="./images/extension-overview.png"
+            loading="lazy"
+          />
+        </div>
+        <p>Bảng điều khiển Live Translator gồm các phần chính sau:</p>
+        <ul>
+          <li>
+            <strong>Thanh tiêu đề</strong> — Nút cài đặt, nút chuyển sang chế độ
+            phụ đề, nút đóng. Nếu có bản cập nhật mới, sẽ hiện thông báo ở đây.
+          </li>
+          <li>
+            <strong>Chọn ngôn ngữ</strong> — Hai ô chọn: "Ngôn ngữ của tôi"
+            (ngôn ngữ bạn nói) và "Ngôn ngữ của họ" (ngôn ngữ bạn muốn dịch sang
+            tiếng bạn).
+          </li>
+          <li>
+            <strong>Khu vực hiển thị bản dịch</strong> — Nơi hiển thị văn bản
+            dịch theo thời gian thực, được phân theo từng người nói.
+          </li>
+          <li>
+            <strong>Thanh điều khiển</strong> — Nút Bắt đầu/Dừng/Tạm dừng,
+            bật/tắt micro, cài đặt đọc bản dịch, trợ lý AI, cỡ chữ, tải bản ghi,
+            và các tùy chọn khác.
+          </li>
+        </ul>
+        <div class="callout callout-tip">
+          <div class="callout-label">Mẹo</div>
+          <p>
+            Bạn có thể <strong>kéo bảng điều khiển</strong> bằng thanh tiêu đề
+            để di chuyển đến bất kỳ vị trí nào trên màn hình, và
+            <strong>thay đổi kích thước</strong> bằng cách kéo các cạnh. Như vậy
+            bảng sẽ không che mất nội dung quan trọng khi bạn đang họp hoặc xem
+            video.
+          </p>
+        </div>
+        <hr class="section-divider" />
+        <!-- ────────────────────────────────────────── -->
+        <!-- API KEYS SETUP                             -->
+        <!-- ────────────────────────────────────────── -->
+        <h2 id="soniox-key">Lấy API Key Soniox</h2>
+        <p class="section-intro">
+          Soniox là dịch vụ nhận dạng giọng nói và dịch thuật theo thời gian
+          thực. Bạn cần có API key của Soniox để sử dụng Live Translator.
+          <span class="badge badge-free">Bắt buộc</span>
+        </p>
+        <div class="callout callout-warn">
+          <div class="callout-label">Quan trọng</div>
+          <p>
+            API key Soniox là <strong>bắt buộc</strong> để tiện ích hoạt động.
+            Nếu không có, tiện ích sẽ không thể nhận diện giọng nói hay dịch bất
+            kỳ âm thanh nào.
+          </p>
+        </div>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title">Truy cập trang web Soniox</span>
+          <div class="step-body">
+            <p>
+              Mở
+              <a href="https://console.soniox.com/signup" target="_blank"
+                >https://console.soniox.com/signup</a
+              >
+              trên trình duyệt. Tạo tài khoản bằng email hoặc đăng nhập bằng
+              Google.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <span class="step-title">Lấy API key</span>
+          <div class="step-body">
+            <p>
+              Sau khi đăng nhập, vào phần API trên trang quản lý Soniox. Bạn
+              cũng có thể xem hướng dẫn chi tiết tại
+              <a
+                href="https://soniox.com/docs/stt/get-started#get-api-key"
+                target="_blank"
+                >trang hướng dẫn của Soniox</a
+              >.
+            </p>
+            <p>Sao chép API key — bạn sẽ cần nó ở các bước tiếp theo.</p>
+            <div class="img-placeholder">
+              <img
+                alt="Lấy API Key"
+                src="./images/create-soniox-api.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <span class="step-title"
+            >Thêm phương thức thanh toán (bắt buộc để dùng API)</span
+          >
+          <div class="step-body">
+            <p>
+              Thêm phương thức thanh toán vào tài khoản Soniox. Bạn có thể dùng
+              thẻ tín dụng, PayPal, hoặc các hình thức khác. Soniox API tính phí
+              theo mức sử dụng — bạn chỉ trả tiền cho phần mình dùng thôi.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Thêm phương thức thanh toán"
+                src="./images/payment-soniox.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="callout callout-tip">
+          <div class="callout-label">Lưu ý</div>
+          <p>
+            Bạn cần nạp tối thiểu $1 vào tài khoản để bắt đầu sử dụng API. Bạn
+            có thể nạp thêm nếu muốn.
+          </p>
+        </div>
+        <hr class="section-divider" />
+        <h2 id="openai-key">Lấy API Key OpenAI (không bắt buộc)</h2>
+        <p class="section-intro">
+          API key OpenAI là <strong>không bắt buộc</strong> — bạn chỉ cần nó nếu
+          muốn sử dụng giọng đọc cao cấp của OpenAI hoặc tính năng Trợ lý AI
+          tích hợp. <span class="badge badge-pro">Pro</span>
+        </p>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title">Truy cập trang OpenAI Platform</span>
+          <div class="step-body">
+            <p>
+              Mở
+              <a href="https://platform.openai.com/api-keys" target="_blank"
+                >https://platform.openai.com/api-keys</a
+              >
+              trên trình duyệt.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <span class="step-title">Tạo tài khoản hoặc đăng nhập</span>
+          <div class="step-body">
+            <p>
+              Nếu chưa có tài khoản OpenAI, bấm <strong>"Sign Up"</strong> để
+              tạo mới. Nếu đã có rồi, đăng nhập bình thường.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <span class="step-title">Tạo API key mới</span>
+          <div class="step-body">
+            <p>
+              Bấm <strong>"+ Create new secret key"</strong>, đặt tên ví dụ
+              "Live Translator", rồi bấm <strong>"Create secret key"</strong>.
+            </p>
+            <p>
+              <strong>Hãy sao chép và lưu key ngay lập tức</strong> — OpenAI chỉ
+              hiển thị key một lần duy nhất, sau đó bạn sẽ không xem lại được.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Tạo API Key OpenAI"
+                src="./images/openai-key.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">4</span>
+          <span class="step-title"
+            >Thêm phương thức thanh toán (bắt buộc để dùng API)</span
+          >
+          <div class="step-body">
+            <p>
+              Vào
+              <a
+                href="https://platform.openai.com/account/billing"
+                target="_blank"
+                >phần Billing (thanh toán)</a
+              >
+              và thêm phương thức thanh toán. OpenAI API cũng tính phí theo mức
+              sử dụng — bạn chỉ trả tiền cho phần mình dùng.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Thanh toán OpenAI"
+                src="./images/openai-billing.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="callout callout-note">
+          <div class="callout-label">Lưu ý</div>
+          <p>
+            Nếu bạn chỉ cần tính năng đọc bản dịch thành giọng nói, bạn có thể
+            dùng <strong>giọng đọc miễn phí của Google Translate</strong> mà
+            không cần API key nào. API key OpenAI chỉ cần thiết khi bạn muốn
+            dùng giọng đọc cao cấp của OpenAI hoặc tính năng Trợ lý AI.
+          </p>
+        </div>
+        <hr class="section-divider" />
+        <h2 id="enter-keys">Nhập API Key vào tiện ích</h2>
+        <p class="section-intro">
+          Sau khi có API key, hãy nhập chúng vào trang cài đặt của Live
+          Translator.
+        </p>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title">Mở cài đặt Live Translator</span>
+          <div class="step-body">
+            <p>Bạn có thể mở cài đặt bằng một trong các cách sau:</p>
+            <ul>
+              <li>
+                Bấm <strong>biểu tượng bánh răng</strong> (⚙) ở góc trên bên
+                phải bảng dịch.
+              </li>
+              <li>
+                Nhấp chuột phải vào biểu tượng Live Translator trên thanh công
+                cụ → chọn <strong>"Options"</strong>.
+              </li>
+              <li>
+                Vào trang quản lý tiện ích của trình duyệt → tìm Live Translator
+                → bấm <strong>"Details"</strong> →
+                <strong>"Extension options"</strong>.
+              </li>
+            </ul>
+            <div class="img-placeholder">
+              <img alt="Trang cài đặt" src="./images/gear.png" loading="lazy" />
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <span class="step-title">Nhập API key Soniox</span>
+          <div class="step-body">
+            <p>
+              Trong trang cài đặt, bấm vào <strong>"Soniox"</strong> ở thanh bên
+              trái. Dán API key Soniox vào ô nhập. Key sẽ được lưu tự động.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Cài đặt Soniox"
+                src="./images/enter-soniox-key.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <span class="step-title">Nhập API key OpenAI (không bắt buộc)</span>
+          <div class="step-body">
+            <p>
+              Bấm vào <strong>"OpenAI"</strong> ở thanh bên trái. Dán API key
+              OpenAI vào ô nhập. Key cũng được lưu tự động.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Cài đặt OpenAI"
+                src="./images/enter-openai-key.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="callout callout-note">
+          <div class="callout-label">Về bảo mật</div>
+          <p>
+            API key của bạn được lưu trữ
+            <strong>hoàn toàn trên máy bạn</strong> thông qua bộ nhớ bảo mật của
+            trình duyệt Chrome. Chúng không bao giờ được gửi đến máy chủ của
+            Live Translator — chỉ được dùng để kết nối trực tiếp với Soniox và
+            OpenAI mà thôi.
+          </p>
+        </div>
+        <hr class="section-divider" />
+        <!-- ────────────────────────────────────────── -->
+        <!-- LICENSE & PRO                              -->
+        <!-- ────────────────────────────────────────── -->
+        <h2 id="buy-license">Mua License Key</h2>
+        <p class="section-intro">
+          License key sẽ mở khóa các tính năng Pro như đọc bản dịch thành giọng
+          nói, tải file SRT, trợ lý AI, và nhiều tính năng khác.
+        </p>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title">Truy cập trang mua hàng</span>
+          <div class="step-body">
+            <p>
+              Vào trang chủ Live Translator tại
+              <a href="https://translate.ezitech.io/#pricing" target="_blank"
+                >https://translate.ezitech.io/#pricing</a
+              >
+              và kéo xuống phần <strong>Bảng giá</strong>, hoặc bấm vào link
+              <strong>"Purchase a license"</strong> trong trang cài đặt của tiện
+              ích.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Trang mua hàng"
+                src="./images/pricing.jpeg"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <span class="step-title">Chọn gói phù hợp</span>
+          <div class="step-body">
+            <p>Bạn có thể chọn:</p>
+            <ul>
+              <li><strong>Theo tháng</strong> — $5.99/tháng</li>
+              <li>
+                <strong>Theo năm</strong> — $59/năm (tiết kiệm khoảng 18%)
+              </li>
+            </ul>
+            <p>
+              Bạn có thể <strong>dùng thử miễn phí 7 ngày</strong> để trải
+              nghiệm các tính năng Pro. Sau khi hết thời gian dùng thử, bạn mua
+              license để tiếp tục sử dụng.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <span class="step-title">Hoàn tất thanh toán</span>
+          <div class="step-body">
+            <p>
+              Bạn sẽ được chuyển đến trang thanh toán Polar. Nhập email và thông
+              tin thanh toán, sau đó hoàn tất giao dịch.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Trang thanh toán"
+                src="./images/purchase.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">4</span>
+          <span class="step-title">Nhận license key qua email</span>
+          <div class="step-body">
+            <p>
+              Sau khi thanh toán, bạn sẽ nhận được
+              <strong>license key</strong> qua email. License key là một mã dài
+              có dạng <code>LT-XXXX-XXXX-XXXX-XXXX</code>. Hãy sao chép mã này.
+            </p>
+          </div>
+        </div>
+        <div class="callout callout-tip">
+          <div class="callout-label">Chính sách hoàn tiền</div>
+          <p>
+            Bạn có thể yêu cầu hoàn tiền trong vòng <strong>30 ngày</strong> kể
+            từ ngày thanh toán bằng cách liên hệ
+            <a href="mailto:phampdoan@gmail.com">phampdoan@gmail.com</a>.
+          </p>
+        </div>
+        <hr class="section-divider" />
+        <h2 id="activate-license">Kích hoạt License</h2>
+        <p class="section-intro">
+          Sau khi mua, hãy kích hoạt license key trong cài đặt tiện ích.
+        </p>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title">Nhập và kích hoạt license key</span>
+          <div class="step-body">
+            <p>
+              Mở cài đặt tiện ích (bấm biểu tượng bánh răng hoặc chuột phải →
+              Options). Bấm vào <strong>"License"</strong> ở thanh bên trái. Dán
+              license key vào ô nhập và bấm <strong>"Activate"</strong>. Tiện
+              ích sẽ xác minh license với máy chủ.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Kích hoạt License"
+                src="./images/enter-license-key.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <span class="step-title">Xác nhận kích hoạt thành công</span>
+          <div class="step-body">
+            <p>
+              Sau khi kích hoạt xong, bạn sẽ thấy trạng thái license, email liên
+              kết, và ngày hết hạn. Tất cả tính năng Pro đã được mở khóa.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Kích hoạt License"
+                src="./images/license-activated.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="callout callout-warn">
+          <div class="callout-label">Đổi thiết bị?</div>
+          <p>
+            Nếu trước đó bạn đã kích hoạt license trên thiết bị khác, bạn có thể
+            dùng tùy chọn <strong>"Force Activate"</strong> để chuyển license
+            sang thiết bị hiện tại. Mỗi license chỉ dùng được trên một thiết bị
+            tại một thời điểm.
+          </p>
+        </div>
+        <hr class="section-divider" />
+        <h2 id="free-vs-pro">So sánh Free và Pro</h2>
+        <p class="section-intro">
+          Dưới đây là những gì bạn dùng được với bản miễn phí và những gì cần
+          license Pro.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Tính năng</th>
+              <th>Free</th>
+              <th>Pro</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Dịch theo thời gian thực</td>
+              <td>✓</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Hỗ trợ 60+ ngôn ngữ</td>
+              <td>✓</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Hiển thị tên người nói</td>
+              <td>✓</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Kéo, thay đổi kích thước, thu nhỏ bảng</td>
+              <td>✓</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Thay đổi cỡ chữ</td>
+              <td>✓</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Tải bản ghi (TXT/JSON)</td>
+              <td>—</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Tải bản ghi (SRT)</td>
+              <td>—</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Đọc bản dịch của họ (TTS)</td>
+              <td>—</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Phát âm giọng tôi (Phiên dịch)</td>
+              <td>—</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Gửi bản dịch qua chat</td>
+              <td>—</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Chế độ phụ đề</td>
+              <td>—</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Trợ lý AI tích hợp</td>
+              <td>—</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Cài đặt ngữ cảnh</td>
+              <td>✓</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Tên người nói</td>
+              <td>✓</td>
+              <td>✓</td>
+            </tr>
+          </tbody>
+        </table>
+        <hr class="section-divider" />
+        <!-- ────────────────────────────────────────── -->
+        <!-- BASIC USAGE                                -->
+        <!-- ────────────────────────────────────────── -->
+        <h2 id="start-translation">Bắt đầu phiên dịch</h2>
+        <p class="section-intro">
+          Hướng dẫn cách bắt đầu dịch trong cuộc họp hoặc video.
+        </p>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title">Mở một trang web được hỗ trợ</span>
+          <div class="step-body">
+            <p>
+              Truy cập bất kỳ
+              <a href="#supported-platforms">nền tảng được hỗ trợ</a> nào (ví
+              dụ: Google Meet, Zoom, YouTube, v.v.) và tham gia cuộc họp hoặc mở
+              video.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <span class="step-title">Mở bảng Live Translator</span>
+          <div class="step-body">
+            <p>
+              Bấm vào <strong>biểu tượng Live Translator</strong> trên thanh
+              công cụ trình duyệt. Bảng dịch sẽ hiện ra trên trang. Bạn cũng có
+              thể bấm vào <strong>biểu tượng nổi</strong> xuất hiện trên trang.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Mở bảng dịch"
+                src="./images/floating-icon.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <span class="step-title">Chọn ngôn ngữ</span>
+          <div class="step-body">
+            <p>Dùng hai ô chọn ngôn ngữ ở đầu bảng:</p>
+            <ul>
+              <li>
+                <strong>"My language" (Ngôn ngữ của tôi)</strong> — Ngôn ngữ
+                <em>bạn</em> nói (ví dụ: Tiếng Việt).
+              </li>
+              <li>
+                <strong>"Their language" (Ngôn ngữ của họ)</strong> — Ngôn ngữ
+                <em>người khác</em> đang nói mà bạn muốn dịch (ví dụ: Tiếng
+                Anh).
+              </li>
+            </ul>
+            <div class="img-placeholder">
+              <img
+                alt="Chọn ngôn ngữ"
+                src="./images/language.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">4</span>
+          <span class="step-title">Bấm nút Bắt đầu</span>
+          <div class="step-body">
+            <p>
+              Bấm nút <strong>Start</strong> (biểu tượng ▶) trên thanh điều
+              khiển ở cuối bảng.
+            </p>
+            <p>
+              Trình duyệt có thể hỏi quyền thu âm thanh — bấm
+              <strong>"Allow" (Cho phép)</strong> và chọn tab bạn muốn thu âm.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Nút Bắt đầu"
+                src="./images/press-start.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">5</span>
+          <span class="step-title">Xem bản dịch theo thời gian thực</span>
+          <div class="step-body">
+            <p>
+              Khi có người nói, bạn sẽ thấy cả <strong>văn bản gốc</strong> và
+              <strong>bản dịch</strong> hiện ra trong khu vực hiển thị. Các dòng
+              sẽ tự động được nhóm theo từng người nói.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Dịch theo thời gian thực"
+                src="./images/translate-real.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="callout callout-tip">
+          <div class="callout-label">Tự động cuộn</div>
+          <p>
+            Bản ghi sẽ tự cuộn xuống để hiển thị nội dung mới nhất. Nếu bạn cuộn
+            lên để đọc lại phần trước, tính năng tự động cuộn sẽ tạm dừng. Bấm
+            nút <strong>"Scroll to latest" (Cuộn xuống cuối)</strong> để quay
+            lại phần mới nhất.
+          </p>
+        </div>
+        <hr class="section-divider" />
+        <h2 id="controls">Điều khiển: Tạm dừng, Tiếp tục, Kết thúc</h2>
+        <p class="section-intro">Tìm hiểu các nút điều khiển phiên dịch.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Nút</th>
+              <th>Chức năng</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Start — Bắt đầu</strong> (▶)</td>
+              <td>Bắt đầu phiên dịch mới. Xóa toàn bộ bản ghi trước đó.</td>
+            </tr>
+            <tr>
+              <td><strong>Pause — Tạm dừng</strong> (⏸)</td>
+              <td>
+                Tạm ngừng dịch. Bản ghi vẫn được giữ lại. Tiện ích vẫn thu âm
+                nhưng không hiển thị văn bản mới.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Resume — Tiếp tục</strong> (▶)</td>
+              <td>
+                Tiếp tục dịch sau khi tạm dừng. Văn bản mới sẽ hiện tiếp sau nội
+                dung trước đó.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>End — Kết thúc</strong> (⏹)</td>
+              <td>
+                Dừng hoàn toàn phiên dịch. Bản ghi vẫn hiển thị trên màn hình
+                cho đến khi bạn bắt đầu phiên mới. Ngừng thu âm, tắt micro và
+                tắt đọc bản dịch.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <hr class="section-divider" />
+        <h2 id="language-selection">Đổi ngôn ngữ</h2>
+        <p class="section-intro">
+          Bạn có thể thay đổi ngôn ngữ dịch bất cứ lúc nào.
+        </p>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title">Bấm vào ô chọn ngôn ngữ</span>
+          <div class="step-body">
+            <p>
+              Bấm vào ô <strong>"My language" (Ngôn ngữ của tôi)</strong> hoặc
+              <strong>"Their language" (Ngôn ngữ của họ)</strong> ở đầu bảng.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <span class="step-title">Chọn ngôn ngữ mới</span>
+          <div class="step-body">
+            <p>
+              Danh sách hỗ trợ <strong>hơn 60 ngôn ngữ</strong> được sắp xếp
+              theo thứ tự bảng chữ cái. Bạn có thể cuộn hoặc gõ để tìm kiếm. Bấm
+              vào ngôn ngữ muốn chọn.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <span class="step-title">Phiên dịch sẽ tự động khởi động lại</span>
+          <div class="step-body">
+            <p>
+              Nếu đang có phiên dịch hoạt động, việc đổi ngôn ngữ sẽ tự động
+              khởi động lại phiên dịch với cặp ngôn ngữ mới. Ngôn ngữ bạn chọn
+              sẽ được nhớ cho lần sau.
+            </p>
+          </div>
+        </div>
+        <hr class="section-divider" />
+        <h2 id="microphone">Bật micro</h2>
+        <p class="section-intro">
+          Bật micro để giọng nói của bạn cũng được dịch cùng với âm thanh của
+          cuộc họp/video.
+        </p>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title">Bấm nút micro</span>
+          <div class="step-body">
+            <p>
+              Trên thanh điều khiển, bấm vào <strong>biểu tượng micro</strong>.
+              Biểu tượng sẽ sáng lên khi micro đang bật.
+            </p>
+            <div class="img-placeholder">
+              <img alt="Nút micro" src="./images/micro.png" loading="lazy" />
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <span class="step-title">Cho phép truy cập micro</span>
+          <div class="step-body">
+            <p>
+              Nếu đây là lần đầu, trình duyệt sẽ hỏi quyền sử dụng micro. Bấm
+              <strong>"Allow" (Cho phép)</strong>.
+            </p>
+          </div>
+        </div>
+        <div class="callout callout-tip">
+          <div class="callout-label">Mẹo</div>
+          <p>
+            Micro <strong>mặc định ở trạng thái tắt</strong> khi bạn mở bảng
+            dịch. Chỉ bật khi bạn muốn giọng nói của mình cũng được nhận diện và
+            dịch. Khi bạn bấm <strong>End (Kết thúc)</strong>, micro sẽ tự động
+            tắt.
+          </p>
+        </div>
+        <hr class="section-divider" />
+        <h2 id="font-size">Thay đổi cỡ chữ</h2>
+        <p class="section-intro">Chỉnh cỡ chữ của bản dịch cho dễ đọc hơn.</p>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title">Bấm nút cỡ chữ</span>
+          <div class="step-body">
+            <p>
+              Trên thanh điều khiển, bấm vào <strong>nút cỡ chữ</strong> (biểu
+              tượng Aa). Sẽ hiện ra menu với ba lựa chọn:
+            </p>
+            <ul>
+              <li>
+                <strong>Small (Nhỏ)</strong> — Gọn gàng, hiển thị nhiều nội dung
+                hơn
+              </li>
+              <li>
+                <strong>Medium (Vừa)</strong> — Kích thước mặc định, cân đối
+              </li>
+              <li>
+                <strong>Large (Lớn)</strong> — Dễ đọc hơn khi ngồi xa màn hình
+              </li>
+            </ul>
+            <p>
+              Bấm vào cỡ chữ bạn muốn. Thay đổi sẽ được áp dụng ngay và nhớ cho
+              lần sau.
+            </p>
+            <div class="img-placeholder">
+              <img alt="Chọn cỡ chữ" src="./images/font.png" loading="lazy" />
+            </div>
+          </div>
+        </div>
+        <hr class="section-divider" />
+        <!-- ────────────────────────────────────────── -->
+        <!-- FEATURES                                   -->
+        <!-- ────────────────────────────────────────── -->
+        <h2 id="speaker-names">Tên người nói</h2>
+        <p class="section-intro">
+          Đặt tên thật cho từng người nói để dễ phân biệt ai nói gì trong bản
+          ghi. <span class="badge badge-free">Miễn phí</span>
+        </p>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title">Mở menu "More" (Thêm)</span>
+          <div class="step-body">
+            <p>
+              Trên thanh điều khiển, bấm nút <strong>"More"</strong> (biểu tượng
+              ⋯). Sau đó bấm nút <strong>"Speaker Settings"</strong>.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <span class="step-title">Mở hộp thoại "Speaker Settings"</span>
+          <div class="step-body">
+            <p>Hộp thoại cài đặt người nói sẽ mở ra.</p>
+            <div class="img-placeholder">
+              <img
+                alt="Hộp thoại cài đặt người nói"
+                src="./images/speaker.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <span class="step-title">Đặt tên cho từng người</span>
+          <div class="step-body">
+            <p>
+              Bạn sẽ thấy danh sách các người nói được nhận diện (Speaker 1,
+              Speaker 2, v.v.). Gõ tên thật bên cạnh (ví dụ: "Hùng", "Lan"). Bấm
+              <strong>"Add row"</strong> nếu cần thêm dòng.
+            </p>
+            <p>
+              Bấm <strong>"Save"</strong>. Toàn bộ bản ghi — cả phần trước và
+              sau — sẽ hiển thị tên bạn đã đặt.
+            </p>
+          </div>
+        </div>
+        <hr class="section-divider" />
+        <h2 id="narration">Đọc bản dịch (Text-to-Speech)</h2>
+        <p class="section-intro">
+          Để tiện ích đọc to bản dịch cho bạn nghe, thay vì phải đọc bằng mắt.
+          Đây là tính năng "Narrate Their Voice" (Đọc bản dịch của họ).
+          <span class="badge badge-pro">Pro</span>
+        </p>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title">Mở cài đặt đọc bản dịch</span>
+          <div class="step-body">
+            <p>
+              Trên thanh điều khiển, bấm <strong>nút đọc bản dịch</strong> (biểu
+              tượng loa). Hộp thoại cài đặt sẽ mở ra.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Cài đặt đọc bản dịch"
+                src="./images/narration-setting.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <span class="step-title">Chọn nhà cung cấp giọng đọc</span>
+          <div class="step-body">
+            <p>Chọn nguồn giọng đọc:</p>
+            <ul>
+              <li>
+                <strong>Google Translate</strong> (Miễn phí) — Không cần API
+                key. Giọng đọc chất lượng tốt, hỗ trợ hơn 60 ngôn ngữ.
+              </li>
+              <li>
+                <strong>OpenAI</strong> (Cao cấp) — Giọng đọc tự nhiên hơn, chất
+                lượng cao hơn. Cần có API key OpenAI.
+              </li>
+            </ul>
+            <p>
+              Chọn <strong>giọng đọc</strong> từ danh sách và bấm
+              <strong>"Test"</strong> để nghe thử.
+            </p>
+            <p>
+              Chỉnh <strong>tốc độ đọc</strong> và <strong>âm lượng</strong> nếu
+              cần.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <span class="step-title">Bật đọc bản dịch</span>
+          <div class="step-body">
+            <p>
+              Bấm nút <strong>"Narrate Their Voice"</strong> trong hộp thoại. Từ
+              giờ, mỗi khi có bản dịch mới xuất hiện, tiện ích sẽ đọc to cho bạn
+              nghe.
+            </p>
+            <p>
+              Để tắt, bấm lại nút đọc bản dịch và chọn <strong>"Stop"</strong>.
+            </p>
+          </div>
+        </div>
+        <hr class="section-divider" />
+        <h2 id="youtube-caption-narration">Thuyết minh theo caption YouTube</h2>
+        <p class="section-intro">
+          Dùng caption dịch của YouTube làm nguồn cho thuyết minh, để tiện ích
+          đọc đúng ngôn ngữ bạn đã chọn sẵn trên YouTube. Tính năng này có thể
+          giúp tiết kiệm tới <strong>99,9%</strong> chi phí Soniox khi dùng trên
+          YouTube. <span class="badge badge-pro">Pro</span>
+        </p>
+
+        <div class="callout callout-warn">
+          <div class="callout-label">Đúng thứ tự thao tác</div>
+          <p>
+            Để tính năng chạy đúng, bạn cần chọn ngôn ngữ caption trên YouTube
+            trước, rồi mới bật thuyết minh trong extension.
+          </p>
+        </div>
+
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title"
+            >Bật và chọn caption dịch trên YouTube trước</span
+          >
+          <div class="step-body">
+            <p>
+              Trong trình phát YouTube, bật caption và chọn ngôn ngữ caption
+              dịch bạn muốn nghe (ví dụ: tiếng Việt).
+            </p>
+            <div class="img-placeholder">
+              <img
+                src="./images/setting-caption.png"
+                alt="Narrate My Voice"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-number">2</span>
+          <span class="step-title"
+            >Bật tự nhận diện trong cài đặt Narration</span
+          >
+          <div class="step-body">
+            <p>
+              Mở cài đặt Narration của extension và bật
+              <strong>Auto detect translated caption</strong>.
+            </p>
+            <div class="img-placeholder">
+              <img
+                src="./images/auto-detect-ytb-caption.png"
+                alt="Narrate My Voice"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-number">3</span>
+          <span class="step-title">Bắt đầu thuyết minh</span>
+          <div class="step-body">
+            <p>
+              Bấm <strong>"Narrate Their Voice"</strong>. Hệ thống sẽ đọc theo
+              đúng ngôn ngữ caption dịch bạn đã chọn trên YouTube.
+            </p>
+          </div>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-label">Ví dụ</div>
+          <p>
+            Nếu bạn muốn nghe thuyết minh tiếng Việt, hãy bật caption tiếng Việt
+            trên YouTube trước. Sau đó bật
+            <strong>Auto detect translated caption</strong> và bấm
+            <strong>"Narrate Their Voice"</strong>.
+          </p>
+        </div>
+
+        <hr class="section-divider" />
+
+        <h2 id="narrate-my-voice">Phát âm giọng tôi (Chế độ phiên dịch)</h2>
+        <p class="section-intro">
+          Nói bằng ngôn ngữ của bạn và để tiện ích phát bản dịch giọng nói cho
+          những người khác trong cuộc họp nghe — giống như có một phiên dịch
+          viên riêng. <span class="badge badge-pro">Pro</span>
+        </p>
+        <div class="callout callout-warn">
+          <div class="callout-label">Yêu cầu</div>
+          <p>
+            Tính năng này hoạt động trên <strong>Google Meet</strong>,
+            <strong>Zoom (Web)</strong>,
+            <strong>Microsoft Teams (Web)</strong> và
+            <strong>WhatsApp Web</strong>. Bạn cần <strong>bật micro</strong> và
+            đang có phiên dịch <strong>đang chạy</strong>.
+          </p>
+        </div>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title">Mở cài đặt đọc bản dịch</span>
+          <div class="step-body">
+            <p>
+              Bấm <strong>nút đọc bản dịch</strong> trên thanh điều khiển để mở
+              hộp thoại cài đặt.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <span class="step-title"
+            >Thiết lập "Narrate My Voice" (Phát âm giọng tôi)</span
+          >
+          <div class="step-body">
+            <p>
+              Trong hộp thoại, tìm phần <strong>"Narrate My Voice"</strong>.
+              Chọn giọng đọc và nhà cung cấp (Google hoặc OpenAI). Bạn có thể
+              đặt <strong>giọng đọc khác nhau</strong> cho "My voice" (giọng
+              tôi) và "Their voice" (giọng họ).
+            </p>
+            <p>Bấm <strong>"Test"</strong> để nghe thử giọng đã chọn.</p>
+            <div class="img-placeholder">
+              <img
+                alt="Phát âm giọng tôi"
+                src="./images/my-voice-setting.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <span class="step-title">Bật "Narrate My Voice"</span>
+          <div class="step-body">
+            <p>
+              Bấm <strong>"Start Narrate My Voice"</strong>. Khi bạn nói, lời
+              của bạn sẽ được:
+            </p>
+            <ol>
+              <li>Chuyển thành văn bản bằng ngôn ngữ của bạn</li>
+              <li>Dịch sang ngôn ngữ đối phương</li>
+              <li>
+                Phát thành giọng nói trong cuộc họp để người kia nghe được bản
+                dịch
+              </li>
+            </ol>
+            <p>
+              Micro của bạn sẽ tự động tắt tạm khi đang phát bản dịch để tránh
+              bị vọng lại.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Bắt đầu phát âm giọng tôi"
+                src="./images/narrate-my-voice.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">4</span>
+          <span class="step-title">Tắt phát âm</span>
+          <div class="step-body">
+            <p>
+              Bấm nút đọc bản dịch và chọn <strong>"Stop"</strong>, hoặc bấm
+              <strong>End (Kết thúc)</strong> để dừng toàn bộ phiên (sẽ tự động
+              tắt phát âm luôn).
+            </p>
+          </div>
+        </div>
+        <div class="callout callout-note">
+          <div class="callout-label">Lưu ý</div>
+          <p>
+            Bạn chỉ có thể chạy
+            <strong>một chế độ đọc bản dịch tại một thời điểm</strong> — hoặc
+            "Narrate My Voice" (Phát âm giọng tôi) hoặc "Narrate Their Voice"
+            (Đọc bản dịch của họ), không chạy cả hai cùng lúc. Biểu tượng trên
+            thanh điều khiển sẽ thay đổi để cho bạn biết chế độ nào đang bật.
+          </p>
+        </div>
+        <hr class="section-divider" />
+        <h2 id="send-chat">Gửi bản dịch qua chat</h2>
+        <p class="section-intro">
+          Tự động gửi bản dịch lời nói của bạn thành tin nhắn văn bản trong
+          khung chat của cuộc họp. <span class="badge badge-pro">Pro</span>
+        </p>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title">Bật tính năng "Send via Chat"</span>
+          <div class="step-body">
+            <p>
+              Trên thanh điều khiển, tìm <strong>nút gửi chat</strong> (nằm cạnh
+              biểu tượng micro). Bấm vào để bật — nút sẽ chuyển sang
+              <strong>màu xanh</strong> khi đang hoạt động.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Gửi qua chat"
+                src="./images/send-via-chat.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <span class="step-title">Nói và bản dịch sẽ tự động gửi đi</span>
+          <div class="step-body">
+            <p>
+              Khi micro đang bật và phiên dịch đang chạy, mỗi khi bạn nói, văn
+              bản đã dịch sẽ tự động được điền vào khung chat của cuộc họp và
+              gửi đi.
+            </p>
+            <p>
+              Tính năng này hoạt động trên <strong>Google Meet</strong>,
+              <strong>Zoom (Web)</strong> và
+              <strong>Microsoft Teams (Web)</strong>.
+            </p>
+          </div>
+        </div>
+        <div class="callout callout-tip">
+          <div class="callout-label">Mẹo</div>
+          <p>
+            Tính năng này rất hữu ích khi nền tảng của bạn chưa hỗ trợ "Narrate
+            My Voice", hoặc khi bạn muốn vừa phát âm bản dịch VÀ gửi tin nhắn
+            chat cùng lúc.
+          </p>
+        </div>
+        <hr class="section-divider" />
+        <h2 id="subtitle-mode">Chế độ phụ đề</h2>
+        <p class="section-intro">
+          Chuyển sang thanh phụ đề gọn gàng kiểu phim, chỉ hiển thị bản dịch mới
+          nhất ở cuối màn hình. <span class="badge badge-pro">Pro</span>
+        </p>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title">Bật chế độ phụ đề</span>
+          <div class="step-body">
+            <p>
+              Trên thanh tiêu đề của bảng dịch, bấm vào
+              <strong>biểu tượng phụ đề</strong> (biểu tượng CC).
+            </p>
+            <p>
+              Bảng dịch đầy đủ sẽ được thay bằng một thanh phụ đề mỏng ở cuối
+              màn hình.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Chế độ phụ đề"
+                src="./images/subtitle.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <span class="step-title">Tùy chỉnh thanh phụ đề</span>
+          <div class="step-body">
+            <p>
+              Bấm <strong>biểu tượng cài đặt</strong> (bánh răng) trên thanh phụ
+              đề để chỉnh:
+            </p>
+            <ul>
+              <li>
+                <strong>Độ trong suốt</strong> — Kéo thanh trượt để thanh phụ đề
+                trong suốt hơn hoặc đậm hơn.
+              </li>
+              <li><strong>Cỡ chữ</strong> — Chọn nhỏ, vừa, hoặc lớn.</li>
+            </ul>
+            <p>
+              Bạn cũng có thể <strong>kéo</strong> thanh phụ đề để di chuyển, và
+              <strong>thay đổi kích thước</strong> bằng cách kéo các cạnh.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Cài đặt phụ đề"
+                src="./images/customize-subtitle-bar.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <span class="step-title">Thoát chế độ phụ đề</span>
+          <div class="step-body">
+            <p>
+              Bấm <strong>nút đóng</strong> (✕) trên thanh phụ đề để quay lại
+              bảng dịch đầy đủ.
+            </p>
+          </div>
+        </div>
+        <hr class="section-divider" />
+        <h2 id="inline-assistant">Trợ lý AI tích hợp</h2>
+        <p class="section-intro">
+          Nhận giải thích và gợi ý câu trả lời từ AI dựa trên nội dung cuộc trò
+          chuyện, ngay trong bản ghi. <span class="badge badge-pro">Pro</span>
+        </p>
+        <div class="callout callout-warn">
+          <div class="callout-label">Yêu cầu</div>
+          <p>
+            Trợ lý AI tích hợp cần có <strong>API key OpenAI</strong> đã được
+            nhập trong phần cài đặt.
+          </p>
+        </div>
+        <h3>Giải thích một dòng</h3>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title">Di chuột qua một dòng trong bản ghi</span>
+          <div class="step-body">
+            <p>
+              Khi bạn di chuột qua bất kỳ dòng nào trong bản ghi, sẽ hiện ra
+              <strong>biểu tượng AI</strong> (🤖).
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <span class="step-title">Bấm biểu tượng AI và chọn "Explain"</span>
+          <div class="step-body">
+            <p>
+              Trợ lý AI sẽ mở trong một cửa sổ riêng. Nó sẽ dựa vào toàn bộ ngữ
+              cảnh bản ghi và dòng bạn chọn để đưa ra giải thích chi tiết.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Giải thích"
+                src="./images/ai-explain.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <h3>Tạo câu trả lời gợi ý</h3>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title"
+            >Bấm biểu tượng AI và chọn "Generate Answer"</span
+          >
+          <div class="step-body">
+            <p>
+              Trợ lý AI sẽ tạo một câu trả lời gợi ý dựa trên nội dung cuộc trò
+              chuyện. AI còn có thể tìm kiếm trên web để đưa ra câu trả lời
+              chính xác hơn.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Tạo câu trả lời"
+                src="./images/ai-help-answer.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <h3>Mở bảng Trợ lý AI</h3>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title">Bấm nút Trợ lý trên thanh điều khiển</span>
+          <div class="step-body">
+            <p>
+              Bạn cũng có thể mở bảng Trợ lý AI trực tiếp từ
+              <strong>nút trợ lý</strong> (biểu tượng 🤖) trên thanh điều khiển.
+              Sẽ mở ra một cửa sổ chat có thể kéo thả, nơi bạn gõ bất kỳ câu hỏi
+              nào. Trợ lý có quyền truy cập vào toàn bộ bản ghi để hiểu ngữ
+              cảnh.
+            </p>
+            <div class="img-placeholder">
+              <img alt="Bảng Trợ lý AI" src="./images/ai.png" loading="lazy" />
+            </div>
+          </div>
+        </div>
+        <hr class="section-divider" />
+        <h2 id="context-setting">Cài đặt ngữ cảnh</h2>
+        <p class="section-intro">
+          Cung cấp thông tin về chủ đề cuộc trò chuyện để bản dịch chính xác
+          hơn. <span class="badge badge-free">Miễn phí</span>
+        </p>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title">Mở cài đặt ngữ cảnh</span>
+          <div class="step-body">
+            <p>
+              Bấm nút <strong>"More"</strong> (⋯) trên thanh điều khiển, sau đó
+              bấm <strong>"Context"</strong>.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Cài đặt ngữ cảnh"
+                src="./images/context.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <span class="step-title">Điền thông tin ngữ cảnh</span>
+          <div class="step-body">
+            <p>Bạn có thể cung cấp:</p>
+            <ul>
+              <li>
+                <strong>Lĩnh vực / Chủ đề</strong> — Cuộc trò chuyện nói về gì
+                (ví dụ: "Hội nghị y khoa", "Họp kỹ thuật phần mềm").
+              </li>
+              <li>
+                <strong>Thuật ngữ quan trọng</strong> — Các từ chuyên ngành, tên
+                riêng hoặc từ ngữ đặc thù khó nhận diện (ví dụ: "Kubernetes, API
+                gateway, microservices").
+              </li>
+              <li>
+                <strong>Thông tin người nói</strong> — Tên và vai trò của người
+                tham gia (ví dụ: "Bác sĩ Smith — bác sĩ tim mạch, đang thuyết
+                trình").
+              </li>
+            </ul>
+            <p>
+              Bấm <strong>"Apply"</strong> để gửi ngữ cảnh này cho hệ thống dịch
+              trong phiên hiện tại.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <span class="step-title">Lưu mẫu (không bắt buộc)</span>
+          <div class="step-body">
+            <p>
+              Nếu bạn thường họp về các chủ đề giống nhau, bấm
+              <strong>"Save Preset"</strong> để lưu ngữ cảnh hiện tại thành mẫu.
+              Lần sau chỉ cần chọn lại mẫu thay vì gõ lại từ đầu.
+            </p>
+            <p>
+              Bạn cũng có thể <strong>Import/Export</strong> (nhập/xuất) các mẫu
+              dưới dạng file JSON để chia sẻ hoặc sao lưu.
+            </p>
+          </div>
+        </div>
+        <div class="callout callout-tip">
+          <div class="callout-label">Tự động điền trên YouTube</div>
+          <p>
+            Khi dùng Live Translator trên <strong>YouTube</strong>, các trường
+            ngữ cảnh có thể được <strong>tự động điền</strong> từ tiêu đề và mô
+            tả video. Điều này giúp hệ thống dịch hiểu rõ hơn nội dung video
+            đang phát.
+          </p>
+        </div>
+        <hr class="section-divider" />
+        <h2 id="download-transcript">Tải bản ghi</h2>
+        <p class="section-intro">
+          Lưu bản ghi dịch thành file để xem lại sau hoặc dùng trong các công cụ
+          khác. <span class="badge badge-pro">Pro</span>
+        </p>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title">Bấm nút Tải xuống</span>
+          <div class="step-body">
+            <p>
+              Sau khi kết thúc phiên dịch (hoặc đang trong phiên dịch), bấm
+              <strong>nút tải xuống</strong> (biểu tượng ↓) trên thanh điều
+              khiển. Hộp thoại tải bản ghi sẽ mở ra.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Tải bản ghi"
+                src="./images/download-transcript.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <span class="step-title">Chọn định dạng file</span>
+          <div class="step-body">
+            <p>Chọn định dạng bạn muốn:</p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Định dạng</th>
+                  <th>Phù hợp khi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>TXT</strong></td>
+                  <td>
+                    File văn bản đơn giản với thời gian và tên người nói. Dễ đọc
+                    nhất.
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>JSON</strong></td>
+                  <td>
+                    Dữ liệu có cấu trúc. Phù hợp để xử lý bằng các công cụ hoặc
+                    chương trình khác.
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>SRT (Bản gốc)</strong></td>
+                  <td>
+                    File phụ đề chứa văn bản ngôn ngữ gốc. Dùng trong phần mềm
+                    chỉnh sửa video.
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>SRT (Bản dịch)</strong></td>
+                  <td>
+                    File phụ đề chứa bản dịch. Dùng trong phần mềm chỉnh sửa
+                    video.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <span class="step-title">Tải file về</span>
+          <div class="step-body">
+            <p>
+              Bấm nút tải xuống cho định dạng bạn chọn. File sẽ được tạo ngay
+              trên trình duyệt và lưu vào thư mục tải xuống mặc định.
+            </p>
+          </div>
+        </div>
+        <div class="callout callout-note">
+          <div class="callout-label">Bảo mật</div>
+          <p>
+            File bản ghi được tạo
+            <strong>hoàn toàn trên trình duyệt của bạn</strong>. Không có dữ
+            liệu bản ghi nào được gửi đi bất kỳ máy chủ nào trong quá trình tải
+            xuống.
+          </p>
+        </div>
+        <hr class="section-divider" />
+        <!-- ────────────────────────────────────────── -->
+        <!-- MORE                                       -->
+        <!-- ────────────────────────────────────────── -->
+        <h2 id="auto-update">Tự động kiểm tra cập nhật</h2>
+        <p class="section-intro">
+          Tiện ích sẽ tự động kiểm tra cập nhật mỗi khi bạn mở nó.
+        </p>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title">Để ý thông báo cập nhật</span>
+          <div class="step-body">
+            <p>
+              Khi có phiên bản mới, bạn sẽ thấy thông báo
+              <strong>"Update available"</strong> trên thanh tiêu đề của bảng
+              dịch.
+            </p>
+            <div class="img-placeholder">
+              <img
+                alt="Có bản cập nhật"
+                src="./images/update-badge.png"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <span class="step-title">Bấm để cập nhật</span>
+          <div class="step-body">
+            <p>
+              Bấm vào thông báo để mở trang Live Translator trên Chrome Web
+              Store và kiểm tra phiên bản mới nhất. Bản cài từ Store sẽ tự động
+              cập nhật sau khi có bản phát hành mới.
+            </p>
+          </div>
+        </div>
+        <hr class="section-divider" />
+        <h2 id="troubleshooting">Xử lý sự cố</h2>
+        <p class="section-intro">Các vấn đề thường gặp và cách khắc phục.</p>
+        <h3>Hiện thông báo "No Soniox API key"</h3>
+        <div class="step">
+          <span class="step-number">!</span>
+          <span class="step-title">Cách khắc phục</span>
+          <div class="step-body">
+            <p>
+              Bạn chưa nhập API key Soniox. Hãy xem phần
+              <a href="#enter-keys">Nhập API Key vào tiện ích</a> để thiết lập.
+            </p>
+          </div>
+        </div>
+        <h3>Không thu được âm thanh</h3>
+        <div class="step">
+          <span class="step-number">!</span>
+          <span class="step-title">Cách khắc phục</span>
+          <div class="step-body">
+            <ul>
+              <li>
+                Kiểm tra xem bạn đã bấm <strong>"Allow" (Cho phép)</strong> khi
+                trình duyệt hỏi quyền thu âm chưa.
+              </li>
+              <li>
+                Kiểm tra xem bạn đã chọn <strong>đúng tab</strong> cần chia sẻ
+                khi được hỏi chưa.
+              </li>
+              <li>Thử tải lại trang và mở lại tiện ích dịch.</li>
+              <li>Kiểm tra xem cuộc họp/video có đang phát âm thanh không.</li>
+            </ul>
+          </div>
+        </div>
+        <h3>Bản dịch không chính xác</h3>
+        <div class="step">
+          <span class="step-number">!</span>
+          <span class="step-title">Cách khắc phục</span>
+          <div class="step-body">
+            <ul>
+              <li>
+                Kiểm tra ô
+                <strong>"Their language" (Ngôn ngữ của họ)</strong> đã chọn đúng
+                ngôn ngữ đang được nói chưa.
+              </li>
+              <li>
+                Dùng <a href="#context-setting">Cài đặt ngữ cảnh</a> để cung cấp
+                thêm thông tin về chủ đề và các thuật ngữ quan trọng.
+              </li>
+              <li>
+                Đảm bảo âm thanh rõ ràng — tiếng ồn xung quanh có thể ảnh hưởng
+                đến độ chính xác.
+              </li>
+            </ul>
+          </div>
+        </div>
+        <h3>"Narrate My Voice" — người khác không nghe được bản dịch</h3>
+        <div class="step">
+          <span class="step-number">!</span>
+          <span class="step-title">Cách khắc phục</span>
+          <div class="step-body">
+            <ul>
+              <li>
+                Xác nhận bạn đang dùng
+                <strong>nền tảng được hỗ trợ</strong> (Google Meet, Zoom Web,
+                Teams Web, WhatsApp Web).
+              </li>
+              <li>
+                Kiểm tra phiên dịch <strong>đang chạy</strong> và
+                <strong>micro đang bật</strong>.
+              </li>
+              <li>
+                Kiểm tra bạn đã <strong>kích hoạt license Pro</strong> chưa.
+              </li>
+              <li>Thử tải lại trang cuộc họp và bắt đầu lại.</li>
+            </ul>
+          </div>
+        </div>
+        <h3>Tính năng OpenAI không hoạt động</h3>
+        <div class="step">
+          <span class="step-number">!</span>
+          <span class="step-title">Cách khắc phục</span>
+          <div class="step-body">
+            <ul>
+              <li>
+                Kiểm tra <strong>API key OpenAI</strong> đã được nhập đúng trong
+                <a href="#enter-keys">phần cài đặt</a> chưa.
+              </li>
+              <li>
+                Kiểm tra tài khoản OpenAI đã
+                <strong>thêm phương thức thanh toán</strong> và còn đủ số dư
+                chưa.
+              </li>
+              <li>
+                Nếu không cần dùng tính năng OpenAI, bạn có thể dùng
+                <strong>giọng đọc của Google Translate</strong> để thay thế
+                (miễn phí, không cần API key).
+              </li>
+            </ul>
+          </div>
+        </div>
+        <h3>Tiện ích không hiện trên trang web</h3>
+        <div class="step">
+          <span class="step-number">!</span>
+          <span class="step-title">Cách khắc phục</span>
+          <div class="step-body">
+            <ul>
+              <li>
+                Live Translator chỉ hoạt động trên
+                <a href="#supported-platforms">các nền tảng được hỗ trợ</a>.
+                Tiện ích sẽ không hiện trên các trang web khác.
+              </li>
+              <li>
+                Nếu trang web được hỗ trợ nhưng tiện ích không hiện, hãy thử
+                <strong>tải lại trang</strong>.
+              </li>
+              <li>
+                Kiểm tra tiện ích đã được <strong>bật</strong> trong trang quản
+                lý tiện ích của trình duyệt chưa.
+              </li>
+            </ul>
+          </div>
+        </div>
+        <hr class="section-divider" />
+        <h2 id="contact">Liên hệ &amp; Hỗ trợ</h2>
+        <p class="section-intro">Cần hỗ trợ? Có câu hỏi hay góp ý?</p>
+        <p>Liên hệ với nhà phát triển:</p>
+        <ul>
+          <li>
+            <strong>Email:</strong>
+            <a href="mailto:ezsolu.io@gmail.com">ezsolu.io@gmail.com</a>
+          </li>
+          <li>
+            <strong>Website:</strong>
+            <a href="https://translate.ezitech.io" target="_blank"
+              >https://translate.ezitech.io</a
+            >
+          </li>
+          <li>
+            <strong>WhatsApp:</strong>
+            <a href="https://wa.me/84355561599" target="_blank"
+              >+84 355 561 599</a
+            >
+          </li>
+          <li>
+            <strong>Telegram:</strong>
+            <a href="https://t.me/ezi_tech" target="_blank">EziTech</a>
+          </li>
+        </ul>
+        <div class="callout callout-tip">
+          <div class="callout-label">Rất mong nhận phản hồi</div>
+          <p>
+            Nếu bạn có ý tưởng về tính năng mới hoặc cải tiến, chúng tôi rất
+            muốn nghe từ bạn. Hãy gửi email với góp ý của bạn nhé!
+          </p>
+        </div>
+        <footer
+          style="
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid var(--c-border);
+            font-size: 0.82rem;
+            color: var(--c-text-secondary);
+          "
+        >
+          <p>
+            © 2026 Doan Pham. Live Translator là tiện ích trình duyệt độc lập,
+            không liên kết với Google, Zoom, Microsoft, Soniox hay OpenAI.
+          </p>
+        </footer>
+      </main>
+    </div>
+    <!-- ═══ Scripts ═══ -->
+    <script>
+      (function () {
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("sidebarOverlay");
+        const menuBtn = document.getElementById("menuBtn");
+        const languageSelect = document.getElementById("languageSelect");
+        const links = sidebar.querySelectorAll('a[href^="#"]');
+
+        if (menuBtn) {
+          menuBtn.addEventListener("click", function () {
+            sidebar.classList.toggle("open");
+            overlay.classList.toggle("open");
+          });
+        }
+
+        overlay.addEventListener("click", function () {
+          sidebar.classList.remove("open");
+          overlay.classList.remove("open");
+        });
+
+        if (languageSelect) {
+          const currentFile =
+            window.location.pathname.split("/").pop() || "instruction.html";
+          languageSelect.value =
+            currentFile in
+            {
+              "instruction.html": true,
+              "instruction-vi.html": true,
+              "instruction-zh.html": true,
+              "instruction-hi.html": true,
+              "instruction-es.html": true,
+              "instruction-fr.html": true,
+              "instruction-ar.html": true,
+              "instruction-pt.html": true,
+              "instruction-ru.html": true,
+            }
+              ? currentFile
+              : "instruction.html";
+
+          languageSelect.addEventListener("change", function (event) {
+            const target = event.target.value;
+            if (target) {
+              window.location.href = target;
+            }
+          });
+        }
+
+        links.forEach(function (link) {
+          link.addEventListener("click", function () {
+            sidebar.classList.remove("open");
+            overlay.classList.remove("open");
+          });
+        });
+
+        function setActive() {
+          var scrollY = window.scrollY || document.documentElement.scrollTop;
+          var current = null;
+          links.forEach(function (link) {
+            var id = link.getAttribute("href").slice(1);
+            var el = document.getElementById(id);
+            if (el && el.offsetTop - 100 <= scrollY) {
+              current = link;
+            }
+          });
+          links.forEach(function (l) {
+            l.classList.remove("active");
+          });
+          if (current) current.classList.add("active");
+        }
+
+        window.addEventListener("scroll", setActive, { passive: true });
+        setActive();
+      })();
+    </script>
+  </body>
 </html>
