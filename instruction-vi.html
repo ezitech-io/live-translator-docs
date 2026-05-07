@@ -549,6 +549,7 @@
             <div class="nav-group-title">Thiết lập API Key</div>
             <a href="#soniox-key">Lấy API Key Soniox</a>
             <a href="#openai-key">Lấy API Key OpenAI (không bắt buộc)</a>
+            <a href="#elevenlabs-key">Lấy API Key ElevenLabs (không bắt buộc)</a>
             <a href="#enter-keys">Nhập API Key vào tiện ích</a>
           </div>
           <div class="nav-group">
@@ -914,6 +915,71 @@
           </p>
         </div>
         <hr class="section-divider" />
+        <h2 id="elevenlabs-key">Lấy API Key ElevenLabs (không bắt buộc)</h2>
+        <p class="section-intro">
+          API key ElevenLabs là <strong>không bắt buộc</strong> — bạn cần nó nếu
+          muốn dùng giọng ElevenLabs cho "Đọc giọng của họ" hoặc "Đọc giọng của
+          tôi". <span class="badge badge-pro">Pro</span>
+        </p>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-title">Truy cập trang ElevenLabs</span>
+          <div class="step-body">
+            <p>
+              Mở
+              <a href="https://elevenlabs.io/sign-up" target="_blank"
+                >https://elevenlabs.io/sign-up</a
+              >
+              trên trình duyệt.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <span class="step-title">Tạo tài khoản hoặc đăng nhập</span>
+          <div class="step-body">
+            <p>
+              Tạo tài khoản ElevenLabs mới, hoặc đăng nhập nếu bạn đã có tài
+              khoản.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <span class="step-title">Tạo và sao chép API key</span>
+          <div class="step-body">
+            <p>
+              Vào trang
+              <a
+                href="https://elevenlabs.io/app/settings/api-keys"
+                target="_blank"
+                >API Keys</a
+              >, tạo key mới (hoặc dùng key có sẵn), rồi sao chép key để cấu
+              hình trong Live Translator.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">4</span>
+          <span class="step-title">Thiết lập gói hoặc tín dụng</span>
+          <div class="step-body">
+            <p>
+              Truy cập
+              <a href="https://elevenlabs.io/app/subscription" target="_blank"
+                >trang gói cước và thanh toán ElevenLabs</a
+              >
+              để đảm bảo tài khoản của bạn có gói hoặc tín dụng API còn hiệu lực.
+            </p>
+          </div>
+        </div>
+        <div class="callout callout-note">
+          <div class="callout-label">Lưu ý</div>
+          <p>
+            API key ElevenLabs và OpenAI đều không bắt buộc. Nếu không cần giọng
+            đọc cao cấp, bạn có thể dùng giọng Google mà không cần API key.
+          </p>
+        </div>
+        <hr class="section-divider" />
         <h2 id="enter-keys">Nhập API Key vào tiện ích</h2>
         <p class="section-intro">
           Sau khi có API key, hãy nhập chúng vào trang cài đặt của Live
@@ -978,14 +1044,24 @@
             </div>
           </div>
         </div>
+        <div class="step">
+          <span class="step-number">4</span>
+          <span class="step-title">Nhập API key ElevenLabs (không bắt buộc)</span>
+          <div class="step-body">
+            <p>
+              Bấm vào <strong>"ElevenLabs"</strong> ở thanh bên trái. Dán API key
+              ElevenLabs vào ô nhập. Key cũng được lưu tự động.
+            </p>
+          </div>
+        </div>
         <div class="callout callout-note">
           <div class="callout-label">Về bảo mật</div>
           <p>
             API key của bạn được lưu trữ
             <strong>hoàn toàn trên máy bạn</strong> thông qua bộ nhớ bảo mật của
             trình duyệt Chrome. Chúng không bao giờ được gửi đến máy chủ của
-            Live Translator — chỉ được dùng để kết nối trực tiếp với Soniox và
-            OpenAI mà thôi.
+            Live Translator — chỉ được dùng để kết nối trực tiếp với Soniox,
+            OpenAI và ElevenLabs mà thôi.
           </p>
         </div>
         <hr class="section-divider" />
